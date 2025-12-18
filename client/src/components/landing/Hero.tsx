@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import chartsImage from "@assets/generated_images/clean_calculator_charts_visualization.png";
+import chartsImage from "@assets/generated_images/clean_floating_charts_and_calculator_visualization.png";
 
 export function Hero() {
   const scrollToCalculator = () => {
@@ -59,7 +59,7 @@ export function Hero() {
              <img 
                src={chartsImage} 
                alt="Calculator with Charts" 
-               className="relative w-full h-auto object-contain rounded-2xl shadow-2xl border border-white/10 bg-white/5 backdrop-blur-md p-8"
+               className="relative w-full h-auto object-contain"
              />
           </div>
         </motion.div>
