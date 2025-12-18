@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import chartsImage from "@assets/generated_images/floating_charts_and_calculator_transparent.png";
+import chartsImage from "@assets/generated_images/clean_floating_charts_and_calculator_visualization.png";
 
 export function Hero() {
   const scrollToCalculator = () => {
