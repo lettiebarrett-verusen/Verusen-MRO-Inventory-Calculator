@@ -24,6 +24,13 @@ export function Calculator() {
     window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
   };
 
+  const handleReset = () => {
+    setStep("input");
+    setInputs(null);
+    setResults(null);
+    window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
+  };
+
   return (
     <div id="calculator-section" className="py-24 bg-white relative">
       <div className="container mx-auto px-4">
@@ -59,7 +66,7 @@ export function Calculator() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <ResultsView results={results} />
+              <ResultsView results={results} onReset={handleReset} />
             </motion.div>
           )}
         </AnimatePresence>

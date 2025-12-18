@@ -7,9 +7,10 @@ import { motion } from "framer-motion";
 
 interface ResultsViewProps {
   results: CalculationResult;
+  onReset: () => void;
 }
 
-export function ResultsView({ results }: ResultsViewProps) {
+export function ResultsView({ results, onReset }: ResultsViewProps) {
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
@@ -133,6 +134,9 @@ export function ResultsView({ results }: ResultsViewProps) {
           </Button>
           <Button size="lg" variant="ghost" className="h-12 px-8 text-muted-foreground">
             <Download className="mr-2 h-4 w-4" /> Download Results
+          </Button>
+          <Button size="lg" variant="ghost" onClick={onReset} className="h-12 px-8 text-muted-foreground">
+            Start Over
           </Button>
         </div>
       </div>
