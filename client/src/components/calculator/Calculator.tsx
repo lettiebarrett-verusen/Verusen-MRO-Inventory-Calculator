@@ -9,9 +9,11 @@ export function Calculator() {
   const [step, setStep] = useState<"input" | "lead" | "results">("input");
   const [inputs, setInputs] = useState<CalculatorInputs | null>(null);
   const [results, setResults] = useState<CalculationResult | null>(null);
+  const [totalInventoryValue, setTotalInventoryValue] = useState<number>(1000000);
 
   const handleInputComplete = (data: CalculatorInputs) => {
     setInputs(data);
+    setTotalInventoryValue(data.totalInventoryValue);
     setResults(calculateSavings(data));
     setStep("lead");
     window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
@@ -66,7 +68,7 @@ export function Calculator() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <ResultsView results={results} onReset={handleReset} />
+              <ResultsView results={results} onReset={handleReset} totalInventoryValue={totalInventoryValue} />
             </motion.div>
           )}
         </AnimatePresence>
