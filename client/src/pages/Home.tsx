@@ -7,13 +7,15 @@ export default function Home() {
     <div className="min-h-screen font-sans">
       <Hero />
       
+      <Calculator />
+
       {/* How It Works / Value Prop Section */}
       <section className="py-20 bg-muted/20">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-bold mb-4">Why It Matters</h2>
             <p className="text-lg text-muted-foreground">
-              Most organizations don’t realize how much inventory value is tied up across sites, SKUs, and material categories.
+              Most organizations don't realize how much inventory value is tied up across sites, SKUs, and material categories.
             </p>
           </div>
 
@@ -48,8 +50,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <Calculator />
 
       <footer className="bg-primary text-primary-foreground py-12 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
