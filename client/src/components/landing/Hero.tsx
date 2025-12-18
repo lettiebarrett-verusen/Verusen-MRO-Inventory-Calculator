@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import dashboardImage from "@assets/generated_images/mro_inventory_analytics_dashboard_with_charts.png";
+import chartsImage from "@assets/generated_images/clean_calculator_charts_visualization.png";
 
 export function Hero() {
   const scrollToCalculator = () => {
@@ -47,19 +47,19 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Dashboard Visual */}
+        {/* Charts & Calculator Visual */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="hidden lg:block relative"
         >
-          <div className="relative w-full aspect-square max-w-[500px] mx-auto">
-             <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/30 to-blue-600/30 rounded-2xl blur-3xl" />
+          <div className="relative w-full max-w-[500px] mx-auto">
+             <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-blue-600/20 rounded-2xl blur-3xl" />
              <img 
-               src={dashboardImage} 
-               alt="Inventory Analytics Dashboard" 
-               className="relative w-full h-full object-cover rounded-2xl shadow-2xl border border-white/10"
+               src={chartsImage} 
+               alt="Calculator with Charts" 
+               className="relative w-full h-auto object-contain rounded-2xl shadow-2xl border border-white/10 bg-white/5 backdrop-blur-md p-8"
              />
           </div>
         </motion.div>
