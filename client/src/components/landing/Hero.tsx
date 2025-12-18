@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import dashboardImage from "@assets/generated_images/mro_inventory_analytics_dashboard_with_charts.png";
 
 export function Hero() {
   const scrollToCalculator = () => {
@@ -46,7 +47,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Abstract Data Visual */}
+        {/* Dashboard Visual */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -54,21 +55,12 @@ export function Hero() {
           className="hidden lg:block relative"
         >
           <div className="relative w-full aspect-square max-w-[500px] mx-auto">
-             <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/30 to-blue-600/30 rounded-full blur-3xl animate-pulse" />
-             <div className="relative bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 shadow-2xl">
-                <div className="space-y-4">
-                  <div className="h-2 bg-white/10 rounded w-1/3"></div>
-                  <div className="h-8 bg-white/20 rounded w-3/4"></div>
-                  <div className="grid grid-cols-3 gap-4 mt-8">
-                    {[1,2,3].map(i => (
-                      <div key={i} className="h-24 rounded-lg bg-gradient-to-b from-white/10 to-transparent border border-white/5 p-4 flex flex-col justify-end">
-                        <div className="h-2 bg-accent/50 rounded w-1/2 mb-2"></div>
-                        <div className="h-4 bg-white/30 rounded w-full"></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-             </div>
+             <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/30 to-blue-600/30 rounded-2xl blur-3xl" />
+             <img 
+               src={dashboardImage} 
+               alt="Inventory Analytics Dashboard" 
+               className="relative w-full h-full object-cover rounded-2xl shadow-2xl border border-white/10"
+             />
           </div>
         </motion.div>
       </div>
