@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import chartsImage from "@assets/generated_images/inventory_optimization_journey_bar_chart.png";
+import chartsImage from "@assets/generated_images/clean_floating_charts_and_calculator_visualization.png";
 
 export function Hero() {
   const scrollToCalculator = () => {
@@ -47,7 +47,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Optimization Journey Visual */}
+        {/* Charts & Calculator Visual */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -58,7 +58,7 @@ export function Hero() {
              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-blue-600/20 rounded-2xl blur-3xl" />
              <img 
                src={chartsImage} 
-               alt="Inventory Optimization Journey" 
+               alt="Calculator with Charts" 
                className="relative w-full h-auto object-contain"
              />
           </div>
