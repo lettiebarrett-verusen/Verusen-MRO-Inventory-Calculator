@@ -25,7 +25,10 @@ const submitLeadSchema = z.object({
     deduplication: z.number(),
     obsoleteReduction: z.number(),
     totalReduction: z.number(),
-  }),
+  }).refine(data => {
+    const sum = data.activePercent + data.obsoletePercent + data.specialPercent;
+    return Math.abs(sum - 100) < 1;
+  }, { message: "Percentages must add up to 100%" }),
 });
 
 export async function registerRoutes(

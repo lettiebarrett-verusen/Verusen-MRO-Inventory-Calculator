@@ -21,7 +21,7 @@ export const leads = pgTable("leads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  email: text("email").notNull(),
+  email: text("email").notNull().unique(),
   company: text("company").notNull(),
   role: text("role").notNull(),
   hubspotSynced: text("hubspot_synced").default("pending"),
@@ -39,7 +39,7 @@ export type Lead = typeof leads.$inferSelect;
 
 export const calculations = pgTable("calculations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  leadId: varchar("lead_id").references(() => leads.id),
+  leadId: varchar("lead_id").references(() => leads.id).notNull(),
   siteCount: integer("site_count").notNull(),
   totalInventoryValue: real("total_inventory_value").notNull(),
   skuCount: integer("sku_count").notNull(),
