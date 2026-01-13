@@ -4,12 +4,56 @@ import { InputStep } from "./InputStep";
 import { LeadForm } from "./LeadForm";
 import { ResultsView } from "./ResultsView";
 import { type CalculatorInputs, type LeadInputs, calculateSavings, type CalculationResult } from "@/lib/calculator-logic";
+import { useMutation } from "@tanstack/react-query";
+
+async function submitLead(data: { lead: LeadInputs; calculation: CalculatorInputs & CalculationResult }) {
+  const response = await fetch("/api/leads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      lead: data.lead,
+      calculation: {
+        siteCount: data.calculation.siteCount,
+        totalInventoryValue: data.calculation.totalInventoryValue,
+        skuCount: data.calculation.skuCount,
+        activePercent: data.calculation.activePercent,
+        obsoletePercent: data.calculation.obsoletePercent,
+        specialPercent: data.calculation.specialPercent,
+        activeOptimization: data.calculation.activeOptimization,
+        networkOptimization: data.calculation.networkOptimization,
+        vmiDisposition: data.calculation.vmiDisposition,
+        deduplication: data.calculation.deduplication,
+        obsoleteReduction: data.calculation.obsoleteReduction,
+        totalReduction: data.calculation.totalReduction,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit lead");
+  }
+
+  return response.json();
+}
 
 export function Calculator() {
   const [step, setStep] = useState<"input" | "lead" | "results">("input");
   const [inputs, setInputs] = useState<CalculatorInputs | null>(null);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [totalInventoryValue, setTotalInventoryValue] = useState<number>(1000000);
+
+  const leadMutation = useMutation({
+    mutationFn: submitLead,
+    onSuccess: () => {
+      setStep("results");
+      window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
+    },
+    onError: (error) => {
+      console.error("Lead submission error:", error);
+      setStep("results");
+      window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
+    },
+  });
 
   const handleInputComplete = (data: CalculatorInputs) => {
     setInputs(data);
@@ -19,11 +63,13 @@ export function Calculator() {
     window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
   };
 
-  const handleLeadComplete = (data: LeadInputs) => {
-    // In a real app, we would submit 'data' and 'inputs' to an API here
-    console.log("Lead captured:", data);
-    setStep("results");
-    window.scrollTo({ top: document.getElementById('calculator-section')?.offsetTop, behavior: 'smooth' });
+  const handleLeadComplete = (leadData: LeadInputs) => {
+    if (!inputs || !results) return;
+    
+    leadMutation.mutate({
+      lead: leadData,
+      calculation: { ...inputs, ...results },
+    });
   };
 
   const handleReset = () => {
@@ -57,7 +103,11 @@ export function Calculator() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.4 }}
             >
-              <LeadForm onComplete={handleLeadComplete} onBack={() => setStep("input")} />
+              <LeadForm 
+                onComplete={handleLeadComplete} 
+                onBack={() => setStep("input")} 
+                isSubmitting={leadMutation.isPending}
+              />
             </motion.div>
           )}
 

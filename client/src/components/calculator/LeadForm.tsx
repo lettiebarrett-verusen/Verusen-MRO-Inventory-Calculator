@@ -9,9 +9,10 @@ import { ArrowRight, Lock } from "lucide-react";
 interface LeadFormProps {
   onComplete: (data: LeadInputs) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
-export function LeadForm({ onComplete, onBack }: LeadFormProps) {
+export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormProps) {
   const form = useForm<LeadInputs>({
     resolver: zodResolver(leadSchema),
   });
@@ -98,8 +99,8 @@ export function LeadForm({ onComplete, onBack }: LeadFormProps) {
             )}
           />
 
-          <Button type="submit" size="lg" className="w-full mt-6 h-12 text-lg">
-            Reveal My Savings <ArrowRight className="ml-2 w-5 h-5" />
+          <Button type="submit" size="lg" className="w-full mt-6 h-12 text-lg" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Reveal My Savings"} {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5" />}
           </Button>
 
           <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1 mt-4">

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -16,3 +16,49 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export const leads = pgTable("leads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  company: text("company").notNull(),
+  role: text("role").notNull(),
+  hubspotSynced: text("hubspot_synced").default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertLeadSchema = createInsertSchema(leads).omit({
+  id: true,
+  hubspotSynced: true,
+  createdAt: true,
+});
+
+export type InsertLead = z.infer<typeof insertLeadSchema>;
+export type Lead = typeof leads.$inferSelect;
+
+export const calculations = pgTable("calculations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  leadId: varchar("lead_id").references(() => leads.id),
+  siteCount: integer("site_count").notNull(),
+  totalInventoryValue: real("total_inventory_value").notNull(),
+  skuCount: integer("sku_count").notNull(),
+  activePercent: real("active_percent").notNull(),
+  obsoletePercent: real("obsolete_percent").notNull(),
+  specialPercent: real("special_percent").notNull(),
+  activeOptimization: real("active_optimization").notNull(),
+  networkOptimization: real("network_optimization").notNull(),
+  vmiDisposition: real("vmi_disposition").notNull(),
+  deduplication: real("deduplication").notNull(),
+  obsoleteReduction: real("obsolete_reduction").notNull(),
+  totalReduction: real("total_reduction").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCalculationSchema = createInsertSchema(calculations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCalculation = z.infer<typeof insertCalculationSchema>;
+export type Calculation = typeof calculations.$inferSelect;
