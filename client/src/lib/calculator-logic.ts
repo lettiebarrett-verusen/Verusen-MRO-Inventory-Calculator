@@ -29,13 +29,25 @@ const personalEmailDomains = [
   'ymail.com', 'inbox.com', 'mail.ru', 'qq.com', '163.com', '126.com'
 ];
 
+// Competitor domains to block
+const competitorDomains = [
+  'sparetech.io', 'sparetech.com', 'spare-tech.com',
+  'ibm.com',
+  'creactives.com', 'creactives.io'
+];
+
 export const leadSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
-  email: z.string().email("Invalid email address").refine((email) => {
-    const domain = email.split('@')[1]?.toLowerCase();
-    return domain && !personalEmailDomains.includes(domain);
-  }, "Please use your business email address"),
+  email: z.string().email("Invalid email address")
+    .refine((email) => {
+      const domain = email.split('@')[1]?.toLowerCase();
+      return domain && !personalEmailDomains.includes(domain);
+    }, "Please use your business email address")
+    .refine((email) => {
+      const domain = email.split('@')[1]?.toLowerCase();
+      return domain && !competitorDomains.includes(domain);
+    }, "This email domain is not allowed"),
   company: z.string().min(2, "Company name is required"),
   jobFunction: z.string().min(1, "Please select your function"),
 });
