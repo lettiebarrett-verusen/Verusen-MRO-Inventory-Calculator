@@ -42,7 +42,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold mb-4">Input Your Inventory Profile</h2>
+        <h2 className="text-3xl font-bold mb-4">Input Your MRO Inventory Profile</h2>
         <p className="text-muted-foreground">Enter a few high-level details to estimate your optimization potential.</p>
       </div>
 
