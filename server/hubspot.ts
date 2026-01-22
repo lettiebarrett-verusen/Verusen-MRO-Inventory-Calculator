@@ -68,8 +68,66 @@ interface CalculationData {
   totalReduction: number;
 }
 
+// HubSpot Form Configuration
+const HUBSPOT_PORTAL_ID = '2886100';
+const HUBSPOT_FORM_GUID = 'b34a5604-13b5-4746-b578-b469c5320b76';
+
+// Submit to HubSpot Forms API to track as a form submission
+async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData): Promise<{ success: boolean; error?: string }> {
+  try {
+    const formatCurrency = (val: number) => 
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+
+    const nameParts = lead.name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const formData = {
+      fields: [
+        { objectTypeId: '0-1', name: 'email', value: lead.email },
+        { objectTypeId: '0-1', name: 'firstname', value: firstName },
+        { objectTypeId: '0-1', name: 'lastname', value: lastName },
+        { objectTypeId: '0-1', name: 'company', value: lead.company },
+        { objectTypeId: '0-1', name: 'jobtitle', value: lead.role }
+      ],
+      context: {
+        pageUri: 'https://mro-calculator.replit.app/',
+        pageName: 'MRO Inventory Optimization Calculator'
+      }
+    };
+
+    const endpoint = `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`;
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('HubSpot Form API error:', errorData);
+      return { success: false, error: errorData };
+    }
+
+    console.log('Form submission tracked in HubSpot');
+    return { success: true };
+  } catch (error: any) {
+    console.error('HubSpot Form submission error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function syncLeadToHubSpot(lead: LeadData, calculation: CalculationData): Promise<{ success: boolean; contactId?: string; error?: string }> {
   try {
+    // First, submit to the HubSpot Form to track as a form fill
+    const formResult = await submitToHubSpotForm(lead, calculation);
+    if (!formResult.success) {
+      console.warn('Form submission failed, continuing with CRM sync:', formResult.error);
+    }
+
     const client = await getHubSpotClient();
     
     // Format currency for notes
