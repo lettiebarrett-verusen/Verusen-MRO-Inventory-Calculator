@@ -15,11 +15,13 @@ interface ResultsViewProps {
 export function ResultsView({ results, onReset, totalInventoryValue = 1000000, inputs, onInputsChange }: ResultsViewProps) {
   return (
     <div className="max-w-6xl mx-auto">
-      {inputs && onInputsChange && (
-        <CompactInputs inputs={inputs} onChange={onInputsChange} />
-      )}
-      
       <OptimizationJourney results={results} totalInventoryValue={totalInventoryValue} />
+      
+      {inputs && onInputsChange && (
+        <div className="mt-8">
+          <CompactInputs inputs={inputs} onChange={onInputsChange} />
+        </div>
+      )}
 
       {/* Value Reinforcement & CTA */}
       <div className="bg-muted/30 rounded-2xl p-8 md:p-12 text-center border border-border/50 mt-16">
