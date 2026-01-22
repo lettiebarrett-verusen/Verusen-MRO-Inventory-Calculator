@@ -1,7 +1,7 @@
 import { type CalculationResult } from "@/lib/calculator-logic";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { TrendingUp, TrendingDown, Network, Package, Layers } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
+import { TrendingUp, TrendingDown, Network, Package, Layers, Square } from "lucide-react";
 
 interface OptimizationJourneyProps {
   results: CalculationResult;
@@ -18,62 +18,67 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     return `$${val}`;
   };
 
-  const savingsBreakdown = [
+  const optimalInventory = totalInventoryValue - results.totalReduction;
+  const activeIncreases = results.activeOptimization * 0.4;
+  const activeDecreases = results.activeOptimization * 0.6;
+
+  const waterfallData = [
+    { name: "Starting", value: totalInventoryValue, color: "#1e3a5f", label: formatCompact(totalInventoryValue) },
+    { name: "Active+", value: activeIncreases, color: "#ef4444", label: `-${formatCompact(activeIncreases)}` },
+    { name: "Active-", value: activeDecreases, color: "#3b82f6", label: `-${formatCompact(activeDecreases)}` },
+    { name: "Network", value: results.networkOptimization, color: "#22c55e", label: `-${formatCompact(results.networkOptimization)}` },
+    { name: "VMI", value: results.vmiDisposition, color: "#f97316", label: `-${formatCompact(results.vmiDisposition)}` },
+    { name: "Dedup", value: results.deduplication, color: "#8b5cf6", label: `-${formatCompact(results.deduplication)}` },
+    { name: "Obsolete", value: results.obsoleteReduction, color: "#ec4899", label: `-${formatCompact(results.obsoleteReduction)}` },
+    { name: "Optimal", value: optimalInventory, color: "#1e3a5f", label: formatCompact(optimalInventory) }
+  ];
+
+  const breakdownItems = [
+    {
+      name: "Starting Inventory",
+      value: totalInventoryValue,
+      color: "#1e3a5f",
+      icon: Square,
+      description: null,
+      isTotal: true
+    },
     {
       name: "Active Material Value Increases",
-      shortName: "Active+",
-      value: results.activeOptimization * 0.4,
-      color: "#22c55e",
+      value: activeIncreases,
+      color: "#ef4444",
       icon: TrendingUp,
       description: "Reducing risk by increasing critical materials"
     },
     {
       name: "Active Material Value Decreases",
-      shortName: "Active-",
-      value: results.activeOptimization * 0.6,
+      value: activeDecreases,
       color: "#3b82f6",
       icon: TrendingDown,
       description: "Right-sizing active stock levels"
     },
     {
-      name: "Network Optimization & Transfers",
-      shortName: "Network",
-      value: results.networkOptimization,
-      color: "#8b5cf6",
-      icon: Network,
-      description: "Cross-site inventory balancing"
-    },
-    {
       name: "VMI Disposition",
-      shortName: "VMI",
       value: results.vmiDisposition,
       color: "#f97316",
       icon: Package,
       description: "Vendor-managed inventory opportunities"
     },
     {
-      name: "Deduplication Savings",
-      shortName: "Dedup",
-      value: results.deduplication,
-      color: "#ec4899",
-      icon: Layers,
-      description: "Eliminating duplicate safety stock"
-    },
-    {
       name: "Obsolete Reduction",
-      shortName: "Obsolete",
       value: results.obsoleteReduction,
-      color: "#ef4444",
+      color: "#ec4899",
       icon: TrendingDown,
       description: "Clearing dead and slow-moving stock"
+    },
+    {
+      name: "Optimal Inventory",
+      value: optimalInventory,
+      color: "#1e3a5f",
+      icon: Square,
+      description: null,
+      isTotal: true
     }
-  ].filter(item => item.value > 0);
-
-  const chartData = savingsBreakdown.map(item => ({
-    name: item.shortName,
-    value: item.value,
-    color: item.color
-  }));
+  ];
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -81,7 +86,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
           <p className="font-semibold text-sm">{data.name}</p>
-          <p className="text-lg font-bold" style={{ color: data.color }}>{formatCurrency(data.value)}</p>
+          <p className="text-lg font-bold" style={{ color: data.color }}>{data.label}</p>
         </div>
       );
     }
@@ -103,37 +108,33 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       <div>
         <Card className="border-border/50 bg-muted/30">
           <CardContent className="pt-8">
-            <div className="grid md:grid-cols-2 gap-8 items-start">
-              {/* Compact Bar Chart */}
-              <div className="h-64">
+            <div className="grid lg:grid-cols-2 gap-8 items-start">
+              {/* Waterfall Chart */}
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={chartData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
+                    data={waterfallData}
+                    margin={{ top: 30, right: 10, left: 10, bottom: 20 }}
                   >
                     <XAxis 
-                      type="number"
-                      tickFormatter={formatCompact}
+                      dataKey="name"
                       tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                       axisLine={{ stroke: "hsl(var(--border))" }}
-                    />
-                    <YAxis 
-                      type="category"
-                      dataKey="name"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      width={55}
-                      axisLine={false}
                       tickLine={false}
                     />
+                    <YAxis hide />
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(59, 130, 246, 0.05)" }} />
-                    <Bar 
-                      dataKey="value" 
-                      radius={[0, 4, 4, 0]}
-                    >
-                      {chartData.map((entry, index) => (
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                      {waterfallData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
+                      <LabelList 
+                        dataKey="label" 
+                        position="top" 
+                        fill="hsl(var(--foreground))"
+                        fontSize={9}
+                        fontWeight={600}
+                      />
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
@@ -141,19 +142,29 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
 
               {/* Breakdown List */}
               <div className="space-y-3">
-                {savingsBreakdown.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
+                {breakdownItems.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex items-center gap-3 p-3 rounded-lg ${item.isTotal ? 'bg-muted/50' : 'bg-background/50'} border border-border/30`}
+                  >
                     <div 
-                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" 
-                      style={{ backgroundColor: `${item.color}20` }}
+                      className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" 
+                      style={{ backgroundColor: item.isTotal ? item.color : `${item.color}20` }}
                     >
-                      <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                      <item.icon className="w-4 h-4" style={{ color: item.isTotal ? 'white' : item.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.description}</p>
+                      <p className={`text-sm font-medium ${item.isTotal ? 'text-foreground font-semibold' : 'text-foreground'}`}>
+                        {item.name}
+                      </p>
+                      {item.description && (
+                        <p className="text-xs text-muted-foreground">{item.description}</p>
+                      )}
                     </div>
-                    <p className="text-sm font-bold flex-shrink-0" style={{ color: item.color }}>
+                    <p 
+                      className={`text-sm font-bold flex-shrink-0 ${item.isTotal ? 'text-foreground' : ''}`} 
+                      style={{ color: item.isTotal ? undefined : item.color }}
+                    >
                       {formatCurrency(item.value)}
                     </p>
                   </div>
