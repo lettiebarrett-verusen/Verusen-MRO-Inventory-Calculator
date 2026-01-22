@@ -50,7 +50,6 @@ interface LeadData {
   name: string;
   email: string;
   company: string;
-  role: string;
   jobFunction: string;
 }
 
@@ -88,7 +87,6 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
         { name: 'firstname', value: firstName },
         { name: 'lastname', value: lastName },
         { name: 'company', value: lead.company },
-        { name: 'jobtitle', value: lead.role },
         { name: 'function', value: lead.jobFunction }
       ],
       context: {
@@ -200,7 +198,7 @@ TOTAL OPTIMIZATION OPPORTUNITY: ${formatCurrency(calculation.totalReduction)}
           firstname: firstName,
           lastname: lastName,
           company: lead.company,
-          jobtitle: lead.role
+          job_function: lead.jobFunction
         }
       });
     } else {
@@ -211,7 +209,7 @@ TOTAL OPTIMIZATION OPPORTUNITY: ${formatCurrency(calculation.totalReduction)}
           firstname: firstName,
           lastname: lastName,
           company: lead.company,
-          jobtitle: lead.role
+          job_function: lead.jobFunction
         }
       });
       contactId = createResponse.id;

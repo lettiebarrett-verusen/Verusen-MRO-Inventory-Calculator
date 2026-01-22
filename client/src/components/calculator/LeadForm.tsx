@@ -96,20 +96,6 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormP
 
           <FormField
             control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Job Title</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="VP of Supply Chain" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="jobFunction"
             render={({ field }) => (
               <FormItem>

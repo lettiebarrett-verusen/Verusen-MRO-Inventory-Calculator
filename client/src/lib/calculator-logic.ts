@@ -23,7 +23,6 @@ export const leadSchema = z.object({
   lastName: z.string().min(2, "Last name is required"),
   email: z.string().email("Invalid email address"),
   company: z.string().min(2, "Company name is required"),
-  role: z.string().min(2, "Job title is required"),
   jobFunction: z.string().min(1, "Please select your function"),
 });
 

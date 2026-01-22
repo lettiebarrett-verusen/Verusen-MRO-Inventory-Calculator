@@ -11,7 +11,6 @@ const submitLeadSchema = z.object({
     lastName: z.string().min(2),
     email: z.string().email(),
     company: z.string().min(2),
-    role: z.string().min(2),
     jobFunction: z.string().min(1),
   }),
   calculation: z.object({
@@ -59,7 +58,7 @@ export async function registerRoutes(
       // Sync to HubSpot using Replit connector
       const fullName = `${data.lead.firstName} ${data.lead.lastName}`;
       syncLeadToHubSpot(
-        { name: fullName, email: data.lead.email, company: data.lead.company, role: data.lead.role, jobFunction: data.lead.jobFunction },
+        { name: fullName, email: data.lead.email, company: data.lead.company, jobFunction: data.lead.jobFunction },
         data.calculation
       ).then(result => {
         if (result.success) {
@@ -94,7 +93,7 @@ export async function registerRoutes(
     console.log("Testing HubSpot form submission...");
     try {
       const result = await syncLeadToHubSpot(
-        { name: "Test User", email: "test@test.com", company: "Test Co", role: "Tester", jobFunction: "operations" },
+        { name: "Test User", email: "test@test.com", company: "Test Co", jobFunction: "operations" },
         { siteCount: 1, totalInventoryValue: 1000000, skuCount: 1000, activePercent: 50, obsoletePercent: 30, specialPercent: 20, activeOptimization: 10000, networkOptimization: 5000, vmiDisposition: 3000, deduplication: 2000, obsoleteReduction: 1000, totalReduction: 21000 }
       );
       console.log("HubSpot test result:", result);
