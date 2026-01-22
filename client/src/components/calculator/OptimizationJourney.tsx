@@ -151,6 +151,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     <div className="space-y-10">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
+          <img src="/verusen-logo.png" alt="Verusen" className="h-6 mb-3" />
           <h2 className="text-3xl font-bold pb-4 border-b-4 border-accent inline-block">
             MRO Inventory Optimizer
           </h2>
