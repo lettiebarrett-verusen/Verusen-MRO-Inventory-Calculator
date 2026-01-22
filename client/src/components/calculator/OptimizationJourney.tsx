@@ -1,7 +1,7 @@
 import { type CalculationResult } from "@/lib/calculator-logic";
 import { Card, CardContent } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { TrendingUp, TrendingDown, Network, Package, Layers } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
+import { TrendingUp, TrendingDown, Network, Package, Layers, CheckCircle2 } from "lucide-react";
 
 interface OptimizationJourneyProps {
   results: CalculationResult;
@@ -12,59 +12,90 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
-  const savingsBreakdown = [
+  const formatCompact = (val: number) => {
+    if (Math.abs(val) >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
+    if (Math.abs(val) >= 1000) return `$${(val / 1000).toFixed(0)}K`;
+    return `$${val}`;
+  };
+
+  const optimalInventory = totalInventoryValue - results.totalReduction;
+  const activeIncreases = results.activeOptimization * 0.4;
+  const activeDecreases = results.activeOptimization * 0.6;
+
+  const timelineData = [
     {
-      name: "Active Material Value Increases",
-      value: results.activeOptimization * 0.4,
+      name: "Starting\nInventory",
+      value: totalInventoryValue,
+      displayValue: formatCompact(totalInventoryValue),
+      color: "#1e3a5f",
+      icon: null,
+      isPositive: true
+    },
+    {
+      name: "Active\nIncreases",
+      value: activeIncreases,
+      displayValue: `+${formatCompact(activeIncreases)}`,
       color: "#22c55e",
       icon: TrendingUp,
-      description: "Improved forecasting on active items"
+      isPositive: true
     },
     {
-      name: "Active Material Value Decreases",
-      value: results.activeOptimization * 0.6,
+      name: "Active\nDecreases",
+      value: activeDecreases,
+      displayValue: `-${formatCompact(activeDecreases)}`,
       color: "#3b82f6",
       icon: TrendingDown,
-      description: "Right-sizing active stock levels"
+      isPositive: false
     },
     {
-      name: "Network Optimization & Transfers",
+      name: "Network\nOptimization",
       value: results.networkOptimization,
+      displayValue: `-${formatCompact(results.networkOptimization)}`,
       color: "#8b5cf6",
       icon: Network,
-      description: "Cross-site inventory balancing"
+      isPositive: false
     },
     {
-      name: "VMI Disposition",
+      name: "VMI\nDisposition",
       value: results.vmiDisposition,
+      displayValue: `-${formatCompact(results.vmiDisposition)}`,
       color: "#f97316",
       icon: Package,
-      description: "Vendor-managed inventory opportunities"
+      isPositive: false
     },
     {
-      name: "Deduplication Savings",
+      name: "Deduplication\nSavings",
       value: results.deduplication,
+      displayValue: `-${formatCompact(results.deduplication)}`,
       color: "#ec4899",
       icon: Layers,
-      description: "Eliminating duplicate safety stock"
+      isPositive: false
     },
     {
-      name: "Obsolete Reduction",
+      name: "Obsolete\nReduction",
       value: results.obsoleteReduction,
+      displayValue: `-${formatCompact(results.obsoleteReduction)}`,
       color: "#ef4444",
       icon: TrendingDown,
-      description: "Clearing dead and slow-moving stock"
+      isPositive: false
+    },
+    {
+      name: "Optimal\nInventory",
+      value: optimalInventory,
+      displayValue: formatCompact(optimalInventory),
+      color: "#06b6d4",
+      icon: CheckCircle2,
+      isPositive: true
     }
-  ].filter(item => item.value > 0);
+  ];
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg max-w-xs">
-          <p className="font-semibold text-sm text-primary">{data.name}</p>
-          <p className="text-lg font-bold" style={{ color: data.color }}>{formatCurrency(data.value)}</p>
-          <p className="text-xs text-muted-foreground mt-1">{data.description}</p>
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-semibold text-sm">{data.name.replace('\n', ' ')}</p>
+          <p className="text-lg font-bold" style={{ color: data.color }}>{data.displayValue}</p>
         </div>
       );
     }
@@ -73,68 +104,80 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
 
   return (
     <div className="space-y-10">
-      <div>
-        <h2 className="text-3xl font-bold mb-2 pb-4 border-b-4 border-accent inline-block">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <h2 className="text-3xl font-bold pb-4 border-b-4 border-accent inline-block">
           MRO Inventory Optimizer
         </h2>
+        <div className="text-right">
+          <p className="text-sm text-muted-foreground">Total Optimization Opportunity</p>
+          <p className="text-3xl font-extrabold text-primary">{formatCurrency(results.totalReduction)}</p>
+        </div>
       </div>
 
       <div>
-        {/* Total Savings & Donut Chart */}
-        <div>
-          <Card className="border-border/50 bg-muted/30">
-            <CardContent className="pt-8">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                {/* Donut Chart */}
-                <div className="h-72 relative">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={savingsBreakdown}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={70}
-                        outerRadius={110}
-                        paddingAngle={2}
-                        dataKey="value"
-                      >
-                        {savingsBreakdown.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-xs text-muted-foreground font-medium">TOTAL SAVINGS</p>
-                    <p className="text-2xl font-extrabold text-primary">{formatCurrency(results.totalReduction)}</p>
-                  </div>
-                </div>
+        <Card className="border-border/50 bg-muted/30">
+          <CardContent className="pt-8 pb-4">
+            <div className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={timelineData}
+                  margin={{ top: 30, right: 20, left: 20, bottom: 60 }}
+                >
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    interval={0}
+                    height={60}
+                    tickLine={false}
+                    axisLine={{ stroke: "hsl(var(--border))" }}
+                  />
+                  <YAxis 
+                    tickFormatter={formatCompact}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tickLine={false}
+                    axisLine={{ stroke: "hsl(var(--border))" }}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(59, 130, 246, 0.05)" }} />
+                  <Bar 
+                    dataKey="value" 
+                    radius={[6, 6, 0, 0]}
+                  >
+                    {timelineData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                    <LabelList 
+                      dataKey="displayValue" 
+                      position="top" 
+                      fill="hsl(var(--foreground))"
+                      fontSize={11}
+                      fontWeight={600}
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-                {/* Breakdown List */}
-                <div className="space-y-3">
-                  {savingsBreakdown.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center" 
-                        style={{ backgroundColor: `${item.color}20` }}
-                      >
-                        <item.icon className="w-5 h-5" style={{ color: item.color }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">{item.description}</p>
-                      </div>
-                      <p className="text-sm font-bold" style={{ color: item.color }}>
-                        {formatCurrency(item.value)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+            {/* Legend */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-6 border-t border-border/50">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: "#1e3a5f" }} />
+                <span className="text-xs text-muted-foreground">Starting Inventory</span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: "#22c55e" }} />
+                <span className="text-xs text-muted-foreground">Risk Reduction (Increases)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: "#8b5cf6" }} />
+                <span className="text-xs text-muted-foreground">Optimization Savings</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: "#06b6d4" }} />
+                <span className="text-xs text-muted-foreground">Optimal Inventory</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
