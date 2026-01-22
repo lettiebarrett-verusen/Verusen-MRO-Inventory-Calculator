@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/landing/Navbar";
-import { Hero } from "@/components/landing/Hero";
 import { Calculator } from "@/components/calculator/Calculator";
 import { CheckCircle2, TrendingUp, Network } from "lucide-react";
 
@@ -7,7 +6,6 @@ export default function Home() {
   return (
     <div className="min-h-screen font-sans">
       <Navbar />
-      <Hero />
       
       <Calculator />
 
