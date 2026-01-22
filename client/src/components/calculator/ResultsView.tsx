@@ -27,7 +27,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
       <div className="bg-muted/30 rounded-2xl p-8 md:p-12 text-center border border-border/50 mt-16">
         <h3 className="text-2xl font-bold mb-4">What's Next?</h3>
         <p className="max-w-2xl mx-auto text-muted-foreground mb-8">
-          Most organizations uncover significantly more value through a deeper discussion. Get a free MRO opportunity assessment or connect with our team today.
+          Most organizations underestimate how much inventory value is tied up across sites, SKUs, and material categories. A deeper conversation typically reveals even greater opportunity. Request a free MRO opportunity assessment or speak with our team today.
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
