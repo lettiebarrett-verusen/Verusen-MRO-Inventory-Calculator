@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertLeadSchema, insertCalculationSchema } from "@shared/schema";
 import { z } from "zod";
+import { syncLeadToHubSpot } from "./hubspot";
 
 const submitLeadSchema = z.object({
   lead: z.object({
@@ -54,8 +55,22 @@ export async function registerRoutes(
         ...data.calculation,
       });
 
-      syncToHubSpot(lead, data.calculation).catch(err => {
+      // Sync to HubSpot using Replit connector
+      const fullName = `${data.lead.firstName} ${data.lead.lastName}`;
+      syncLeadToHubSpot(
+        { name: fullName, email: data.lead.email, company: data.lead.company, role: data.lead.role },
+        data.calculation
+      ).then(result => {
+        if (result.success) {
+          storage.updateLeadHubspotStatus(lead.id, "synced");
+          console.log("Lead synced to HubSpot:", data.lead.email);
+        } else {
+          storage.updateLeadHubspotStatus(lead.id, "failed");
+          console.error("HubSpot sync failed:", result.error);
+        }
+      }).catch(err => {
         console.error("HubSpot sync failed:", err);
+        storage.updateLeadHubspotStatus(lead.id, "failed");
       });
 
       res.json({ 
@@ -90,46 +105,3 @@ export async function registerRoutes(
   return httpServer;
 }
 
-async function syncToHubSpot(lead: any, calculation: any) {
-  const hubspotApiKey = process.env.HUBSPOT_ACCESS_TOKEN;
-  
-  if (!hubspotApiKey) {
-    console.log("HubSpot API key not configured, skipping sync");
-    return;
-  }
-
-  try {
-    const response = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${hubspotApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        properties: {
-          email: lead.email,
-          firstname: lead.firstName,
-          lastname: lead.lastName,
-          company: lead.company,
-          jobtitle: lead.role,
-          inventory_value: calculation.totalInventoryValue,
-          optimization_opportunity: calculation.totalReduction,
-          site_count: calculation.siteCount,
-          sku_count: calculation.skuCount,
-        },
-      }),
-    });
-
-    if (response.ok) {
-      await storage.updateLeadHubspotStatus(lead.id, "synced");
-      console.log("Lead synced to HubSpot:", lead.email);
-    } else {
-      const error = await response.text();
-      console.error("HubSpot API error:", error);
-      await storage.updateLeadHubspotStatus(lead.id, "failed");
-    }
-  } catch (error) {
-    console.error("HubSpot sync error:", error);
-    await storage.updateLeadHubspotStatus(lead.id, "failed");
-  }
-}
