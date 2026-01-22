@@ -12,9 +12,6 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
-  const shortTermRealization = results.totalReduction * 0.35;
-  const longTermPotential = results.totalReduction * 0.65;
-
   const savingsBreakdown = [
     {
       name: "Active Material Value Increases",
@@ -82,9 +79,9 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
         </h2>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div>
         {/* Total Savings & Donut Chart */}
-        <div className="lg:col-span-2">
+        <div>
           <Card className="border-border/50 bg-muted/30">
             <CardContent className="pt-8">
               <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -133,42 +130,6 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
                       </p>
                     </div>
                   ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Summary Card */}
-        <div>
-          <Card className="bg-primary text-primary-foreground border-none h-full">
-            <CardContent className="pt-8 space-y-6">
-              <div>
-                <div className="text-5xl font-extrabold mb-2">{formatCurrency(results.totalReduction)}</div>
-                <p className="text-blue-100 font-semibold">Optimization Opportunity</p>
-              </div>
-
-              <div className="space-y-4 pt-4 border-t border-white/20">
-                <div>
-                  <p className="text-sm text-blue-200 mb-2 font-semibold">
-                    {formatCurrency(shortTermRealization)} Realized in &lt;12 months
-                  </p>
-                  <ul className="text-xs text-blue-100 space-y-1">
-                    <li>✓ Acceptance of recommendations (site and network level stocking policies)</li>
-                    <li>✓ Leverage of the Verusen Trusted Ecosystem</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="text-sm text-blue-200 mb-2 font-semibold">
-                    {formatCurrency(longTermPotential)}+ Long Term Potential
-                  </p>
-                  <ul className="text-xs text-blue-100 space-y-1">
-                    <li>✓ Continued network/spare parts sharing</li>
-                    <li>✓ Realizing burndown on slower moving inventory</li>
-                    <li>✓ Continued rundown of nonstock</li>
-                    <li>✓ Ongoing repositioning of SLOB targeting additional value</li>
-                  </ul>
                 </div>
               </div>
             </CardContent>
