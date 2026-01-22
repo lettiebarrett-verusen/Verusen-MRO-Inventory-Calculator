@@ -32,7 +32,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
 
         <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
           <Button size="lg" className="h-12 px-8">
-            <FileText className="mr-2 h-4 w-4" /> Request an MRO Opportunity Assessment
+            <FileText className="mr-2 h-4 w-4" /> Get an MRO Opportunity Assessment
           </Button>
           <Button size="lg" variant="outline" className="h-12 px-8">
             <Phone className="mr-2 h-4 w-4" /> Talk to an Expert
