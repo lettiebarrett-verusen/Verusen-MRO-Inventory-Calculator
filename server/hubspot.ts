@@ -51,6 +51,7 @@ interface LeadData {
   email: string;
   company: string;
   role: string;
+  jobFunction: string;
 }
 
 interface CalculationData {
@@ -88,7 +89,7 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
         { name: 'lastname', value: lastName },
         { name: 'company', value: lead.company },
         { name: 'jobtitle', value: lead.role },
-        { name: 'function', value: lead.role }
+        { name: 'function', value: lead.jobFunction }
       ],
       context: {
         pageUri: 'https://mro-calculator.replit.app/',

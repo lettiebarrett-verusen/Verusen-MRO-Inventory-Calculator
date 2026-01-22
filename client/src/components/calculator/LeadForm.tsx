@@ -6,6 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
 
+const JOB_FUNCTIONS = [
+  { value: "operations", label: "Operations" },
+  { value: "procurement", label: "Procurement" },
+  { value: "supply_chain", label: "Supply Chain" },
+  { value: "maintenance", label: "Maintenance" },
+  { value: "finance", label: "Finance" },
+  { value: "engineering", label: "Engineering" },
+  { value: "it", label: "Information Technology" },
+  { value: "executive", label: "Executive/C-Suite" },
+  { value: "other", label: "Other" },
+];
+
 interface LeadFormProps {
   onComplete: (data: LeadInputs) => void;
   onBack: () => void;
@@ -93,6 +105,30 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormP
                 <FormLabel>Job Title</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="VP of Supply Chain" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="jobFunction"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Function</FormLabel>
+                <FormControl>
+                  <select 
+                    {...field}
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Select your function</option>
+                    {JOB_FUNCTIONS.map((fn) => (
+                      <option key={fn.value} value={fn.value}>
+                        {fn.label}
+                      </option>
+                    ))}
+                  </select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
