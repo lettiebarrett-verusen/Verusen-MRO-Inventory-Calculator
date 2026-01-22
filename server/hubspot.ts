@@ -207,7 +207,7 @@ TOTAL OPTIMIZATION OPPORTUNITY: ${formatCurrency(calculation.totalReduction)}
           firstname: firstName,
           lastname: lastName,
           company: lead.company,
-          job_function: lead.jobFunction
+          function: lead.jobFunction
         }
       });
     } else {
@@ -218,7 +218,7 @@ TOTAL OPTIMIZATION OPPORTUNITY: ${formatCurrency(calculation.totalReduction)}
           firstname: firstName,
           lastname: lastName,
           company: lead.company,
-          job_function: lead.jobFunction
+          function: lead.jobFunction
         }
       });
       contactId = createResponse.id;
