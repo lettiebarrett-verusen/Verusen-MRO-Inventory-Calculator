@@ -88,6 +88,22 @@ export async function registerRoutes(
     }
   });
 
+  // Test endpoint for HubSpot form submission
+  app.get("/api/test-hubspot-form", async (req, res) => {
+    console.log("Testing HubSpot form submission...");
+    try {
+      const result = await syncLeadToHubSpot(
+        { name: "Test User", email: "test@test.com", company: "Test Co", role: "Tester" },
+        { siteCount: 1, totalInventoryValue: 1000000, skuCount: 1000, activePercent: 50, obsoletePercent: 30, specialPercent: 20, activeOptimization: 10000, networkOptimization: 5000, vmiDisposition: 3000, deduplication: 2000, obsoleteReduction: 1000, totalReduction: 21000 }
+      );
+      console.log("HubSpot test result:", result);
+      res.json({ success: true, result });
+    } catch (error: any) {
+      console.error("HubSpot test error:", error);
+      res.json({ success: false, error: error.message });
+    }
+  });
+
   app.get("/api/leads/:id", async (req, res) => {
     try {
       const lead = await storage.getLead(req.params.id);

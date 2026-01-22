@@ -87,7 +87,8 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
         { name: 'firstname', value: firstName },
         { name: 'lastname', value: lastName },
         { name: 'company', value: lead.company },
-        { name: 'jobtitle', value: lead.role }
+        { name: 'jobtitle', value: lead.role },
+        { name: 'function', value: lead.role }
       ],
       context: {
         pageUri: 'https://mro-calculator.replit.app/',
