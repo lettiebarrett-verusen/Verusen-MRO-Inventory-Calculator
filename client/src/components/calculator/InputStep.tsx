@@ -10,6 +10,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
+function formatNumberWithCommas(value: number | string): string {
+  const num = typeof value === 'string' ? parseFloat(value.replace(/,/g, '')) : value;
+  if (isNaN(num)) return '';
+  return num.toLocaleString('en-US');
+}
+
+function parseFormattedNumber(value: string): number {
+  const cleaned = value.replace(/,/g, '');
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+}
+
 interface InputStepProps {
   onComplete: (data: CalculatorInputs) => void;
   defaultValues?: Partial<CalculatorInputs>;
@@ -59,9 +71,10 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                       <FormLabel>Number of Sites</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          {...field} 
-                          onChange={e => field.onChange(Number(e.target.value))}
+                          type="text"
+                          inputMode="numeric"
+                          value={formatNumberWithCommas(field.value)}
+                          onChange={e => field.onChange(parseFormattedNumber(e.target.value))}
                           className="text-lg font-medium"
                         />
                       </FormControl>
@@ -84,9 +97,10 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                         <div className="relative">
                           <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
                           <Input 
-                            type="number" 
-                            {...field} 
-                            onChange={e => field.onChange(Number(e.target.value))}
+                            type="text"
+                            inputMode="numeric"
+                            value={formatNumberWithCommas(field.value)}
+                            onChange={e => field.onChange(parseFormattedNumber(e.target.value))}
                             className="text-lg font-medium pl-8"
                           />
                         </div>
@@ -108,9 +122,10 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                       <FormLabel>Approx. SKU Count</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          {...field} 
-                          onChange={e => field.onChange(Number(e.target.value))}
+                          type="text"
+                          inputMode="numeric"
+                          value={formatNumberWithCommas(field.value)}
+                          onChange={e => field.onChange(parseFormattedNumber(e.target.value))}
                           className="text-lg font-medium"
                         />
                       </FormControl>
