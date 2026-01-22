@@ -42,10 +42,6 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
           </Button>
         </div>
       </div>
-      
-      <p className="text-center text-xs text-muted-foreground mt-8">
-        * Estimates are based on industry benchmarks and high-level inputs. Actual results may vary based on data quality and operational constraints.
-      </p>
     </div>
   );
 }

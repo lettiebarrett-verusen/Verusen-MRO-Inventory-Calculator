@@ -235,6 +235,9 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
             </div>
           </CardContent>
         </Card>
+        <p className="text-center text-xs text-muted-foreground mt-4">
+          * Estimates are based on industry benchmarks and high-level inputs. Actual results may vary based on data quality and operational constraints.
+        </p>
       </div>
     </div>
   );
