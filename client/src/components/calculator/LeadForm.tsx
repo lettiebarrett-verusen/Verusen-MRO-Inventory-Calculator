@@ -99,7 +99,7 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormP
             name="jobFunction"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Function</FormLabel>
+                <FormLabel>Job Function</FormLabel>
                 <FormControl>
                   <select 
                     {...field}
