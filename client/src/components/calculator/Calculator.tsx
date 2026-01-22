@@ -72,6 +72,17 @@ export function Calculator() {
     });
   };
 
+  const handleInputsChange = (newInputs: CalculatorInputs) => {
+    const totalPct = newInputs.activePercent + newInputs.obsoletePercent + newInputs.specialPercent;
+    if (Math.abs(totalPct - 100) < 1 && newInputs.totalInventoryValue >= 1000 && newInputs.siteCount >= 1) {
+      setInputs(newInputs);
+      setTotalInventoryValue(newInputs.totalInventoryValue);
+      setResults(calculateSavings(newInputs));
+    } else {
+      setInputs(newInputs);
+    }
+  };
+
   const handleReset = () => {
     setStep("input");
     setInputs(null);
@@ -111,14 +122,20 @@ export function Calculator() {
             </motion.div>
           )}
 
-          {step === "results" && results && (
+          {step === "results" && results && inputs && (
             <motion.div 
               key="results"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <ResultsView results={results} onReset={handleReset} totalInventoryValue={totalInventoryValue} />
+              <ResultsView 
+                results={results} 
+                onReset={handleReset} 
+                totalInventoryValue={totalInventoryValue}
+                inputs={inputs}
+                onInputsChange={handleInputsChange}
+              />
             </motion.div>
           )}
         </AnimatePresence>

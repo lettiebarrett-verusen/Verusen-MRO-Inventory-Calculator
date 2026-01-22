@@ -1,17 +1,24 @@
-import { type CalculationResult } from "@/lib/calculator-logic";
+import { type CalculationResult, type CalculatorInputs } from "@/lib/calculator-logic";
 import { Button } from "@/components/ui/button";
 import { Download, Phone, FileText } from "lucide-react";
 import { OptimizationJourney } from "./OptimizationJourney";
+import { CompactInputs } from "./CompactInputs";
 
 interface ResultsViewProps {
   results: CalculationResult;
   onReset: () => void;
   totalInventoryValue?: number;
+  inputs?: CalculatorInputs;
+  onInputsChange?: (inputs: CalculatorInputs) => void;
 }
 
-export function ResultsView({ results, onReset, totalInventoryValue = 1000000 }: ResultsViewProps) {
+export function ResultsView({ results, onReset, totalInventoryValue = 1000000, inputs, onInputsChange }: ResultsViewProps) {
   return (
     <div className="max-w-6xl mx-auto">
+      {inputs && onInputsChange && (
+        <CompactInputs inputs={inputs} onChange={onInputsChange} />
+      )}
+      
       <OptimizationJourney results={results} totalInventoryValue={totalInventoryValue} />
 
       {/* Value Reinforcement & CTA */}
