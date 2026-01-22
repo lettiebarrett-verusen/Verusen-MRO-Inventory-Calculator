@@ -1,7 +1,7 @@
 import { type CalculationResult } from "@/lib/calculator-logic";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
-import { TrendingUp, TrendingDown, Network, Package, Layers, Square } from "lucide-react";
+import { TrendingUp, TrendingDown, Package } from "lucide-react";
 
 interface OptimizationJourneyProps {
   results: CalculationResult;
@@ -35,14 +35,6 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
 
   const breakdownItems = [
     {
-      name: "Starting Inventory",
-      value: totalInventoryValue,
-      color: "#1e3a5f",
-      icon: Square,
-      description: null,
-      isTotal: true
-    },
-    {
       name: "Active Material Value Increases",
       value: activeIncreases,
       color: "#ef4444",
@@ -69,14 +61,6 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       color: "#ec4899",
       icon: TrendingDown,
       description: "Clearing dead and slow-moving stock"
-    },
-    {
-      name: "Optimal Inventory",
-      value: optimalInventory,
-      color: "#1e3a5f",
-      icon: Square,
-      description: null,
-      isTotal: true
     }
   ];
 
@@ -145,16 +129,16 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
                 {breakdownItems.map((item, index) => (
                   <div 
                     key={index} 
-                    className={`flex items-center gap-3 p-3 rounded-lg ${item.isTotal ? 'bg-muted/50' : 'bg-background/50'} border border-border/30`}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/30"
                   >
                     <div 
                       className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" 
-                      style={{ backgroundColor: item.isTotal ? item.color : `${item.color}20` }}
+                      style={{ backgroundColor: `${item.color}20` }}
                     >
-                      <item.icon className="w-4 h-4" style={{ color: item.isTotal ? 'white' : item.color }} />
+                      <item.icon className="w-4 h-4" style={{ color: item.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${item.isTotal ? 'text-foreground font-semibold' : 'text-foreground'}`}>
+                      <p className="text-sm font-medium text-foreground">
                         {item.name}
                       </p>
                       {item.description && (
@@ -162,8 +146,8 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
                       )}
                     </div>
                     <p 
-                      className={`text-sm font-bold flex-shrink-0 ${item.isTotal ? 'text-foreground' : ''}`} 
-                      style={{ color: item.isTotal ? undefined : item.color }}
+                      className="text-sm font-bold flex-shrink-0" 
+                      style={{ color: item.color }}
                     >
                       {formatCurrency(item.value)}
                     </p>
