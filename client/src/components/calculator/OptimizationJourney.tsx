@@ -75,7 +75,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     <div className="space-y-10">
       <div>
         <h2 className="text-3xl font-bold mb-2 pb-4 border-b-4 border-accent inline-block">
-          Inventory Optimization Roadmap
+          MRO Inventory Optimizer
         </h2>
       </div>
 
