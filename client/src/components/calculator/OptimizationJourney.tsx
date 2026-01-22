@@ -1,7 +1,7 @@
 import { type CalculationResult } from "@/lib/calculator-logic";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
-import { TrendingUp, TrendingDown, Package } from "lucide-react";
+import { TrendingUp, TrendingDown, Network, Package, Layers } from "lucide-react";
 
 interface OptimizationJourneyProps {
   results: CalculationResult;
@@ -18,26 +18,89 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     return `$${val}`;
   };
 
-  const optimalInventory = totalInventoryValue - results.totalReduction;
   const activeIncreases = results.activeOptimization * 0.4;
   const activeDecreases = results.activeOptimization * 0.6;
+  
+  // Calculate running totals for waterfall positioning (excluding obsolete)
+  const reductionsWithoutObsolete = activeIncreases + activeDecreases + results.networkOptimization + results.vmiDisposition + results.deduplication;
+  const optimalInventory = totalInventoryValue - reductionsWithoutObsolete;
 
+  // Build waterfall data with base (invisible) and visible portions
+  let runningTotal = totalInventoryValue;
+  
   const waterfallData = [
-    { name: "Starting", value: totalInventoryValue, color: "#1e3a5f", label: formatCompact(totalInventoryValue) },
-    { name: "Active+", value: activeIncreases, color: "#ef4444", label: `-${formatCompact(activeIncreases)}` },
-    { name: "Active-", value: activeDecreases, color: "#3b82f6", label: `-${formatCompact(activeDecreases)}` },
-    { name: "Network", value: results.networkOptimization, color: "#22c55e", label: `-${formatCompact(results.networkOptimization)}` },
-    { name: "VMI", value: results.vmiDisposition, color: "#f97316", label: `-${formatCompact(results.vmiDisposition)}` },
-    { name: "Dedup", value: results.deduplication, color: "#8b5cf6", label: `-${formatCompact(results.deduplication)}` },
-    { name: "Obsolete", value: results.obsoleteReduction, color: "#ec4899", label: `-${formatCompact(results.obsoleteReduction)}` },
-    { name: "Optimal", value: optimalInventory, color: "#1e3a5f", label: formatCompact(optimalInventory) }
+    { 
+      name: "Starting", 
+      base: 0, 
+      value: totalInventoryValue, 
+      color: "#1e3a5f", 
+      label: formatCompact(totalInventoryValue),
+      isEndpoint: true
+    },
+    { 
+      name: "Active+", 
+      base: runningTotal - activeIncreases, 
+      value: activeIncreases, 
+      color: "#22c55e", 
+      label: `-${formatCompact(activeIncreases)}`,
+      isEndpoint: false
+    },
   ];
+  runningTotal -= activeIncreases;
+  
+  waterfallData.push({ 
+    name: "Active-", 
+    base: runningTotal - activeDecreases, 
+    value: activeDecreases, 
+    color: "#3b82f6", 
+    label: `-${formatCompact(activeDecreases)}`,
+    isEndpoint: false
+  });
+  runningTotal -= activeDecreases;
+  
+  waterfallData.push({ 
+    name: "Network", 
+    base: runningTotal - results.networkOptimization, 
+    value: results.networkOptimization, 
+    color: "#8b5cf6", 
+    label: `-${formatCompact(results.networkOptimization)}`,
+    isEndpoint: false
+  });
+  runningTotal -= results.networkOptimization;
+  
+  waterfallData.push({ 
+    name: "VMI", 
+    base: runningTotal - results.vmiDisposition, 
+    value: results.vmiDisposition, 
+    color: "#f97316", 
+    label: `-${formatCompact(results.vmiDisposition)}`,
+    isEndpoint: false
+  });
+  runningTotal -= results.vmiDisposition;
+  
+  waterfallData.push({ 
+    name: "Dedup", 
+    base: runningTotal - results.deduplication, 
+    value: results.deduplication, 
+    color: "#ec4899", 
+    label: `-${formatCompact(results.deduplication)}`,
+    isEndpoint: false
+  });
+  
+  waterfallData.push({ 
+    name: "Optimal", 
+    base: 0, 
+    value: optimalInventory, 
+    color: "#1e3a5f", 
+    label: formatCompact(optimalInventory),
+    isEndpoint: true
+  });
 
   const breakdownItems = [
     {
       name: "Active Material Value Increases",
       value: activeIncreases,
-      color: "#ef4444",
+      color: "#22c55e",
       icon: TrendingUp,
       description: "Reducing risk by increasing critical materials"
     },
@@ -49,6 +112,13 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       description: "Right-sizing active stock levels"
     },
     {
+      name: "Network Optimization & Transfer Opportunity",
+      value: results.networkOptimization,
+      color: "#8b5cf6",
+      icon: Network,
+      description: "Cross-site inventory balancing"
+    },
+    {
       name: "VMI Disposition",
       value: results.vmiDisposition,
       color: "#f97316",
@@ -56,11 +126,11 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       description: "Vendor-managed inventory opportunities"
     },
     {
-      name: "Obsolete Reduction",
-      value: results.obsoleteReduction,
+      name: "Deduplication Savings",
+      value: results.deduplication,
       color: "#ec4899",
-      icon: TrendingDown,
-      description: "Clearing dead and slow-moving stock"
+      icon: Layers,
+      description: "Eliminating duplicate safety stock"
     }
   ];
 
@@ -90,7 +160,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Total Optimization Opportunity</p>
-          <p className="text-3xl font-extrabold text-primary">{formatCurrency(results.totalReduction)}</p>
+          <p className="text-3xl font-extrabold text-primary">{formatCurrency(reductionsWithoutObsolete)}</p>
         </div>
       </div>
 
@@ -111,9 +181,12 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
                       axisLine={{ stroke: "hsl(var(--border))" }}
                       tickLine={false}
                     />
-                    <YAxis hide />
+                    <YAxis hide domain={[0, totalInventoryValue * 1.1]} />
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(59, 130, 246, 0.05)" }} />
-                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                    {/* Invisible base bar */}
+                    <Bar dataKey="base" stackId="stack" fill="transparent" />
+                    {/* Visible value bar */}
+                    <Bar dataKey="value" stackId="stack" radius={[4, 4, 0, 0]}>
                       {waterfallData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
