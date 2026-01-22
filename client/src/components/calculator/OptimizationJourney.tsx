@@ -1,7 +1,6 @@
 import { type CalculationResult } from "@/lib/calculator-logic";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Label } from "recharts";
 import { useState } from "react";
 
 interface OptimizationJourneyProps {
@@ -19,58 +18,68 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
 
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
-  // Create waterfall-style data
   const chartData = [
     {
       stage: "Starting\nInventory",
       value: totalInventoryValue,
       fill: "#1e293b",
-      tooltip: `Starting SOH: ${formatCurrency(totalInventoryValue)}`
+      tooltip: `Starting SOH: ${formatCurrency(totalInventoryValue)}`,
+      timeline: null
     },
     {
-      stage: "Network\nOptimization",
+      stage: "Network",
       value: -results.networkOptimization,
       fill: "#ef4444",
-      tooltip: `Network: -${formatCurrency(results.networkOptimization)}`
+      tooltip: `Network: -${formatCurrency(results.networkOptimization)}`,
+      timeline: null
     },
     {
-      stage: "VMI &\nConsignment",
+      stage: "VMI",
       value: -results.vmiDisposition,
       fill: "#f97316",
-      tooltip: `VMI: -${formatCurrency(results.vmiDisposition)}`
+      tooltip: `VMI: -${formatCurrency(results.vmiDisposition)}`,
+      timeline: null
     },
     {
-      stage: "Deduplication",
+      stage: "Dedup",
       value: -results.deduplication,
       fill: "#eab308",
-      tooltip: `Dedup: -${formatCurrency(results.deduplication)}`
+      tooltip: `Dedup: -${formatCurrency(results.deduplication)}`,
+      timeline: null
     },
     {
-      stage: "Obsolete\nReduction",
+      stage: "Obsolete",
       value: -results.obsoleteReduction,
       fill: "#ec4899",
-      tooltip: `Obsolete: -${formatCurrency(results.obsoleteReduction)}`
+      tooltip: `Obsolete: -${formatCurrency(results.obsoleteReduction)}`,
+      timeline: null
     },
     {
-      stage: "Improved\nInventory",
+      stage: "Improved\n12-24 Mo",
       value: improvedInventory,
       fill: "#0ea5e9",
-      tooltip: `Improved SOH: ${formatCurrency(improvedInventory)}`
+      tooltip: `Improved SOH: ${formatCurrency(improvedInventory)}`,
+      timeline: "12-24 MONTHS"
     },
     {
-      stage: "Optimal\nInventory",
+      stage: "Optimal\nLong Term",
       value: improvedInventory * 0.95,
       fill: "#06b6d4",
-      tooltip: `Optimal SOH: ${formatCurrency(improvedInventory * 0.95)}`
+      tooltip: `Optimal SOH: ${formatCurrency(improvedInventory * 0.95)}`,
+      timeline: "LONG TERM"
     }
   ];
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-semibold text-sm text-primary">{payload[0].payload.stage}</p>
-          <p className="text-sm text-muted-foreground">{payload[0].payload.tooltip}</p>
+          <p className="font-semibold text-sm text-primary">{data.stage.replace('\n', ' ')}</p>
+          <p className="text-sm text-muted-foreground">{data.tooltip}</p>
+          {data.timeline && (
+            <p className="text-xs text-accent font-medium mt-1">{data.timeline}</p>
+          )}
         </div>
       );
     }
@@ -90,19 +99,20 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
         <div className="lg:col-span-2">
           <Card className="border-border/50 bg-muted/30">
             <CardContent className="pt-8">
-              <div className="h-96">
+              <div className="h-[420px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                    margin={{ top: 40, right: 30, left: 20, bottom: 60 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis 
                       dataKey="stage" 
-                      angle={-45}
+                      angle={-35}
                       textAnchor="end"
-                      height={100}
-                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      height={80}
+                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      interval={0}
                     />
                     <YAxis 
                       tickFormatter={(val) => {
@@ -113,6 +123,12 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
                       tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                     />
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(59, 130, 246, 0.1)" }} />
+                    <ReferenceLine x="Improved\n12-24 Mo" stroke="#0ea5e9" strokeDasharray="3 3" strokeWidth={2}>
+                      <Label value="📅 12-24 MONTHS" position="top" fill="#0ea5e9" fontSize={11} fontWeight={600} />
+                    </ReferenceLine>
+                    <ReferenceLine x="Optimal\nLong Term" stroke="#06b6d4" strokeDasharray="3 3" strokeWidth={2}>
+                      <Label value="📅 LONG TERM" position="top" fill="#06b6d4" fontSize={11} fontWeight={600} />
+                    </ReferenceLine>
                     <Bar 
                       dataKey="value" 
                       radius={[8, 8, 0, 0]}
@@ -132,38 +148,26 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
               </div>
 
               {/* Legend */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-border/50">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border/50">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded" style={{ backgroundColor: "#1e293b" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Start</span>
+                  <span className="text-xs font-medium text-muted-foreground">Current State</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded" style={{ backgroundColor: "#ef4444" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Network</span>
+                  <span className="text-xs font-medium text-muted-foreground">Reductions</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#f97316" }} />
-                  <span className="text-xs font-medium text-muted-foreground">VMI</span>
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#0ea5e9" }} />
+                  <span className="text-xs font-medium text-muted-foreground">Improved (12-24 Mo)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#eab308" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Dedup</span>
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#06b6d4" }} />
+                  <span className="text-xs font-medium text-muted-foreground">Optimal (Long Term)</span>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Timeline */}
-          <div className="flex justify-between mt-8 gap-4">
-            <div className="flex items-center gap-2 px-6 py-3 bg-muted/30 rounded-full border border-border/50 flex-1">
-              <div className="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center text-xs font-bold">📅</div>
-              <span className="text-sm font-semibold">12-24 MONTHS</span>
-            </div>
-            <div className="flex items-center gap-2 px-6 py-3 bg-muted/30 rounded-full border border-border/50 flex-1">
-              <div className="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center text-xs font-bold">📅</div>
-              <span className="text-sm font-semibold">LONG TERM & BEYOND</span>
-            </div>
-          </div>
         </div>
 
         {/* Summary Card */}
