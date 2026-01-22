@@ -1,6 +1,6 @@
 import { type CalculationResult, type CalculatorInputs } from "@/lib/calculator-logic";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Phone } from "lucide-react";
+import { Download, FileText, Phone, RotateCcw } from "lucide-react";
 import { OptimizationJourney } from "./OptimizationJourney";
 import { CompactInputs } from "./CompactInputs";
 
@@ -41,6 +41,12 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
             <Download className="mr-2 h-4 w-4" /> Download Results
           </Button>
         </div>
+      </div>
+
+      <div className="text-center mt-8">
+        <Button variant="ghost" onClick={onReset} className="text-muted-foreground">
+          <RotateCcw className="mr-2 h-4 w-4" /> Start Over
+        </Button>
       </div>
     </div>
   );
