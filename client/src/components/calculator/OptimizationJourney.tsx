@@ -1,7 +1,7 @@
 import { type CalculationResult } from "@/lib/calculator-logic";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Label } from "recharts";
-import { useState } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { TrendingUp, TrendingDown, Network, Package, Layers } from "lucide-react";
 
 interface OptimizationJourneyProps {
   results: CalculationResult;
@@ -12,74 +12,62 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
-  const improvedInventory = totalInventoryValue - results.totalReduction;
   const shortTermRealization = results.totalReduction * 0.35;
   const longTermPotential = results.totalReduction * 0.65;
 
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-
-  const chartData = [
+  const savingsBreakdown = [
     {
-      stage: "Starting\nInventory",
-      value: totalInventoryValue,
-      fill: "#1e293b",
-      tooltip: `Starting SOH: ${formatCurrency(totalInventoryValue)}`,
-      timeline: null
+      name: "Active Material Value Increases",
+      value: results.activeOptimization * 0.4,
+      color: "#22c55e",
+      icon: TrendingUp,
+      description: "Improved forecasting on active items"
     },
     {
-      stage: "Network",
-      value: -results.networkOptimization,
-      fill: "#ef4444",
-      tooltip: `Network: -${formatCurrency(results.networkOptimization)}`,
-      timeline: null
+      name: "Active Material Value Decreases",
+      value: results.activeOptimization * 0.6,
+      color: "#3b82f6",
+      icon: TrendingDown,
+      description: "Right-sizing active stock levels"
     },
     {
-      stage: "VMI",
-      value: -results.vmiDisposition,
-      fill: "#f97316",
-      tooltip: `VMI: -${formatCurrency(results.vmiDisposition)}`,
-      timeline: null
+      name: "Network Optimization & Transfers",
+      value: results.networkOptimization,
+      color: "#8b5cf6",
+      icon: Network,
+      description: "Cross-site inventory balancing"
     },
     {
-      stage: "Dedup",
-      value: -results.deduplication,
-      fill: "#eab308",
-      tooltip: `Dedup: -${formatCurrency(results.deduplication)}`,
-      timeline: null
+      name: "VMI Disposition",
+      value: results.vmiDisposition,
+      color: "#f97316",
+      icon: Package,
+      description: "Vendor-managed inventory opportunities"
     },
     {
-      stage: "Obsolete",
-      value: -results.obsoleteReduction,
-      fill: "#ec4899",
-      tooltip: `Obsolete: -${formatCurrency(results.obsoleteReduction)}`,
-      timeline: null
+      name: "Deduplication Savings",
+      value: results.deduplication,
+      color: "#ec4899",
+      icon: Layers,
+      description: "Eliminating duplicate safety stock"
     },
     {
-      stage: "Improved\n12-24 Mo",
-      value: improvedInventory,
-      fill: "#0ea5e9",
-      tooltip: `Improved SOH: ${formatCurrency(improvedInventory)}`,
-      timeline: "12-24 MONTHS"
-    },
-    {
-      stage: "Optimal\nLong Term",
-      value: improvedInventory * 0.95,
-      fill: "#06b6d4",
-      tooltip: `Optimal SOH: ${formatCurrency(improvedInventory * 0.95)}`,
-      timeline: "LONG TERM"
+      name: "Obsolete Reduction",
+      value: results.obsoleteReduction,
+      color: "#ef4444",
+      icon: TrendingDown,
+      description: "Clearing dead and slow-moving stock"
     }
-  ];
+  ].filter(item => item.value > 0);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-semibold text-sm text-primary">{data.stage.replace('\n', ' ')}</p>
-          <p className="text-sm text-muted-foreground">{data.tooltip}</p>
-          {data.timeline && (
-            <p className="text-xs text-accent font-medium mt-1">{data.timeline}</p>
-          )}
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg max-w-xs">
+          <p className="font-semibold text-sm text-primary">{data.name}</p>
+          <p className="text-lg font-bold" style={{ color: data.color }}>{formatCurrency(data.value)}</p>
+          <p className="text-xs text-muted-foreground mt-1">{data.description}</p>
         </div>
       );
     }
@@ -87,7 +75,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       <div>
         <h2 className="text-3xl font-bold mb-2 pb-4 border-b-4 border-accent inline-block">
           Inventory Optimization Roadmap
@@ -95,75 +83,56 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Interactive Bar Chart */}
+        {/* Total Savings & Donut Chart */}
         <div className="lg:col-span-2">
           <Card className="border-border/50 bg-muted/30">
             <CardContent className="pt-8">
-              <div className="h-[420px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    margin={{ top: 40, right: 30, left: 20, bottom: 60 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis 
-                      dataKey="stage" 
-                      angle={-35}
-                      textAnchor="end"
-                      height={80}
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      interval={0}
-                    />
-                    <YAxis 
-                      tickFormatter={(val) => {
-                        if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
-                        if (val >= 1000) return `$${(val / 1000).toFixed(0)}K`;
-                        return `$${val}`;
-                      }}
-                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                    />
-                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(59, 130, 246, 0.1)" }} />
-                    <ReferenceLine x="Improved\n12-24 Mo" stroke="#0ea5e9" strokeDasharray="3 3" strokeWidth={2}>
-                      <Label value="📅 12-24 MONTHS" position="top" fill="#0ea5e9" fontSize={11} fontWeight={600} />
-                    </ReferenceLine>
-                    <ReferenceLine x="Optimal\nLong Term" stroke="#06b6d4" strokeDasharray="3 3" strokeWidth={2}>
-                      <Label value="📅 LONG TERM" position="top" fill="#06b6d4" fontSize={11} fontWeight={600} />
-                    </ReferenceLine>
-                    <Bar 
-                      dataKey="value" 
-                      radius={[8, 8, 0, 0]}
-                      onMouseEnter={(data) => setHoveredCategory(data.stage)}
-                      onMouseLeave={() => setHoveredCategory(null)}
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.fill}
-                          opacity={hoveredCategory === null || hoveredCategory === entry.stage ? 1 : 0.4}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* Donut Chart */}
+                <div className="h-72 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={savingsBreakdown}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={110}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {savingsBreakdown.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <p className="text-xs text-muted-foreground font-medium">TOTAL SAVINGS</p>
+                    <p className="text-2xl font-extrabold text-primary">{formatCurrency(results.totalReduction)}</p>
+                  </div>
+                </div>
 
-              {/* Legend */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border/50">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#1e293b" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Current State</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#ef4444" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Reductions</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#0ea5e9" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Improved (12-24 Mo)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: "#06b6d4" }} />
-                  <span className="text-xs font-medium text-muted-foreground">Optimal (Long Term)</span>
+                {/* Breakdown List */}
+                <div className="space-y-3">
+                  {savingsBreakdown.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
+                      <div 
+                        className="w-10 h-10 rounded-lg flex items-center justify-center" 
+                        style={{ backgroundColor: `${item.color}20` }}
+                      >
+                        <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">{item.description}</p>
+                      </div>
+                      <p className="text-sm font-bold" style={{ color: item.color }}>
+                        {formatCurrency(item.value)}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
