@@ -42,7 +42,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       base: runningTotal - activeIncreases, 
       value: activeIncreases, 
       color: "#22c55e", 
-      label: `-${formatCompact(activeIncreases)}`,
+      label: `+${formatCompact(activeIncreases)}`,
       isEndpoint: false
     },
   ];
