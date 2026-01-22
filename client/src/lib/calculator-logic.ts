@@ -18,10 +18,24 @@ export const calculatorSchema = z.object({
 
 export type CalculatorInputs = z.infer<typeof calculatorSchema>;
 
+// Personal email domains to block
+const personalEmailDomains = [
+  'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com',
+  'icloud.com', 'mail.com', 'protonmail.com', 'zoho.com', 'yandex.com',
+  'gmx.com', 'live.com', 'msn.com', 'me.com', 'comcast.net',
+  'att.net', 'verizon.net', 'sbcglobal.net', 'bellsouth.net', 'cox.net',
+  'earthlink.net', 'charter.net', 'optonline.net', 'frontier.com',
+  'yahoo.co.uk', 'hotmail.co.uk', 'googlemail.com', 'rocketmail.com',
+  'ymail.com', 'inbox.com', 'mail.ru', 'qq.com', '163.com', '126.com'
+];
+
 export const leadSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email address").refine((email) => {
+    const domain = email.split('@')[1]?.toLowerCase();
+    return domain && !personalEmailDomains.includes(domain);
+  }, "Please use your business email address"),
   company: z.string().min(2, "Company name is required"),
   jobFunction: z.string().min(1, "Please select your function"),
 });
