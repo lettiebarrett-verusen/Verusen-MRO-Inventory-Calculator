@@ -102,35 +102,40 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       value: activeIncreases,
       color: "#22c55e",
       icon: TrendingUp,
-      description: "Reducing risk by increasing critical materials"
+      description: "Reducing risk by increasing critical materials",
+      isIncrease: true
     },
     {
       name: "Active Material Value Decreases",
       value: activeDecreases,
       color: "#3b82f6",
       icon: TrendingDown,
-      description: "Right-sizing active stock levels"
+      description: "Right-sizing active stock levels",
+      isIncrease: false
     },
     {
       name: "Network Optimization & Transfer Opportunity",
       value: results.networkOptimization,
       color: "#8b5cf6",
       icon: Network,
-      description: "Cross-site inventory balancing"
+      description: "Cross-site inventory balancing",
+      isIncrease: false
     },
     {
       name: "VMI Disposition",
       value: results.vmiDisposition,
       color: "#f97316",
       icon: Package,
-      description: "Vendor-managed inventory opportunities"
+      description: "Vendor-managed inventory opportunities",
+      isIncrease: false
     },
     {
       name: "Deduplication Savings",
       value: results.deduplication,
       color: "#ec4899",
       icon: Layers,
-      description: "Eliminating duplicate safety stock"
+      description: "Eliminating duplicate safety stock",
+      isIncrease: false
     }
   ];
 
@@ -228,7 +233,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
                       className="text-sm font-bold flex-shrink-0" 
                       style={{ color: item.color }}
                     >
-                      {formatCurrency(item.value)}
+                      {item.isIncrease ? '+' : '-'}{formatCurrency(item.value)}
                     </p>
                   </div>
                 ))}
