@@ -75,20 +75,19 @@ const HUBSPOT_FORM_GUID = 'b34a5604-13b5-4746-b578-b469c5320b76';
 // Submit to HubSpot Forms API to track as a form submission
 async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData): Promise<{ success: boolean; error?: string }> {
   try {
-    const formatCurrency = (val: number) => 
-      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
-
+    console.log('Starting HubSpot Form submission for:', lead.email);
+    
     const nameParts = lead.name.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
 
     const formData = {
       fields: [
-        { objectTypeId: '0-1', name: 'email', value: lead.email },
-        { objectTypeId: '0-1', name: 'firstname', value: firstName },
-        { objectTypeId: '0-1', name: 'lastname', value: lastName },
-        { objectTypeId: '0-1', name: 'company', value: lead.company },
-        { objectTypeId: '0-1', name: 'jobtitle', value: lead.role }
+        { name: 'email', value: lead.email },
+        { name: 'firstname', value: firstName },
+        { name: 'lastname', value: lastName },
+        { name: 'company', value: lead.company },
+        { name: 'jobtitle', value: lead.role }
       ],
       context: {
         pageUri: 'https://mro-calculator.replit.app/',
@@ -97,6 +96,8 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
     };
 
     const endpoint = `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`;
+    console.log('Submitting to HubSpot Form endpoint:', endpoint);
+    console.log('Form data:', JSON.stringify(formData, null, 2));
     
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -106,13 +107,16 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
       body: JSON.stringify(formData)
     });
 
+    const responseText = await response.text();
+    console.log('HubSpot Form API response status:', response.status);
+    console.log('HubSpot Form API response:', responseText);
+
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('HubSpot Form API error:', errorData);
-      return { success: false, error: errorData };
+      console.error('HubSpot Form API error:', responseText);
+      return { success: false, error: responseText };
     }
 
-    console.log('Form submission tracked in HubSpot');
+    console.log('Form submission tracked in HubSpot successfully');
     return { success: true };
   } catch (error: any) {
     console.error('HubSpot Form submission error:', error);
