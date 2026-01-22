@@ -126,10 +126,19 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
 
 export async function syncLeadToHubSpot(lead: LeadData, calculation: CalculationData): Promise<{ success: boolean; contactId?: string; error?: string }> {
   try {
+    console.log('=== Starting HubSpot sync for lead ===');
+    console.log('Lead email:', lead.email);
+    console.log('Lead name:', lead.name);
+    console.log('Lead company:', lead.company);
+    console.log('Lead jobFunction:', lead.jobFunction);
+    
     // First, submit to the HubSpot Form to track as a form fill
     const formResult = await submitToHubSpotForm(lead, calculation);
+    console.log('Form submission result:', formResult);
     if (!formResult.success) {
       console.warn('Form submission failed, continuing with CRM sync:', formResult.error);
+    } else {
+      console.log('Form submission successful!');
     }
 
     const client = await getHubSpotClient();
