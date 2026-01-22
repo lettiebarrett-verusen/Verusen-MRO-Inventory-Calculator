@@ -7,14 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
 
 const JOB_FUNCTIONS = [
-  { value: "operations", label: "Operations" },
   { value: "procurement", label: "Procurement" },
+  { value: "innovation", label: "Innovation" },
   { value: "supply_chain", label: "Supply Chain" },
-  { value: "maintenance", label: "Maintenance" },
-  { value: "finance", label: "Finance" },
-  { value: "engineering", label: "Engineering" },
-  { value: "it", label: "Information Technology" },
-  { value: "executive", label: "Executive/C-Suite" },
+  { value: "operations", label: "Operations" },
+  { value: "sourcing", label: "Sourcing" },
   { value: "other", label: "Other" },
 ];
 
