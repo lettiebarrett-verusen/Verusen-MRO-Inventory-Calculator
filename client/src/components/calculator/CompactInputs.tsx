@@ -17,6 +17,14 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
     onChange({ ...inputs, [field]: value });
   };
 
+  const formatNumber = (val: number) => 
+    new Intl.NumberFormat('en-US').format(val);
+
+  const parseFormattedNumber = (str: string) => {
+    const cleaned = str.replace(/[^0-9]/g, '');
+    return cleaned ? parseInt(cleaned, 10) : 0;
+  };
+
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
@@ -33,11 +41,10 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Sites</label>
             <Input 
-              type="number" 
-              value={inputs.siteCount}
-              onChange={e => handleChange("siteCount", Number(e.target.value))}
+              type="text" 
+              value={formatNumber(inputs.siteCount)}
+              onChange={e => handleChange("siteCount", parseFormattedNumber(e.target.value))}
               className="h-9 text-sm"
-              min={1}
             />
           </div>
           
@@ -46,11 +53,10 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
             <div className="relative">
               <span className="absolute left-2 top-2 text-xs text-muted-foreground">$</span>
               <Input 
-                type="number" 
-                value={inputs.totalInventoryValue}
-                onChange={e => handleChange("totalInventoryValue", Number(e.target.value))}
+                type="text" 
+                value={formatNumber(inputs.totalInventoryValue)}
+                onChange={e => handleChange("totalInventoryValue", parseFormattedNumber(e.target.value))}
                 className="h-9 text-sm pl-5"
-                min={1000}
               />
             </div>
           </div>
@@ -58,11 +64,10 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">SKUs</label>
             <Input 
-              type="number" 
-              value={inputs.skuCount}
-              onChange={e => handleChange("skuCount", Number(e.target.value))}
+              type="text" 
+              value={formatNumber(inputs.skuCount)}
+              onChange={e => handleChange("skuCount", parseFormattedNumber(e.target.value))}
               className="h-9 text-sm"
-              min={1}
             />
           </div>
 
