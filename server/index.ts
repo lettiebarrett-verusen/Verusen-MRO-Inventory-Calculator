@@ -22,6 +22,28 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map(s => s.trim())
+  : ["https://verusen.com", "https://www.verusen.com"];
+
+app.use((req, res, next) => {
+  res.removeHeader("X-Frame-Options");
+  const frameAncestors = ALLOWED_ORIGINS.join(" ");
+  res.setHeader("Content-Security-Policy", `frame-ancestors 'self' ${frameAncestors}`);
+
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.some(allowed => origin.startsWith(allowed))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  }
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",

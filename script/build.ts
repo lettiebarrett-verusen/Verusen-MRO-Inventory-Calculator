@@ -30,6 +30,7 @@ const allowlist = [
   "xlsx",
   "zod",
   "zod-validation-error",
+  "@hubspot/api-client",
 ];
 
 async function buildAll() {
