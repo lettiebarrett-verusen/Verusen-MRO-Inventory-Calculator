@@ -91,7 +91,9 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
         { name: 'function', value: lead.jobFunction }
       ],
       context: {
-        pageUri: 'https://mro-calculator.replit.app/',
+        pageUri: process.env.NODE_ENV === 'production' 
+          ? 'https://verusenai-mro-inventory-calculator.onrender.com/'
+          : 'https://mro-calculator.replit.app/',
         pageName: 'MRO Inventory Optimization Calculator'
       }
     };
