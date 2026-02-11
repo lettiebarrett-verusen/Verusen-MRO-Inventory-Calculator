@@ -47,7 +47,13 @@ export async function registerRoutes(
       if (existingLead) {
         lead = existingLead;
       } else {
-        lead = await storage.createLead(data.lead);
+        lead = await storage.createLead({
+          firstName: data.lead.firstName,
+          lastName: data.lead.lastName,
+          email: data.lead.email,
+          company: data.lead.company,
+          role: data.lead.jobFunction,
+        });
       }
       
       const calculation = await storage.createCalculation({
