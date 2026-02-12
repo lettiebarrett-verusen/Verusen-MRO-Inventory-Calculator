@@ -94,7 +94,7 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
         pageUri: process.env.NODE_ENV === 'production' 
           ? 'https://verusenai-mro-inventory-calculator.onrender.com/'
           : 'https://mro-calculator.replit.app/',
-        pageName: 'MRO Inventory Optimization Calculator'
+        pageName: 'MRO Inventory Calculator'
       }
     };
 
@@ -157,7 +157,7 @@ export async function syncLeadToHubSpot(lead: LeadData, calculation: Calculation
 
     // Build the calculator results note
     const calculatorNote = `
-MRO Inventory Optimization Calculator Results
+MRO Inventory Calculator Results
 ==============================================
 Date: ${new Date().toLocaleDateString()}
 

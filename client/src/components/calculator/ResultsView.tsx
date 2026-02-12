@@ -37,7 +37,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
 
     doc.setFontSize(22);
     doc.setTextColor(255, 255, 255);
-    doc.text("MRO Inventory Optimizer", 20, 25);
+    doc.text("MRO Inventory Calculator", 20, 25);
 
     doc.setFontSize(10);
     doc.setTextColor(180, 200, 220);
