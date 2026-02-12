@@ -36,9 +36,9 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
       siteCount: 1,
       totalInventoryValue: 1000000,
       skuCount: 5000,
-      activePercent: 50,
-      obsoletePercent: 30,
-      specialPercent: 20,
+      activePercent: 67,
+      obsoletePercent: 24,
+      specialPercent: 10,
       ...defaultValues
     }
   });
