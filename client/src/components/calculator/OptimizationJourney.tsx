@@ -32,7 +32,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
       name: "Starting", 
       base: 0, 
       value: totalInventoryValue, 
-      color: "#1e3a5f", 
+      color: "#9ca3af", 
       label: formatCompact(totalInventoryValue),
       isEndpoint: true
     },
@@ -90,7 +90,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     name: "Optimal", 
     base: 0, 
     value: optimalInventory, 
-    color: "#1e3a5f", 
+    color: "#22c55e", 
     label: formatCompact(optimalInventory),
     isEndpoint: true
   });

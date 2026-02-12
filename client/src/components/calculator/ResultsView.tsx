@@ -128,7 +128,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
     doc.text("INVENTORY VALUE WATERFALL", 20, yPos);
     yPos += 8;
 
-    doc.setFillColor(30, 58, 95);
+    doc.setFillColor(156, 163, 175);
     doc.roundedRect(barX, yPos, barWidth, barHeight, 2, 2, "F");
     doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
@@ -136,7 +136,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
 
     yPos += barHeight + 4;
     const optimalWidth = totalInventoryValue > 0 ? (optimalInventory / totalInventoryValue) * barWidth : 0;
-    doc.setFillColor(0, 166, 81);
+    doc.setFillColor(34, 197, 94);
     doc.roundedRect(barX, yPos, optimalWidth, barHeight, 2, 2, "F");
     doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
