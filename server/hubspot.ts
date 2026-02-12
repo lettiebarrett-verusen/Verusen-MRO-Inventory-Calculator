@@ -61,11 +61,11 @@ interface CalculationData {
   activePercent: number;
   obsoletePercent: number;
   specialPercent: number;
-  activeOptimization: number;
+  activeMaterialIncreases: number;
+  activeMaterialDecreases: number;
   networkOptimization: number;
   vmiDisposition: number;
   deduplication: number;
-  obsoleteReduction: number;
   totalReduction: number;
 }
 
@@ -170,11 +170,11 @@ INPUT PROFILE:
 - Special/Critical Items: ${calculation.specialPercent}%
 
 OPTIMIZATION OPPORTUNITIES:
-- Active Material Optimization: ${formatCurrency(calculation.activeOptimization)}
+- Active Material Value Increases: ${formatCurrency(calculation.activeMaterialIncreases)}
+- Active Material Value Decreases: ${formatCurrency(calculation.activeMaterialDecreases)}
 - Network Optimization & Transfers: ${formatCurrency(calculation.networkOptimization)}
 - VMI Disposition: ${formatCurrency(calculation.vmiDisposition)}
 - Deduplication Savings: ${formatCurrency(calculation.deduplication)}
-- Obsolete Reduction: ${formatCurrency(calculation.obsoleteReduction)}
 
 TOTAL OPTIMIZATION OPPORTUNITY: ${formatCurrency(calculation.totalReduction)}
     `.trim();

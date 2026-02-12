@@ -55,49 +55,56 @@ export const leadSchema = z.object({
 export type LeadInputs = z.infer<typeof leadSchema>;
 
 export interface CalculationResult {
-  activeOptimization: number;
+  activeMaterialIncreases: number;
+  activeMaterialDecreases: number;
   networkOptimization: number;
   vmiDisposition: number;
   deduplication: number;
-  obsoleteReduction: number;
   totalReduction: number;
-  // Breakdowns for charts
   activeValue: number;
   obsoleteValue: number;
   specialValue: number;
 }
 
+function getNetworkSlidingFactor(siteCount: number): number {
+  if (siteCount <= 1) return 0;
+  if (siteCount <= 4) return 0.04;
+  return 0.06;
+}
+
+function getVmiSlidingFactor(skuCount: number): number {
+  if (skuCount < 50000) return 0.05;
+  if (skuCount <= 100000) return 0.07;
+  return 0.09;
+}
+
+function getDeduplicationSlidingFactor(skuCount: number): number {
+  if (skuCount < 50000) return 0.01;
+  if (skuCount <= 100000) return 0.025;
+  return 0.04;
+}
+
 export function calculateSavings(inputs: CalculatorInputs): CalculationResult {
-  const { totalInventoryValue, activePercent, obsoletePercent, specialPercent, siteCount } = inputs;
+  const { totalInventoryValue, activePercent, obsoletePercent, specialPercent, siteCount, skuCount } = inputs;
 
   const activeVal = totalInventoryValue * (activePercent / 100);
   const obsoleteVal = totalInventoryValue * (obsoletePercent / 100);
   const specialVal = totalInventoryValue * (specialPercent / 100);
 
-  // Placeholder Logic based on industry benchmarks
-  // 1. Obsolete Reduction: We can usually clear ~60% of dead stock
-  const obsoleteReduction = obsoleteVal * 0.60;
+  const activeMaterialIncreases = activeVal * 0.06 * -1;
+  const activeMaterialDecreases = activeVal * 0.22;
+  const networkOptimization = (activeVal + obsoleteVal) * getNetworkSlidingFactor(siteCount);
+  const vmiDisposition = activeVal * getVmiSlidingFactor(skuCount);
+  const deduplication = (activeVal + obsoleteVal) * getDeduplicationSlidingFactor(skuCount);
 
-  // 2. Network Optimization: If > 1 site, we can optimize ~8% of active inventory via transfers
-  const networkOptimization = siteCount > 1 ? activeVal * 0.08 : 0;
-
-  // 3. Deduplication: If > 1 site, usually ~4% of total value is duplicate safety stock
-  const deduplication = siteCount > 1 ? totalInventoryValue * 0.04 : 0;
-
-  // 4. VMI Disposition: We can often move ~30% of "Special" (often consumables/MRO) to VMI
-  const vmiDisposition = specialVal * 0.30;
-
-  // 5. Active Optimization: General improved forecasting on active items ~5%
-  const activeOptimization = activeVal * 0.05;
-
-  const totalReduction = obsoleteReduction + networkOptimization + deduplication + vmiDisposition + activeOptimization;
+  const totalReduction = activeMaterialIncreases + activeMaterialDecreases + networkOptimization + vmiDisposition + deduplication;
 
   return {
-    activeOptimization,
+    activeMaterialIncreases,
+    activeMaterialDecreases,
     networkOptimization,
     vmiDisposition,
     deduplication,
-    obsoleteReduction,
     totalReduction,
     activeValue: activeVal,
     obsoleteValue: obsoleteVal,

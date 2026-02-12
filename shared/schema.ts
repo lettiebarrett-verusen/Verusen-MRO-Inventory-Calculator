@@ -46,11 +46,11 @@ export const calculations = pgTable("calculations", {
   activePercent: real("active_percent").notNull(),
   obsoletePercent: real("obsolete_percent").notNull(),
   specialPercent: real("special_percent").notNull(),
-  activeOptimization: real("active_optimization").notNull(),
+  activeMaterialIncreases: real("active_material_increases").notNull(),
+  activeMaterialDecreases: real("active_material_decreases").notNull(),
   networkOptimization: real("network_optimization").notNull(),
   vmiDisposition: real("vmi_disposition").notNull(),
   deduplication: real("deduplication").notNull(),
-  obsoleteReduction: real("obsolete_reduction").notNull(),
   totalReduction: real("total_reduction").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });

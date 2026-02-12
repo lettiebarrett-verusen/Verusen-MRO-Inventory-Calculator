@@ -19,9 +19,9 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    const activeIncreases = results.activeOptimization * 0.4;
-    const activeDecreases = results.activeOptimization * 0.6;
-    const reductionsWithoutObsolete = activeIncreases + activeDecreases + results.networkOptimization + results.vmiDisposition + results.deduplication;
+    const activeIncreases = Math.abs(results.activeMaterialIncreases);
+    const activeDecreases = results.activeMaterialDecreases;
+    const totalOptimization = results.totalReduction;
     
     doc.setFontSize(20);
     doc.setTextColor(30, 58, 95);
@@ -41,7 +41,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
     doc.text("Total Optimization Opportunity", 20, 58);
     doc.setFontSize(24);
     doc.setTextColor(0, 166, 81);
-    doc.text(formatCurrency(reductionsWithoutObsolete), 20, 70);
+    doc.text(formatCurrency(totalOptimization), 20, 70);
     
     doc.setFontSize(12);
     doc.setTextColor(30, 58, 95);

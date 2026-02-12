@@ -18,12 +18,11 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     return `$${val}`;
   };
 
-  const activeIncreases = results.activeOptimization * 0.4;
-  const activeDecreases = results.activeOptimization * 0.6;
+  const activeIncreases = Math.abs(results.activeMaterialIncreases);
+  const activeDecreases = results.activeMaterialDecreases;
   
-  // Calculate running totals for waterfall positioning (excluding obsolete)
-  const reductionsWithoutObsolete = activeIncreases + activeDecreases + results.networkOptimization + results.vmiDisposition + results.deduplication;
-  const optimalInventory = totalInventoryValue - reductionsWithoutObsolete;
+  const totalOptimization = results.totalReduction;
+  const optimalInventory = totalInventoryValue - totalOptimization;
 
   // Build waterfall data with base (invisible) and visible portions
   let runningTotal = totalInventoryValue;
@@ -39,14 +38,14 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     },
     { 
       name: "Active+", 
-      base: runningTotal - activeIncreases, 
+      base: runningTotal, 
       value: activeIncreases, 
-      color: "#22c55e", 
+      color: "#ef4444", 
       label: `+${formatCompact(activeIncreases)}`,
       isEndpoint: false
     },
   ];
-  runningTotal -= activeIncreases;
+  runningTotal += activeIncreases;
   
   waterfallData.push({ 
     name: "Active-", 
@@ -166,7 +165,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Total Optimization Opportunity</p>
-          <p className="text-3xl font-extrabold text-primary">{formatCurrency(reductionsWithoutObsolete)}</p>
+          <p className="text-3xl font-extrabold text-primary">{formatCurrency(totalOptimization)}</p>
         </div>
       </div>
 

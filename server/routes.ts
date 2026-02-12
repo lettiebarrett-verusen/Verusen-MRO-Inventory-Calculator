@@ -20,11 +20,11 @@ const submitLeadSchema = z.object({
     activePercent: z.number().min(0).max(100),
     obsoletePercent: z.number().min(0).max(100),
     specialPercent: z.number().min(0).max(100),
-    activeOptimization: z.number(),
+    activeMaterialIncreases: z.number(),
+    activeMaterialDecreases: z.number(),
     networkOptimization: z.number(),
     vmiDisposition: z.number(),
     deduplication: z.number(),
-    obsoleteReduction: z.number(),
     totalReduction: z.number(),
   }).refine(data => {
     const sum = data.activePercent + data.obsoletePercent + data.specialPercent;
@@ -100,7 +100,7 @@ export async function registerRoutes(
     try {
       const result = await syncLeadToHubSpot(
         { name: "Test User", email: "test@test.com", company: "Test Co", jobFunction: "operations" },
-        { siteCount: 1, totalInventoryValue: 1000000, skuCount: 1000, activePercent: 50, obsoletePercent: 30, specialPercent: 20, activeOptimization: 10000, networkOptimization: 5000, vmiDisposition: 3000, deduplication: 2000, obsoleteReduction: 1000, totalReduction: 21000 }
+        { siteCount: 1, totalInventoryValue: 1000000, skuCount: 1000, activePercent: 50, obsoletePercent: 30, specialPercent: 20, activeMaterialIncreases: -30000, activeMaterialDecreases: 110000, networkOptimization: 0, vmiDisposition: 25000, deduplication: 8000, totalReduction: 113000 }
       );
       console.log("HubSpot test result:", result);
       res.json({ success: true, result });
