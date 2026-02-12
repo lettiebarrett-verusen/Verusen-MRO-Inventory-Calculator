@@ -95,7 +95,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                   name="totalInventoryValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Total Inventory Value ($)</FormLabel>
+                      <FormLabel>Total Inventory Value</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
