@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { calculatorSchema, type CalculatorInputs } from "@/lib/calculator-logic";
+import { calculatorSchema, type CalculatorInputs, industryOptions } from "@/lib/calculator-logic";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -34,6 +35,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
       siteCount: 1,
       totalInventoryValue: 1000000,
       skuCount: 5000,
+      industry: "",
       activePercent: 50,
       obsoletePercent: 30,
       specialPercent: 20,
@@ -60,7 +62,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onComplete)} className="space-y-8">
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardContent className="pt-6">
                 <FormField
@@ -73,6 +75,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                         <Input 
                           type="text"
                           inputMode="numeric"
+                          data-testid="input-site-count"
                           value={formatNumberWithCommas(field.value)}
                           onChange={e => field.onChange(parseFormattedNumber(e.target.value))}
                           className="text-lg font-medium"
@@ -99,6 +102,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                           <Input 
                             type="text"
                             inputMode="numeric"
+                            data-testid="input-inventory-value"
                             value={formatNumberWithCommas(field.value)}
                             onChange={e => field.onChange(parseFormattedNumber(e.target.value))}
                             className="text-lg font-medium pl-8"
@@ -124,11 +128,41 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                         <Input 
                           type="text"
                           inputMode="numeric"
+                          data-testid="input-sku-count"
                           value={formatNumberWithCommas(field.value)}
                           onChange={e => field.onChange(parseFormattedNumber(e.target.value))}
                           className="text-lg font-medium"
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <FormField
+                  control={form.control}
+                  name="industry"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Industry</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-industry" className="text-lg font-medium">
+                            <SelectValue placeholder="Select industry" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {industryOptions.map((option) => (
+                            <SelectItem key={option} value={option} data-testid={`option-industry-${option}`}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

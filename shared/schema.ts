@@ -43,6 +43,7 @@ export const calculations = pgTable("calculations", {
   siteCount: integer("site_count").notNull(),
   totalInventoryValue: real("total_inventory_value").notNull(),
   skuCount: integer("sku_count").notNull(),
+  industry: text("industry").notNull().default("Other"),
   activePercent: real("active_percent").notNull(),
   obsoletePercent: real("obsolete_percent").notNull(),
   specialPercent: real("special_percent").notNull(),
