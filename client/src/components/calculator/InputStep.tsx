@@ -56,7 +56,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 text-center">
-        <p className="text-muted-foreground mt-2">See your MRO savings potential in minutes. Backed by AI insights, the largest MRO materials dataset, and industry benchmarks.</p>
+        <p className="text-muted-foreground mt-2">See your MRO savings potential in minutes. Backed by AI industry insights and the largest MRO materials dataset.</p>
       </div>
 
       <Form {...form}>
