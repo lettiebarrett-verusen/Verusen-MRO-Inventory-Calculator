@@ -19,81 +19,155 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
 
   const downloadPDF = () => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
     const activeIncreases = Math.abs(results.activeMaterialIncreases);
     const activeDecreases = results.activeMaterialDecreases;
     const totalOptimization = results.totalReduction;
-    
-    doc.setFontSize(20);
-    doc.setTextColor(30, 58, 95);
-    doc.text("MRO Inventory Optimization Results", 20, 25);
-    
+    const optimalInventory = totalInventoryValue - totalOptimization;
+
+    const hexToRgb = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return [r, g, b] as const;
+    };
+
+    doc.setFillColor(30, 58, 95);
+    doc.rect(0, 0, pageWidth, 50, "F");
+
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text("MRO Inventory Optimizer", 20, 25);
+
     doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Powered by Verusen AI", 20, 33);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 39);
-    
-    doc.setDrawColor(0, 166, 81);
-    doc.setLineWidth(1);
-    doc.line(20, 45, 190, 45);
-    
-    doc.setFontSize(14);
-    doc.setTextColor(30, 58, 95);
-    doc.text("Total Optimization Opportunity", 20, 58);
-    doc.setFontSize(24);
-    doc.setTextColor(0, 166, 81);
-    doc.text(formatCurrency(totalOptimization), 20, 70);
-    
-    doc.setFontSize(12);
-    doc.setTextColor(30, 58, 95);
-    doc.text("Input Profile", 20, 90);
-    
+    doc.setTextColor(180, 200, 220);
+    doc.text("Powered by Verusen AI", 20, 35);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 42);
+
     doc.setFontSize(10);
+    doc.setTextColor(180, 200, 220);
+    doc.text("Total Optimization Opportunity", pageWidth - 20, 20, { align: "right" });
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text(formatCurrency(totalOptimization), pageWidth - 20, 35, { align: "right" });
+
+    let yPos = 65;
+
+    doc.setFillColor(245, 247, 250);
+    doc.roundedRect(15, yPos - 5, pageWidth - 30, 35, 3, 3, "F");
+
+    doc.setFontSize(10);
+    doc.setTextColor(100, 110, 120);
+    doc.text("INPUT PROFILE", 20, yPos + 3);
+
+    yPos += 12;
+    doc.setFontSize(9);
     doc.setTextColor(60, 60, 60);
-    let yPos = 100;
     if (inputs) {
-      doc.text(`Number of Sites: ${inputs.siteCount.toLocaleString()}`, 25, yPos);
+      const col1X = 22;
+      const col2X = 80;
+      const col3X = 140;
+      doc.text(`Sites: ${inputs.siteCount.toLocaleString()}`, col1X, yPos);
+      doc.text(`Inventory Value: ${formatCurrency(inputs.totalInventoryValue)}`, col2X, yPos);
+      doc.text(`SKU Count: ${inputs.skuCount.toLocaleString()}`, col3X, yPos);
       yPos += 8;
-      doc.text(`Total Inventory Value: ${formatCurrency(inputs.totalInventoryValue)}`, 25, yPos);
-      yPos += 8;
-      doc.text(`SKU Count: ${inputs.skuCount.toLocaleString()}`, 25, yPos);
-      yPos += 8;
-      doc.text(`Active Materials: ${inputs.activePercent}%`, 25, yPos);
-      yPos += 8;
-      doc.text(`Obsolete/Non-Moving: ${inputs.obsoletePercent}%`, 25, yPos);
-      yPos += 8;
-      doc.text(`Special/Critical Items: ${inputs.specialPercent}%`, 25, yPos);
+      doc.text(`Active & Slow: ${inputs.activePercent}%`, col1X, yPos);
+      doc.text(`Non-Moving: ${inputs.obsoletePercent}%`, col2X, yPos);
+      doc.text(`Special Items: ${inputs.specialPercent}%`, col3X, yPos);
     }
-    
-    yPos += 15;
+
+    yPos += 20;
     doc.setFontSize(12);
     doc.setTextColor(30, 58, 95);
     doc.text("Optimization Breakdown", 20, yPos);
-    
-    yPos += 12;
-    doc.setFontSize(10);
-    doc.setTextColor(60, 60, 60);
-    doc.text(`Active Material Value Increases: +${formatCurrency(activeIncreases)}`, 25, yPos);
-    yPos += 8;
-    doc.text(`Active Material Value Decreases: -${formatCurrency(activeDecreases)}`, 25, yPos);
-    yPos += 8;
-    doc.text(`Network Optimization & Transfers: -${formatCurrency(results.networkOptimization)}`, 25, yPos);
-    yPos += 8;
-    doc.text(`VMI Disposition: -${formatCurrency(results.vmiDisposition)}`, 25, yPos);
-    yPos += 8;
-    doc.text(`Deduplication Savings: -${formatCurrency(results.deduplication)}`, 25, yPos);
-    
-    yPos += 20;
+
+    yPos += 10;
+
+    const breakdownItems = [
+      { name: "Active Material Value Increases", value: activeIncreases, color: "#ef4444", sign: "+", desc: "Reducing risk by increasing critical materials" },
+      { name: "Active Material Value Decreases", value: activeDecreases, color: "#3b82f6", sign: "-", desc: "Right-sizing active stock levels" },
+      { name: "Network Optimization & Transfer Opportunity", value: results.networkOptimization, color: "#8b5cf6", sign: "-", desc: "Cross-site inventory balancing" },
+      { name: "VMI Disposition", value: results.vmiDisposition, color: "#f97316", sign: "-", desc: "Vendor-managed inventory opportunities" },
+      { name: "Deduplication Savings", value: results.deduplication, color: "#ec4899", sign: "-", desc: "Eliminating duplicate safety stock" },
+    ];
+
+    breakdownItems.forEach((item) => {
+      const [r, g, b] = hexToRgb(item.color);
+
+      doc.setFillColor(r, g, b);
+      doc.roundedRect(20, yPos - 4, 4, 22, 2, 2, "F");
+
+      doc.setFillColor(248, 249, 252);
+      doc.roundedRect(28, yPos - 6, pageWidth - 48, 26, 3, 3, "F");
+
+      doc.setFontSize(10);
+      doc.setTextColor(30, 40, 60);
+      doc.text(item.name, 33, yPos + 3);
+
+      doc.setFontSize(8);
+      doc.setTextColor(120, 130, 140);
+      doc.text(item.desc, 33, yPos + 12);
+
+      doc.setFontSize(11);
+      doc.setTextColor(r, g, b);
+      doc.text(`${item.sign}${formatCurrency(item.value)}`, pageWidth - 25, yPos + 7, { align: "right" });
+
+      yPos += 30;
+    });
+
+    yPos += 5;
+    const barWidth = pageWidth - 50;
+    const barHeight = 20;
+    const barX = 25;
+
+    doc.setFillColor(245, 247, 250);
+    doc.roundedRect(15, yPos - 8, pageWidth - 30, barHeight + 35, 3, 3, "F");
+
     doc.setFontSize(9);
-    doc.setTextColor(120, 120, 120);
-    doc.text("* Estimates are based on industry benchmarks and high-level inputs.", 20, yPos);
-    doc.text("  Actual results may vary based on data quality and operational constraints.", 20, yPos + 5);
-    
-    yPos += 20;
+    doc.setTextColor(100, 110, 120);
+    doc.text("INVENTORY VALUE WATERFALL", 20, yPos);
+    yPos += 8;
+
+    doc.setFillColor(30, 58, 95);
+    doc.roundedRect(barX, yPos, barWidth, barHeight, 2, 2, "F");
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`Starting: ${formatCurrency(totalInventoryValue)}`, barX + 5, yPos + 13);
+
+    yPos += barHeight + 4;
+    const optimalWidth = totalInventoryValue > 0 ? (optimalInventory / totalInventoryValue) * barWidth : 0;
+    doc.setFillColor(0, 166, 81);
+    doc.roundedRect(barX, yPos, optimalWidth, barHeight, 2, 2, "F");
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`Optimal: ${formatCurrency(optimalInventory)}`, barX + 5, yPos + 13);
+
+    const savedWidth = barWidth - optimalWidth;
+    if (savedWidth > 0) {
+      doc.setFillColor(220, 230, 240);
+      doc.roundedRect(barX + optimalWidth, yPos, savedWidth, barHeight, 0, 0, "F");
+      doc.setFontSize(7);
+      doc.setTextColor(100, 110, 120);
+      if (savedWidth > 30) {
+        doc.text(`-${formatCurrency(totalOptimization)}`, barX + optimalWidth + 5, yPos + 13);
+      }
+    }
+
+    yPos += barHeight + 15;
+    doc.setFontSize(8);
+    doc.setTextColor(140, 140, 140);
+    doc.text("* Estimates are based on industry benchmarks and high-level inputs. Actual results may vary.", 20, yPos);
+
+    yPos += 15;
+    doc.setFillColor(30, 58, 95);
+    doc.roundedRect(15, yPos - 5, pageWidth - 30, 25, 3, 3, "F");
     doc.setFontSize(10);
-    doc.setTextColor(30, 58, 95);
-    doc.text("Ready to unlock your MRO optimization potential?", 20, yPos);
-    doc.text("Visit verusen.com or talk to an expert today.", 20, yPos + 6);
-    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Ready to unlock your MRO optimization potential?", pageWidth / 2, yPos + 4, { align: "center" });
+    doc.setFontSize(9);
+    doc.setTextColor(180, 200, 220);
+    doc.text("Visit verusen.com or talk to an expert today.", pageWidth / 2, yPos + 13, { align: "center" });
+
     doc.save("MRO-Optimization-Results.pdf");
   };
   return (
