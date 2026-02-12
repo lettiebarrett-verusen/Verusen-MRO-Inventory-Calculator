@@ -16,7 +16,6 @@ export const calculatorSchema = z.object({
   siteCount: z.number().min(1, "At least 1 site is required"),
   totalInventoryValue: z.number().min(1000, "Value must be at least $1,000"),
   skuCount: z.number().min(1, "At least 1 SKU is required"),
-  industry: z.string().min(1, "Please select your industry"),
   activePercent: z.number().min(0).max(100),
   obsoletePercent: z.number().min(0).max(100),
   specialPercent: z.number().min(0).max(100),

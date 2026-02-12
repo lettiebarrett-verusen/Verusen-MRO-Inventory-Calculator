@@ -29,13 +29,13 @@ interface InputStepProps {
 }
 
 export function InputStep({ onComplete, defaultValues }: InputStepProps) {
+  const [industry, setIndustry] = useState("");
   const form = useForm<CalculatorInputs>({
     resolver: zodResolver(calculatorSchema),
     defaultValues: {
       siteCount: 1,
       totalInventoryValue: 1000000,
       skuCount: 5000,
-      industry: "",
       activePercent: 50,
       obsoletePercent: 30,
       specialPercent: 20,
@@ -143,30 +143,21 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
 
             <Card>
               <CardContent className="pt-6">
-                <FormField
-                  control={form.control}
-                  name="industry"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Industry</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-industry" className="text-lg font-medium">
-                            <SelectValue placeholder="Select industry" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {industryOptions.map((option) => (
-                            <SelectItem key={option} value={option} data-testid={`option-industry-${option}`}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none">Industry</label>
+                  <Select onValueChange={setIndustry} value={industry}>
+                    <SelectTrigger data-testid="select-industry" className="text-lg font-medium">
+                      <SelectValue placeholder="Select industry" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {industryOptions.map((option) => (
+                        <SelectItem key={option} value={option} data-testid={`option-industry-${option}`}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
           </div>
