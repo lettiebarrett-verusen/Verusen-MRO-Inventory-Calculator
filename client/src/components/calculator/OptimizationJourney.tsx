@@ -87,7 +87,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
   });
   
   waterfallData.push({ 
-    name: "Optimal", 
+    name: "Optimal (<12 mo)", 
     base: 0, 
     value: optimalInventory, 
     color: "#22c55e", 

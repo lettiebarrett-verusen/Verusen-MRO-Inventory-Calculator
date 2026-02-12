@@ -140,7 +140,7 @@ export function ResultsView({ results, onReset, totalInventoryValue = 1000000, i
     doc.roundedRect(barX, yPos, optimalWidth, barHeight, 2, 2, "F");
     doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
-    doc.text(`Optimal: ${formatCurrency(optimalInventory)}`, barX + 5, yPos + 13);
+    doc.text(`Optimal (<12 months): ${formatCurrency(optimalInventory)}`, barX + 5, yPos + 13);
 
     const savedWidth = barWidth - optimalWidth;
     if (savedWidth > 0) {
