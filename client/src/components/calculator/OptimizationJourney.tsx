@@ -153,20 +153,9 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
 
   return (
     <div className="space-y-10">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <img src="/verusen-logo.png" alt="Verusen" className="h-6 mb-3" />
-          <h2 className="text-3xl font-bold pb-4 border-b-4 border-accent inline-block">
-            MRO Inventory Calculator
-          </h2>
-          <p className="text-sm text-muted-foreground mt-3 max-w-xl">
-            Powered by Verusen AI, this directional estimate illustrates how improved MRO visibility and optimization can unlock measurable inventory value across your network.
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-muted-foreground">Total Optimization Opportunity</p>
-          <p className="text-3xl font-extrabold text-primary">{formatCurrency(totalOptimization)}</p>
-        </div>
+      <div className="text-center">
+        <p className="text-sm text-muted-foreground mb-2">Total Optimization Opportunity</p>
+        <p className="text-5xl font-extrabold text-primary">{formatCurrency(totalOptimization)}</p>
       </div>
 
       <div>
