@@ -1,6 +1,5 @@
 import { type CalculatorInputs } from "@/lib/calculator-logic";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Settings2 } from "lucide-react";
 
@@ -25,8 +24,11 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
     return cleaned ? parseInt(cleaned, 10) : 0;
   };
 
-  const formatCurrency = (val: number) => 
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+  const parsePercent = (str: string) => {
+    const cleaned = str.replace(/[^0-9]/g, '');
+    const val = cleaned ? parseInt(cleaned, 10) : 0;
+    return Math.min(100, val);
+  };
 
   return (
     <Card className="border-border/50 bg-muted/20 mb-8">
@@ -36,8 +38,7 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
           <span className="text-sm font-medium text-muted-foreground">Adjust Inputs</span>
         </div>
         
-        <div className="grid md:grid-cols-6 gap-4 items-end">
-          {/* Core Inputs */}
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4 items-end">
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Sites</label>
             <Input 
@@ -71,44 +72,46 @@ export function CompactInputs({ inputs, onChange }: CompactInputsProps) {
             />
           </div>
 
-          {/* Percentage Sliders */}
           <div>
-            <div className="flex justify-between mb-1">
-              <label className="text-xs text-muted-foreground">Active</label>
-              <span className="text-xs font-mono">{inputs.activePercent}%</span>
+            <label className="text-xs text-muted-foreground mb-1 block">Active %</label>
+            <div className="relative">
+              <Input 
+                type="text"
+                inputMode="numeric"
+                value={inputs.activePercent}
+                onChange={e => handleChange("activePercent", parsePercent(e.target.value))}
+                className="h-9 text-sm font-mono pr-6 text-right"
+              />
+              <span className="absolute right-2 top-2 text-xs text-muted-foreground">%</span>
             </div>
-            <Slider 
-              min={0} max={100} step={1} 
-              value={[inputs.activePercent]} 
-              onValueChange={vals => handleChange("activePercent", vals[0])}
-              className="h-9"
-            />
           </div>
           
           <div>
-            <div className="flex justify-between mb-1">
-              <label className="text-xs text-muted-foreground">Obsolete</label>
-              <span className="text-xs font-mono">{inputs.obsoletePercent}%</span>
+            <label className="text-xs text-muted-foreground mb-1 block">Non-Moving %</label>
+            <div className="relative">
+              <Input 
+                type="text"
+                inputMode="numeric"
+                value={inputs.obsoletePercent}
+                onChange={e => handleChange("obsoletePercent", parsePercent(e.target.value))}
+                className="h-9 text-sm font-mono pr-6 text-right"
+              />
+              <span className="absolute right-2 top-2 text-xs text-muted-foreground">%</span>
             </div>
-            <Slider 
-              min={0} max={100} step={1} 
-              value={[inputs.obsoletePercent]} 
-              onValueChange={vals => handleChange("obsoletePercent", vals[0])}
-              className="h-9"
-            />
           </div>
           
           <div>
-            <div className="flex justify-between mb-1">
-              <label className="text-xs text-muted-foreground">Special</label>
-              <span className={`text-xs font-mono ${is100 ? '' : 'text-red-500'}`}>{inputs.specialPercent}%</span>
+            <label className={`text-xs mb-1 block ${is100 ? 'text-muted-foreground' : 'text-red-500'}`}>Special %</label>
+            <div className="relative">
+              <Input 
+                type="text"
+                inputMode="numeric"
+                value={inputs.specialPercent}
+                onChange={e => handleChange("specialPercent", parsePercent(e.target.value))}
+                className={`h-9 text-sm font-mono pr-6 text-right ${!is100 ? 'border-red-500' : ''}`}
+              />
+              <span className="absolute right-2 top-2 text-xs text-muted-foreground">%</span>
             </div>
-            <Slider 
-              min={0} max={100} step={1} 
-              value={[inputs.specialPercent]} 
-              onValueChange={vals => handleChange("specialPercent", vals[0])}
-              className="h-9"
-            />
           </div>
         </div>
         

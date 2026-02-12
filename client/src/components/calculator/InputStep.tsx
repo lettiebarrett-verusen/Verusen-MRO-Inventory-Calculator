@@ -185,9 +185,22 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                   name="activePercent"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex justify-between mb-2">
+                      <div className="flex justify-between items-center mb-2">
                         <FormLabel>Active & Slow Moving</FormLabel>
-                        <span className="font-mono">{field.value}%</span>
+                        <div className="relative w-20">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            data-testid="input-active-percent"
+                            value={field.value}
+                            onChange={e => {
+                              const val = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10);
+                              field.onChange(isNaN(val) ? 0 : Math.min(100, val));
+                            }}
+                            className="h-8 text-sm font-mono pr-6 text-right"
+                          />
+                          <span className="absolute right-2 top-1.5 text-sm text-muted-foreground">%</span>
+                        </div>
                       </div>
                       <FormControl>
                         <Slider 
@@ -206,9 +219,22 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                   name="obsoletePercent"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex justify-between mb-2">
+                      <div className="flex justify-between items-center mb-2">
                         <FormLabel>Non-Moving / Obsolete</FormLabel>
-                        <span className="font-mono">{field.value}%</span>
+                        <div className="relative w-20">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            data-testid="input-obsolete-percent"
+                            value={field.value}
+                            onChange={e => {
+                              const val = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10);
+                              field.onChange(isNaN(val) ? 0 : Math.min(100, val));
+                            }}
+                            className="h-8 text-sm font-mono pr-6 text-right"
+                          />
+                          <span className="absolute right-2 top-1.5 text-sm text-muted-foreground">%</span>
+                        </div>
                       </div>
                       <FormControl>
                         <Slider 
@@ -228,9 +254,22 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
                   name="specialPercent"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex justify-between mb-2">
+                      <div className="flex justify-between items-center mb-2">
                         <FormLabel>Special Items</FormLabel>
-                        <span className="font-mono">{field.value}%</span>
+                        <div className="relative w-20">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            data-testid="input-special-percent"
+                            value={field.value}
+                            onChange={e => {
+                              const val = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10);
+                              field.onChange(isNaN(val) ? 0 : Math.min(100, val));
+                            }}
+                            className="h-8 text-sm font-mono pr-6 text-right"
+                          />
+                          <span className="absolute right-2 top-1.5 text-sm text-muted-foreground">%</span>
+                        </div>
                       </div>
                       <FormControl>
                         <Slider 
