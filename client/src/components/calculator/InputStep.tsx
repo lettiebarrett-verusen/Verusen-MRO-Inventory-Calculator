@@ -56,7 +56,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold" style={{ color: '#003252' }}>MRO Inventory Calculator</h2>
+        <h2 className="text-4xl font-extrabold" style={{ color: '#003252' }}>MRO Inventory Calculator</h2>
         <p className="text-muted-foreground mt-2">Enter a few high-level details to estimate your optimization potential.</p>
       </div>
 
