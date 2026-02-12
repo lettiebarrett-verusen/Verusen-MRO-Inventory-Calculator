@@ -37,7 +37,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
       totalInventoryValue: 1000000,
       skuCount: 5000,
       activePercent: 67,
-      obsoletePercent: 24,
+      obsoletePercent: 23,
       specialPercent: 10,
       ...defaultValues
     }
