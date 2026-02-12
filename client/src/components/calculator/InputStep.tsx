@@ -144,9 +144,9 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none">Industry</label>
+                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Industry</label>
                   <Select onValueChange={setIndustry} value={industry}>
-                    <SelectTrigger data-testid="select-industry" className="text-lg font-medium">
+                    <SelectTrigger data-testid="select-industry" className="text-lg font-medium [&>span]:text-sm">
                       <SelectValue placeholder="Select industry" />
                     </SelectTrigger>
                     <SelectContent>
