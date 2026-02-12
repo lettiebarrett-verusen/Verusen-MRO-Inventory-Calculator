@@ -41,48 +41,55 @@ export async function registerRoutes(
     try {
       const data = submitLeadSchema.parse(req.body);
       
-      const existingLead = await storage.getLeadByEmail(data.lead.email);
-      let lead;
-      
-      if (existingLead) {
-        lead = existingLead;
-      } else {
-        lead = await storage.createLead({
-          firstName: data.lead.firstName,
-          lastName: data.lead.lastName,
-          email: data.lead.email,
-          company: data.lead.company,
-          role: data.lead.jobFunction,
-        });
-      }
-      
-      const calculation = await storage.createCalculation({
-        leadId: lead.id,
-        ...data.calculation,
-      });
-
-      // Sync to HubSpot using Replit connector
       const fullName = `${data.lead.firstName} ${data.lead.lastName}`;
+      
       syncLeadToHubSpot(
         { name: fullName, email: data.lead.email, company: data.lead.company, jobFunction: data.lead.jobFunction },
         data.calculation
       ).then(result => {
         if (result.success) {
-          storage.updateLeadHubspotStatus(lead.id, "synced");
           console.log("Lead synced to HubSpot:", data.lead.email);
         } else {
-          storage.updateLeadHubspotStatus(lead.id, "failed");
           console.error("HubSpot sync failed:", result.error);
         }
       }).catch(err => {
         console.error("HubSpot sync failed:", err);
-        storage.updateLeadHubspotStatus(lead.id, "failed");
       });
+
+      let leadId = "hubspot-only";
+      let calculationId = "hubspot-only";
+      
+      try {
+        const existingLead = await storage.getLeadByEmail(data.lead.email);
+        let lead;
+        
+        if (existingLead) {
+          lead = existingLead;
+        } else {
+          lead = await storage.createLead({
+            firstName: data.lead.firstName,
+            lastName: data.lead.lastName,
+            email: data.lead.email,
+            company: data.lead.company,
+            role: data.lead.jobFunction,
+          });
+        }
+        
+        const calculation = await storage.createCalculation({
+          leadId: lead.id,
+          ...data.calculation,
+        });
+        
+        leadId = lead.id;
+        calculationId = calculation.id;
+      } catch (dbError) {
+        console.error("Database save error (HubSpot sync still attempted):", dbError);
+      }
 
       res.json({ 
         success: true, 
-        leadId: lead.id, 
-        calculationId: calculation.id 
+        leadId, 
+        calculationId 
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
