@@ -7,12 +7,16 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
 
 const JOB_FUNCTIONS = [
-  { value: "procurement", label: "Procurement" },
-  { value: "innovation", label: "Innovation" },
-  { value: "supply_chain", label: "Supply Chain" },
-  { value: "operations", label: "Operations" },
-  { value: "sourcing", label: "Sourcing" },
-  { value: "other", label: "Other" },
+  { value: "Procurement", label: "Procurement" },
+  { value: "Innovation", label: "Innovation" },
+  { value: "IT / IS", label: "IT / IS" },
+  { value: "Finance", label: "Finance" },
+  { value: "Sourcing", label: "Sourcing" },
+  { value: "Maintenance", label: "Maintenance" },
+  { value: "Manufacturing", label: "Manufacturing" },
+  { value: "Supply Chain", label: "Supply Chain" },
+  { value: "Operations", label: "Operations" },
+  { value: "Other", label: "Other" },
 ];
 
 interface LeadFormProps {
