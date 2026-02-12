@@ -99,7 +99,7 @@ export function OptimizationJourney({ results, totalInventoryValue }: Optimizati
     {
       name: "Active Material Value Increases",
       value: activeIncreases,
-      color: "#22c55e",
+      color: "#ef4444",
       icon: TrendingUp,
       description: "Reducing risk by increasing critical materials",
       isIncrease: true
