@@ -56,8 +56,7 @@ export function InputStep({ onComplete, defaultValues }: InputStepProps) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 text-center">
-        <h2 className="text-4xl font-extrabold" style={{ color: '#003252' }}>MRO Inventory Calculator</h2>
-        <p className="text-muted-foreground mt-2">Enter a few high-level details to estimate your optimization potential.</p>
+        <p className="text-muted-foreground mt-2">See your MRO savings potential in minutes. Backed by AI insights, the largest MRO materials dataset, and industry benchmarks.</p>
       </div>
 
       <Form {...form}>
