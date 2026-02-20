@@ -35,70 +35,273 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
   const downloadPDF = () => {
     const doc = new jsPDF();
     const pw = doc.internal.pageSize.getWidth();
+    const ph = doc.internal.pageSize.getHeight();
+    const mx = 15;
+    const cw = pw - mx * 2;
+
+    const hexToRgb = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return [r, g, b] as const;
+    };
+
+    const checkPage = (needed: number, y: number) => {
+      if (y + needed > ph - 20) { doc.addPage(); return 30; }
+      return y;
+    };
 
     doc.setFillColor(0, 50, 82);
-    doc.rect(0, 0, pw, 50, "F");
-    doc.setFontSize(22);
+    doc.rect(0, 0, pw, 60, "F");
+    doc.setFontSize(8);
+    doc.setTextColor(160, 185, 210);
+    doc.text("TOTAL MRO OPTIMIZATION OPPORTUNITY", mx + 5, 15);
+    doc.setFontSize(26);
     doc.setTextColor(255, 255, 255);
-    doc.text("MRO Optimization Calculator", 20, 25);
-    doc.setFontSize(10);
-    doc.setTextColor(180, 200, 220);
-    doc.text("Powered by Verusen AI", 20, 35);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 42);
-    doc.setFontSize(10);
-    doc.setTextColor(180, 200, 220);
-    doc.text("Total Estimated Annual Opportunity", pw - 20, 20, { align: "right" });
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
-    doc.text(fmt(results.grandTotal), pw - 20, 35, { align: "right" });
+    doc.text(fmt(results.grandTotal), mx + 5, 30);
+    doc.setFontSize(8);
+    doc.setTextColor(160, 185, 210);
+    doc.text("Powered by your data, Verusen\u2019s advanced AI modeling, and industry benchmarks.", mx + 5, 40);
+    doc.setFontSize(7);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pw - mx - 5, 15, { align: "right" });
 
-    let y = 60;
-    doc.setFontSize(9);
-    doc.setTextColor(100, 110, 120);
-    doc.setFillColor(245, 247, 250);
-    doc.roundedRect(15, y, pw - 30, 25, 3, 3, "F");
-    doc.text("INPUT PROFILE", 20, y + 8);
-    y += 14;
-    doc.setTextColor(60, 60, 60);
-    doc.text(`Sites: ${inputs.siteCount}  |  Inventory: ${fmt(inputs.totalInventoryValue)}  |  SKUs: ${fmtInt(inputs.skuCount)}  |  Active: ${inputs.activePercent}%  Non-Moving: ${inputs.obsoletePercent}%  Special: ${inputs.specialPercent}%`, 20, y);
+    const bucketW = cw / buckets.length;
+    const bucketY = 48;
+    buckets.forEach((b, i) => {
+      const bx = mx + i * bucketW;
+      doc.setFillColor(20, 60, 95);
+      doc.rect(bx, bucketY, bucketW, 12, "F");
+      doc.setFontSize(5.5);
+      doc.setTextColor(160, 185, 210);
+      doc.text(b.label.toUpperCase(), bx + 3, bucketY + 4);
+      doc.setFontSize(9);
+      const [cr, cg, cb] = hexToRgb(b.color);
+      doc.setTextColor(cr, cg, cb);
+      doc.text(fmt(b.value), bx + 3, bucketY + 10);
+    });
 
-    y += 20;
+    let y = 70;
+
+    const drawSectionHeader = (title: string, _icon: string, color: string, yPos: number) => {
+      const [r, g, b] = hexToRgb(color);
+      doc.setFillColor(r + Math.round((255 - r) * 0.92), g + Math.round((255 - g) * 0.92), b + Math.round((255 - b) * 0.92));
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, yPos, cw, 8, "FD");
+      doc.setFontSize(7);
+      doc.setTextColor(r, g, b);
+      doc.text(title.toUpperCase(), mx + 3, yPos + 5.5);
+      return yPos + 8;
+    };
+
+    const drawTotalRow = (label: string, sub: string, value: number, color: string, yPos: number) => {
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, yPos, cw, 14, "FD");
+      doc.setFontSize(9);
+      doc.setTextColor(0, 50, 82);
+      doc.text(label, mx + 4, yPos + 6);
+      doc.setFontSize(6);
+      doc.setTextColor(120, 120, 120);
+      doc.text(sub, mx + 4, yPos + 11);
+      const [r, g, b] = hexToRgb(color);
+      doc.setFontSize(12);
+      doc.setTextColor(r, g, b);
+      doc.text(fmt(value), pw - mx - 4, yPos + 8, { align: "right" });
+      return yPos + 14;
+    };
+
+    const drawRiskRow = (label: string, sub: string, value: number, yPos: number) => {
+      doc.setFillColor(254, 249, 243);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, yPos, cw, 14, "FD");
+      doc.setFontSize(9);
+      doc.setTextColor(0, 50, 82);
+      doc.text(`\u26A0 ${label}`, mx + 4, yPos + 6);
+      doc.setFontSize(6);
+      doc.setTextColor(120, 120, 120);
+      doc.text(sub, mx + 4, yPos + 11);
+      doc.setFontSize(12);
+      doc.setTextColor(237, 155, 41);
+      doc.text(fmt(value), pw - mx - 4, yPos + 8, { align: "right" });
+      return yPos + 14;
+    };
+
+    const drawBreakdownTable = (
+      headerText: string,
+      rows: { name: string; desc: string; value: number }[],
+      total: number,
+      color: string,
+      yPos: number
+    ) => {
+      yPos = checkPage(10 + rows.length * 9 + 9, yPos);
+      doc.setFillColor(245, 247, 250);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, yPos, cw, 7, "FD");
+      doc.setFontSize(6);
+      doc.setTextColor(120, 120, 120);
+      doc.text(headerText.toUpperCase(), mx + 4, yPos + 4.5);
+      yPos += 7;
+
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, yPos, cw, 6, "FD");
+      doc.setFontSize(6);
+      doc.setTextColor(120, 120, 120);
+      doc.text("INITIATIVE", mx + 4, yPos + 4);
+      doc.text("DESCRIPTION", mx + 55, yPos + 4);
+      doc.text("AMOUNT", pw - mx - 4, yPos + 4, { align: "right" });
+      yPos += 6;
+
+      const [cr, cg, cb] = hexToRgb(color);
+      rows.forEach((row) => {
+        yPos = checkPage(9, yPos);
+        doc.setDrawColor(240, 240, 240);
+        doc.rect(mx, yPos, cw, 9, "D");
+        doc.setFontSize(7);
+        doc.setTextColor(0, 50, 82);
+        doc.text(row.name, mx + 4, yPos + 4);
+        doc.setFontSize(6);
+        doc.setTextColor(120, 120, 120);
+        const descLines = doc.splitTextToSize(row.desc, 75);
+        doc.text(descLines[0], mx + 55, yPos + 4);
+        if (descLines[1]) doc.text(descLines[1], mx + 55, yPos + 7.5);
+        doc.setFontSize(7);
+        doc.setTextColor(cr, cg, cb);
+        doc.text(fmt(row.value), pw - mx - 4, yPos + 5, { align: "right" });
+        yPos += 9;
+      });
+
+      yPos = checkPage(8, yPos);
+      doc.setFillColor(245, 247, 250);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, yPos, cw, 8, "FD");
+      doc.setFontSize(8);
+      doc.setTextColor(0, 50, 82);
+      doc.text("Total", mx + 4, yPos + 5.5);
+      doc.setTextColor(cr, cg, cb);
+      doc.text(fmt(total), pw - mx - 4, yPos + 5.5, { align: "right" });
+      yPos += 8;
+
+      return yPos;
+    };
+
     if (hasInv && results.inventory) {
-      doc.setFontSize(11);
-      doc.setTextColor(0, 50, 82);
-      doc.text("Inventory Reduction: " + fmt(results.inventory.totalInvReduction), 20, y);
-      y += 8;
-      doc.setFontSize(9);
-      doc.setTextColor(80, 80, 80);
-      doc.text(`Risk Investment: +${fmt(results.inventory.activeIncrease)}  |  Active Reduction: ${fmt(results.inventory.activeDecrease)}  |  Pooling: ${fmt(results.inventory.pooling)}  |  VMI: ${fmt(results.inventory.vmi)}  |  Dedup: ${fmt(results.inventory.dedup)}`, 20, y);
-      y += 12;
-    }
-    if (hasSpend && results.spend) {
-      doc.setFontSize(11);
-      doc.setTextColor(0, 50, 82);
-      doc.text("Spend Reduction: " + fmt(results.spend.totalSpend), 20, y);
-      y += 8;
-      doc.setFontSize(9);
-      doc.setTextColor(80, 80, 80);
-      doc.text(`Holding: ${fmt(results.spend.holdingSavings)}  |  WACC: ${fmt(results.spend.waccSavings)}  |  PPV: ${fmt(results.spend.ppvSavings)}  |  Replen: ${fmt(results.spend.replenishmentSuppression)}`, 20, y);
-      y += 12;
-    }
-    if (hasDowntime && results.downtime) {
-      doc.setFontSize(11);
-      doc.setTextColor(0, 50, 82);
-      doc.text("Downtime Savings: " + fmt(results.downtime.dtSavings), 20, y);
-      y += 12;
+      y = checkPage(60, y);
+      y = drawSectionHeader("Inventory Imbalance", "\uD83D\uDCE6", "#3ec26d", y);
+      y = drawTotalRow("Total Inventory Value Reduction Opportunity", "One-time reduction in on-hand inventory value through right-sizing initiatives", results.inventory.totalInvReduction, "#3ec26d", y);
+      y = drawRiskRow("Active Materials Increase", "Active material investment to cover critical stockout gaps", results.inventory.activeIncrease, y);
+      y = drawBreakdownTable(
+        `Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`,
+        [
+          { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
+          { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
+          { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
+          { name: "VMI Disposition", desc: "Vendor-managed inventory transfers stock ownership off your books", value: results.inventory.vmi },
+        ],
+        results.inventory.totalInvReduction,
+        "#3ec26d",
+        y
+      );
+      y += 6;
     }
 
-    y += 5;
+    if (hasSpend && results.spend) {
+      y = checkPage(60, y);
+      y = drawSectionHeader("Spend Leakage", "\uD83D\uDCB8", "#0075c9", y);
+      y = drawTotalRow("Total Annual Spend Reduction & Avoidance", "Ongoing annual savings from eliminating leakage across your MRO spend categories", results.spend.totalSpend, "#0075c9", y);
+      y = drawBreakdownTable(
+        `Components of the ${fmt(results.spend.totalSpend)} annual spend reduction`,
+        [
+          { name: "Carrying / Holding Cost Savings", desc: "Annual cost of carrying inventory eliminated as on-hand value drops", value: results.spend.holdingSavings },
+          { name: "WACC Savings", desc: "Capital cost freed as inventory reduction releases working capital", value: results.spend.waccSavings },
+          { name: "PPV & Tailspend Savings", desc: "Price variance and tail spend consolidation through supplier rationalization", value: results.spend.ppvSavings },
+          { name: "Replenishment Suppression", desc: "Reduced reorder activity as optimized inventory eliminates unnecessary restocking", value: results.spend.replenishmentSuppression },
+          { name: "Additional Repairable Materials", desc: "Parts identified as repairable rather than replaced, reducing new spend", value: results.spend.repairableMaterials },
+          { name: "Expediting Cost Reduction", desc: "Emergency and rush order costs avoided through better stock positioning", value: results.spend.expediting },
+        ],
+        results.spend.totalSpend,
+        "#0075c9",
+        y
+      );
+      y += 6;
+    }
+
+    if (hasDowntime && results.downtime) {
+      y = checkPage(50, y);
+      y = drawSectionHeader("Downtime Risk", "\u26A0\uFE0F", "#6b7280", y);
+      y = drawTotalRow("Total Estimated Downtime Cost Avoidance", "Annual savings from reducing stockout-driven unplanned downtime", results.downtime.dtSavings, "#6b7280", y);
+
+      doc.setFillColor(245, 247, 250);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, y, cw, 7, "FD");
+      doc.setFontSize(6);
+      doc.setTextColor(120, 120, 120);
+      doc.text("HOW THIS SAVINGS IS CALCULATED \u2014 CURRENT VS. OPTIMIZED STATE", mx + 4, y + 4.5);
+      y += 7;
+
+      doc.setFillColor(255, 255, 255);
+      doc.rect(mx, y, cw, 6, "FD");
+      doc.setFontSize(6);
+      doc.setTextColor(120, 120, 120);
+      doc.text("METRIC", mx + 4, y + 4);
+      doc.text("CURRENT STATE", mx + 75, y + 4);
+      doc.text("OPTIMIZED STATE", pw - mx - 4, y + 4, { align: "right" });
+      y += 6;
+
+      const dtRows = [
+        { metric: "Org-Wide Unplanned Downtime Hours", current: `${fmtInt(results.downtime.orgDtHours)} hrs`, optimized: `${fmtInt(results.downtime.optimizedDtHours)} hrs` },
+        { metric: "Total Unplanned Downtime Cost", current: fmt(results.downtime.unplannedCost), optimized: fmt(results.downtime.optimizedDtCost) },
+        { metric: "Critical Spares Stockout Rate", current: `${(results.downtime.curStockoutRate * 100).toFixed(0)}%`, optimized: `${(results.downtime.tgtStockoutRate * 100).toFixed(0)}%` },
+      ];
+      dtRows.forEach((row) => {
+        doc.setDrawColor(240, 240, 240);
+        doc.rect(mx, y, cw, 8, "D");
+        doc.setFontSize(7);
+        doc.setTextColor(0, 50, 82);
+        doc.text(row.metric, mx + 4, y + 5);
+        doc.setTextColor(120, 120, 120);
+        doc.text(row.current, mx + 75, y + 5);
+        doc.setTextColor(107, 114, 128);
+        doc.text(row.optimized, pw - mx - 4, y + 5, { align: "right" });
+        y += 8;
+      });
+
+      doc.setFillColor(245, 247, 250);
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(mx, y, cw, 8, "FD");
+      doc.setFontSize(7);
+      doc.setTextColor(0, 50, 82);
+      doc.text("Avoidable Downtime Cost (stockout-attributed portion)", mx + 4, y + 5);
+      doc.setTextColor(107, 114, 128);
+      doc.text(fmt(results.downtime.dtSavings), pw - mx - 4, y + 5, { align: "right" });
+      y += 8;
+      y += 6;
+    }
+
+    y = checkPage(20, y);
+    doc.setFillColor(245, 247, 250);
+    doc.setDrawColor(220, 220, 220);
+    doc.roundedRect(mx, y, cw, 22, 2, 2, "FD");
+    doc.setFontSize(7);
+    doc.setTextColor(0, 50, 82);
+    doc.text("How we calculated this.", mx + 4, y + 5);
+    doc.setFontSize(6);
+    doc.setTextColor(120, 120, 120);
+    const methText = "Sliding factors for Parts Pooling, VMI, Deduplication, and PPV Savings scale with your number of sites and SKU count using conservative industry benchmarks. Inventory mix defaults to 67% active/slow, 23% non-moving, 10% special items. Downtime savings use your service level inputs directly per the stockout rate optimization formula. Your actual results may vary.";
+    const methLines = doc.splitTextToSize(methText, cw - 8);
+    doc.text(methLines, mx + 4, y + 10);
+    y += 26;
+
+    y = checkPage(22, y);
     doc.setFillColor(0, 50, 82);
-    doc.roundedRect(15, y, pw - 30, 25, 3, 3, "F");
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text("Ready to unlock your MRO optimization potential?", pw / 2, y + 10, { align: "center" });
+    doc.roundedRect(mx, y, cw, 18, 2, 2, "F");
     doc.setFontSize(9);
-    doc.setTextColor(180, 200, 220);
-    doc.text("Visit verusen.com or talk to an expert today.", pw / 2, y + 18, { align: "center" });
+    doc.setTextColor(255, 255, 255);
+    doc.text("Ready to unlock your MRO optimization potential?", pw / 2, y + 8, { align: "center" });
+    doc.setFontSize(7);
+    doc.setTextColor(160, 185, 210);
+    doc.text("Visit verusen.com or talk to an expert today.", pw / 2, y + 14, { align: "center" });
+
     doc.save("MRO-Optimization-Results.pdf");
   };
 

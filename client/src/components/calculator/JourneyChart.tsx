@@ -83,7 +83,8 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
     points.push({ label: "Long Term", value: cur, tip: `Optimal On-Hand Inv: ${fmt(cur)}`, color: "#003252" });
   }
 
-  const data = points.map(p => ({ name: p.label, value: Math.max(p.value, 0), tip: p.tip, dotColor: p.color }));
+  const lastIdx = points.length - 1;
+  const data = points.map((p, i) => ({ name: p.label, value: Math.max(p.value, 0), tip: p.tip, dotColor: p.color, isLast: i === lastIdx }));
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -101,6 +102,18 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     if (!cx || !cy) return null;
+    if (payload.isLast) {
+      return (
+        <g>
+          <polygon
+            points={`${cx + 12},${cy} ${cx - 4},${cy - 7} ${cx - 4},${cy + 7}`}
+            fill={payload.dotColor || "#003252"}
+            stroke="white"
+            strokeWidth={1.5}
+          />
+        </g>
+      );
+    }
     return (
       <circle cx={cx} cy={cy} r={5} fill={payload.dotColor || "#003252"} stroke="white" strokeWidth={2} />
     );
