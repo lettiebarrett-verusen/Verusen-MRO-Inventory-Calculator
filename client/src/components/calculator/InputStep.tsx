@@ -308,7 +308,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
         <>
           <SectionHead>Downtime Profile</SectionHead>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
-            <FieldGroup label="Avg. Unplanned Downtime Hours / Site / Year" required error={errors.downtimeHoursPerSite} hint="Suggested range: 300–1,200 hrs/year" warning={dtHoursWarning}>
+            <FieldGroup label="Unplanned Downtime Hours (Avg Per Site)" required error={errors.downtimeHoursPerSite} hint="Suggested range: 300–1,200 hrs/year" warning={dtHoursWarning}>
               <Input
                 id="inp-downtimeHoursPerSite"
                 data-testid="input-dt-hours"
@@ -316,10 +316,10 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
                 inputMode="numeric"
                 value={values.downtimeHoursPerSite ? formatNumberWithCommas(values.downtimeHoursPerSite) : ''}
                 onChange={e => updateField("downtimeHoursPerSite", parseFormattedNumber(e.target.value))}
-                placeholder="e.g. 600"
+                placeholder="e.g. 400"
               />
             </FieldGroup>
-            <FieldGroup label="Avg. Downtime Cost / Hour / Site" required error={errors.downtimeCostPerHour} hint="Suggested range: $5,600–$22,000/hr" warning={dtCostWarning}>
+            <FieldGroup label="Downtime Cost Per Hour Per Production Unit (Avg Per Site)" required error={errors.downtimeCostPerHour} hint="Suggested range: $5,600–$22,000/hr" warning={dtCostWarning}>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
                 <Input
@@ -330,7 +330,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
                   className="pl-7"
                   value={values.downtimeCostPerHour ? formatNumberWithCommas(values.downtimeCostPerHour) : ''}
                   onChange={e => updateField("downtimeCostPerHour", parseFormattedNumber(e.target.value))}
-                  placeholder="e.g. 12,000"
+                  placeholder="e.g. 6,000"
                 />
               </div>
             </FieldGroup>
