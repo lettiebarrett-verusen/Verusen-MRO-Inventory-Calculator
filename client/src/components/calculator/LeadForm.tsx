@@ -23,17 +23,108 @@ interface LeadFormProps {
   onComplete: (data: LeadInputs) => void;
   onBack: () => void;
   isSubmitting?: boolean;
+  compact?: boolean;
 }
 
-export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormProps) {
+export function LeadForm({ onComplete, onBack, isSubmitting = false, compact = false }: LeadFormProps) {
   const form = useForm<LeadInputs>({
     resolver: zodResolver(leadSchema),
   });
 
+  if (compact) {
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onComplete)} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} placeholder="First name" className="bg-gray-50" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} placeholder="Last name" className="bg-gray-50" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input {...field} type="email" placeholder="Business email" className="bg-gray-50" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="company"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input {...field} placeholder="Company" className="bg-gray-50" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="jobFunction"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <select 
+                    {...field}
+                    className="flex h-9 w-full items-center rounded-md border border-input bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
+                    <option value="">Select your function</option>
+                    {JOB_FUNCTIONS.map((fn) => (
+                      <option key={fn.value} value={fn.value}>{fn.label}</option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full bg-[#003252] hover:bg-[#003252]/90 h-11" disabled={isSubmitting} data-testid="button-reveal-savings">
+            {isSubmitting ? "Submitting..." : "Unlock My Full Report"} {!isSubmitting && <ArrowRight className="ml-2 w-4 h-4" />}
+          </Button>
+
+          <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
+            <Lock className="w-3 h-3" /> We respect your privacy. No spam.
+          </p>
+        </form>
+      </Form>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold mb-2">Your Results Are Ready</h2>
+        <h2 className="text-2xl font-bold text-[#003252] mb-2">Your Results Are Ready</h2>
         <p className="text-muted-foreground">
           Enter your details to unlock your customized inventory optimization report.
         </p>
@@ -107,13 +198,11 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormP
                 <FormControl>
                   <select 
                     {...field}
-                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-9 w-full items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   >
                     <option value="">Select your function</option>
                     {JOB_FUNCTIONS.map((fn) => (
-                      <option key={fn.value} value={fn.value}>
-                        {fn.label}
-                      </option>
+                      <option key={fn.value} value={fn.value}>{fn.label}</option>
                     ))}
                   </select>
                 </FormControl>
@@ -122,7 +211,7 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false }: LeadFormP
             )}
           />
 
-          <Button type="submit" size="lg" className="w-full mt-6 h-12 text-lg" disabled={isSubmitting}>
+          <Button type="submit" size="lg" className="w-full mt-6 h-12 text-lg bg-[#003252] hover:bg-[#003252]/90" disabled={isSubmitting} data-testid="button-reveal-savings">
             {isSubmitting ? "Submitting..." : "Reveal My Savings"} {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5" />}
           </Button>
 
