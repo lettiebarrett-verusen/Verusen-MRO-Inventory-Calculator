@@ -448,8 +448,8 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
             </a>
           </Button>
           <Button size="lg" variant="outline" className="h-12 px-8" asChild>
-            <a href="https://verusen.com/mro-inventory-optimization-platforms-compared-why-verusen-outperforms-sap-ibm-xtivity-and-sparetech-in-2025/" target="_blank" rel="noopener noreferrer">
-              <Award className="mr-2 h-4 w-4" /> Learn Why Customers Choose Verusen
+            <a href="https://verusen.com/ai-agent-explainability-for-mro-inventory-optimization/" target="_blank" rel="noopener noreferrer">
+              <Award className="mr-2 h-4 w-4" /> Learn About Verusen's Explainability AI Agent
             </a>
           </Button>
           <Button size="lg" variant="ghost" className="h-12 px-8 text-muted-foreground" onClick={downloadPDF}>
