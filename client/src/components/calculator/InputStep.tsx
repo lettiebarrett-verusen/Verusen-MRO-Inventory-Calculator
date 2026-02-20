@@ -319,7 +319,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
                 placeholder="e.g. 400"
               />
             </FieldGroup>
-            <FieldGroup label="Downtime Cost Per Hour Per Production Unit (Avg Per Site)" required error={errors.downtimeCostPerHour} hint="Suggested range: $5,600–$22,000/hr" warning={dtCostWarning}>
+            <FieldGroup label="Downtime Cost/Hr Per Production Unit (Avg Per Site)" required error={errors.downtimeCostPerHour} hint="Suggested range: $5,600–$22,000/hr" warning={dtCostWarning}>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
                 <Input
