@@ -233,9 +233,9 @@ function GatedResults({
     <div>
       <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden">
         <div className="absolute top-[-60px] right-[-60px] w-[300px] h-[300px] rounded-full bg-[#0075c9]/15" />
-        <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium">Total Estimated Annual Opportunity</p>
+        <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium">Total MRO Optimization Opportunity</p>
         <p className="text-4xl md:text-5xl font-extrabold text-white mb-2 relative" data-testid="text-gated-total">{fmt(results.grandTotal)}</p>
-        <p className="text-sm text-white/60 relative">Based on your inputs and industry benchmarks.</p>
+        <p className="text-sm text-white/70 relative max-w-2xl leading-relaxed">Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.</p>
       </div>
 
       <div className="relative">

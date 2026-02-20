@@ -25,15 +25,12 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
   const hasSpend = selectedPains.has("spend");
   const hasDowntime = selectedPains.has("downtime");
 
-  const parts: string[] = [];
-  if (hasInv && results.inventory) parts.push(`${fmt(results.inventory.totalInvReduction)} in inventory value reduction`);
-  if (hasSpend && results.spend) parts.push(`${fmt(results.spend.totalSpend)} in annual spend reduction & avoidance`);
-  if (hasDowntime && results.downtime) parts.push(`${fmt(results.downtime.dtSavings)} in downtime cost savings`);
-  const headline = parts.length >= 2
-    ? `We identified ${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}.`
-    : parts[0]
-      ? `Your assessment identified ${parts[0]}.`
-      : 'Based on your inputs and industry benchmarks.';
+  const buckets = [
+    hasInv && results.inventory ? { label: "Active Material Increases", color: "#ed9b29", value: results.inventory.activeIncrease } : null,
+    hasInv && results.inventory ? { label: "Inventory Reduction Savings", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
+    hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
+    hasDowntime && results.downtime ? { label: "Downtime Reduction", color: "#6b7280", value: results.downtime.dtSavings } : null,
+  ].filter(Boolean) as { label: string; color: string; value: number }[];
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -110,12 +107,24 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden">
         <div className="absolute top-[-60px] right-[-60px] w-[300px] h-[300px] rounded-full bg-[#0075c9]/15" />
         <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium" data-testid="text-results-label">
-          Total Estimated Annual Opportunity
+          Total MRO Optimization Opportunity
         </p>
         <p className="text-4xl md:text-5xl font-extrabold text-white mb-2 relative" data-testid="text-grand-total">
           {fmt(results.grandTotal)}
         </p>
-        <p className="text-sm text-white/60 relative">{headline}</p>
+        <p className="text-sm text-white/70 relative max-w-2xl leading-relaxed">
+          Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.
+        </p>
+
+        <div className={`mt-6 grid gap-px rounded-lg overflow-hidden border border-white/15`} style={{ gridTemplateColumns: `repeat(${buckets.length}, 1fr)` }}>
+          {buckets.map((b) => (
+            <div key={b.label} className="bg-white/5 backdrop-blur px-3 py-3">
+              <p className="text-[10px] uppercase tracking-wider text-white/50 mb-1 leading-tight">{b.label}</p>
+              <p className="text-base md:text-lg font-bold whitespace-nowrap" style={{ color: b.color }}>{fmt(b.value)}</p>
+            </div>
+          ))}
+        </div>
+
         <button
           onClick={onAdjustInputs}
           className="mt-4 text-sm text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded px-4 py-2 transition-all flex items-center gap-2"

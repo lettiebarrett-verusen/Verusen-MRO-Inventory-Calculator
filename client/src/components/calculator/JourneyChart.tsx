@@ -28,15 +28,6 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   const inv = results.inventory;
   const spend = results.spend;
 
-  const buckets = [
-    hasInv && inv ? { label: "Active Material Increases", color: "#ed9b29", value: inv.activeIncrease } : null,
-    hasInv && inv ? { label: "Inventory Reduction Savings", color: "#3ec26d", value: inv.totalInvReduction } : null,
-    hasSpend && spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: spend.totalSpend } : null,
-    hasDowntime && results.downtime ? { label: "Downtime Reduction", color: "#6b7280", value: results.downtime.dtSavings } : null,
-  ].filter(Boolean) as { label: string; color: string; value: number }[];
-
-  const grandTotal = buckets.reduce((s, b) => s + b.value, 0);
-
   const points: { label: string; value: number; tip: string }[] = [];
   let cur = totalInventoryValue;
 
@@ -101,24 +92,6 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
 
   return (
     <>
-      <div className="border border-gray-200 rounded-xl overflow-hidden mb-8">
-        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-100 px-4 py-2.5 border-b border-gray-200">
-          Total MRO Optimization Opportunity
-        </div>
-        <div className="grid gap-px bg-gray-200" style={{ gridTemplateColumns: `repeat(${buckets.length}, 1fr)` }}>
-          {buckets.map((b) => (
-            <div key={b.label} className="bg-white px-3 py-3">
-              <p className="text-xs text-muted-foreground mb-1 leading-tight">{b.label}</p>
-              <p className="text-base md:text-lg font-bold whitespace-nowrap" style={{ color: b.color }}>{fmt(b.value)}</p>
-            </div>
-          ))}
-        </div>
-        <div className="bg-[#003252] px-5 py-3.5 flex items-center justify-between">
-          <p className="text-xs uppercase tracking-wider text-white/60 font-medium">Total Identified Savings</p>
-          <p className="text-xl font-bold text-white">{fmt(grandTotal)}</p>
-        </div>
-      </div>
-
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-5">
           <div>
