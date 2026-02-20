@@ -441,13 +441,13 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         <p className="max-w-2xl mx-auto text-muted-foreground mb-8">
           Most teams underestimate how much inventory value is tied up across their enterprise. A deeper conversation typically reveals even greater opportunity.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
-          <Button size="lg" className="h-14 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all" asChild>
+        <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-xl mx-auto">
+          <Button size="lg" className="h-14 flex-1 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all justify-center" asChild>
             <a href="https://verusen.com/talk-to-an-mro-expert/" target="_blank" rel="noopener noreferrer">
               <Phone className="mr-2 h-5 w-5" /> Talk to an MRO Expert
             </a>
           </Button>
-          <Button size="lg" className="h-14 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all" asChild>
+          <Button size="lg" className="h-14 flex-1 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all justify-center" asChild>
             <a href="https://verusen.com/ai-agent-explainability-for-mro-inventory-optimization/" target="_blank" rel="noopener noreferrer">
               <Brain className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
             </a>
