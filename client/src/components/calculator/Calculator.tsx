@@ -239,7 +239,7 @@ function GatedResults({
         <p className="text-sm text-white/70 relative max-w-2xl leading-relaxed">Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.</p>
       </div>
 
-      <div className="relative">
+      <div className="relative" style={{ minHeight: '480px' }}>
         <div className="blur-[6px] pointer-events-none select-none" aria-hidden="true">
           {selectedPains.has("inventory") && results.inventory && (
             <div className="mb-4">
