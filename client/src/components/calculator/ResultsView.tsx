@@ -287,7 +287,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     doc.text("How we calculated this.", mx + 4, y + 5);
     doc.setFontSize(6);
     doc.setTextColor(120, 120, 120);
-    const methText = "Sliding factors for Parts Pooling, VMI, Deduplication, and PPV Savings scale with your number of sites and SKU count using conservative industry benchmarks. Inventory mix defaults to 67% active/slow, 23% non-moving, 10% special items. Downtime savings use your service level inputs directly per the stockout rate optimization formula. Your actual results may vary.";
+    const methText = "Estimates are based on your inputs and proven benchmarks, where customers have achieved 20% lower working capital and a 2.8% increase in asset uptime within months. Results may vary.";
     const methLines = doc.splitTextToSize(methText, cw - 8);
     doc.text(methLines, mx + 4, y + 10);
     y += 26;
@@ -432,7 +432,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex gap-3 mb-8 text-sm text-muted-foreground">
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
-          <strong className="text-[#003252]">How we calculated this.</strong> Sliding factors for Parts Pooling, VMI, Deduplication, and PPV Savings scale with your number of sites and SKU count using conservative industry benchmarks. Inventory mix defaults to 67% active/slow, 23% non-moving, 10% special items. Downtime savings use your service level inputs directly per the stockout rate optimization formula. Your actual results may vary.
+          <strong className="text-[#003252]">How we calculated this.</strong> Estimates are based on your inputs and proven benchmarks, where customers have achieved 20% lower working capital and a 2.8% increase in asset uptime within months. Results may vary.
         </div>
       </div>
 
