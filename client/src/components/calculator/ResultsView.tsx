@@ -444,7 +444,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
           <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all" asChild>
             <a href="https://verusen.com/talk-to-an-mro-expert/" target="_blank" rel="noopener noreferrer">
-              <Phone className="mr-2 h-5 w-5" /> Talk to an Expert
+              <Phone className="mr-2 h-5 w-5" /> Talk to an MRO Expert
             </a>
           </Button>
           <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all" asChild>
