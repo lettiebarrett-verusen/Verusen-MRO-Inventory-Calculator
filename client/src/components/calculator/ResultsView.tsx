@@ -135,7 +135,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           totalLabel="Total Inventory Value Reduction Opportunity"
           totalSub="One-time reduction in on-hand inventory value through right-sizing initiatives"
           totalValue={results.inventory.totalInvReduction}
-          riskLabel="Risk Reduction Investment Required"
+          riskLabel="Active Materials Increase"
           riskSub="Active material investment to cover critical stockout gaps"
           riskValue={results.inventory.activeIncrease}
           breakdownLabel={`Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`}
@@ -153,7 +153,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         <ResultSection
           title="Spend Leakage"
           icon="💸"
-          color="red"
+          color="blue"
           totalLabel="Total Annual Spend Reduction & Avoidance"
           totalSub="Ongoing annual savings from eliminating leakage across your MRO spend categories"
           totalValue={results.spend.totalSpend}
@@ -172,7 +172,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
       {hasDowntime && results.downtime && (
         <div className="mb-8">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0075c9] bg-[#0075c9]/5 px-4 py-2.5 rounded-t-lg border border-[#0075c9]/20 border-b-0">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#6b7280] bg-gray-50 px-4 py-2.5 rounded-t-lg border border-gray-200 border-b-0">
             <span>⚠️</span> Downtime Risk
           </div>
           <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
@@ -180,7 +180,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
               <p className="font-semibold text-[#003252]">Total Estimated Downtime Cost Avoidance</p>
               <p className="text-xs text-muted-foreground">Annual savings from reducing stockout-driven unplanned downtime</p>
             </div>
-            <p className="text-2xl font-bold text-[#0075c9]" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
+            <p className="text-2xl font-bold text-[#6b7280]" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
           </div>
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
             How this savings is calculated — current vs. optimized state
@@ -190,28 +190,28 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
               <tr className="bg-white">
                 <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Metric</th>
                 <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Current State</th>
-                <th className="text-right text-xs font-medium text-[#0075c9] uppercase tracking-wider px-4 py-2 border-b border-gray-200">Optimized State</th>
+                <th className="text-right text-xs font-medium text-[#6b7280] uppercase tracking-wider px-4 py-2 border-b border-gray-200">Optimized State</th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b border-gray-100">
                 <td className="px-4 py-2.5 font-medium text-[#003252]">Org-Wide Unplanned Downtime Hours</td>
                 <td className="px-4 py-2.5 text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#0075c9] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
+                <td className="px-4 py-2.5 text-right font-mono text-[#6b7280] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
               </tr>
               <tr className="border-b border-gray-100">
                 <td className="px-4 py-2.5 font-medium text-[#003252]">Total Unplanned Downtime Cost</td>
                 <td className="px-4 py-2.5 text-muted-foreground">{fmt(results.downtime.unplannedCost)}</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#0075c9] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
+                <td className="px-4 py-2.5 text-right font-mono text-[#6b7280] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
               </tr>
               <tr className="border-b border-gray-100">
                 <td className="px-4 py-2.5 font-medium text-[#003252]">Critical Spares Stockout Rate</td>
                 <td className="px-4 py-2.5 text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#0075c9] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
+                <td className="px-4 py-2.5 text-right font-mono text-[#6b7280] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
               </tr>
               <tr className="bg-gray-50 font-semibold">
                 <td className="px-4 py-2.5 text-[#003252]" colSpan={2}>Avoidable Downtime Cost (stockout-attributed portion)</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#0075c9]">{fmt(results.downtime.dtSavings)}</td>
+                <td className="px-4 py-2.5 text-right font-mono text-[#6b7280]">{fmt(results.downtime.dtSavings)}</td>
               </tr>
             </tbody>
           </table>
@@ -272,7 +272,7 @@ function ResultSection({
 }: {
   title: string;
   icon: string;
-  color: "green" | "red";
+  color: "green" | "blue";
   totalLabel: string;
   totalSub: string;
   totalValue: number;
@@ -283,8 +283,8 @@ function ResultSection({
   rows: { name: string; desc: string; value: number }[];
   totalRowValue: number;
 }) {
-  const colorClass = color === "green" ? "text-[#3ec26d]" : "text-[#ed9b29]";
-  const headerBg = color === "green" ? "bg-[#3ec26d]/5 text-[#3ec26d] border-[#3ec26d]/20" : "bg-[#ed9b29]/5 text-[#ed9b29] border-[#ed9b29]/20";
+  const colorClass = color === "green" ? "text-[#3ec26d]" : "text-[#0075c9]";
+  const headerBg = color === "green" ? "bg-[#3ec26d]/5 text-[#3ec26d] border-[#3ec26d]/20" : "bg-[#0075c9]/5 text-[#0075c9] border-[#0075c9]/20";
 
   return (
     <div className="mb-8">
