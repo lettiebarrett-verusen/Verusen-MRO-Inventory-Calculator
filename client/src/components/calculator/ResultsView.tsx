@@ -441,13 +441,13 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         <p className="max-w-2xl mx-auto text-muted-foreground mb-8">
           Most teams underestimate how much inventory value is tied up across their enterprise. A deeper conversation typically reveals even greater opportunity.
         </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
-          <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all" asChild>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+          <Button size="lg" className="h-14 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all" asChild>
             <a href="https://verusen.com/talk-to-an-mro-expert/" target="_blank" rel="noopener noreferrer">
               <Phone className="mr-2 h-5 w-5" /> Talk to an MRO Expert
             </a>
           </Button>
-          <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all" asChild>
+          <Button size="lg" className="h-14 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all" asChild>
             <a href="https://verusen.com/ai-agent-explainability-for-mro-inventory-optimization/" target="_blank" rel="noopener noreferrer">
               <Brain className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
             </a>
@@ -455,13 +455,13 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         </div>
       </div>
 
-      <div className="flex justify-center gap-4">
-        <Button variant="ghost" className="text-muted-foreground" onClick={downloadPDF}>
-          <Download className="mr-2 h-4 w-4" /> Download Results
-        </Button>
-        <Button variant="ghost" onClick={onReset} className="text-muted-foreground" data-testid="button-start-over">
-          <RotateCcw className="mr-2 h-4 w-4" /> Start Over
-        </Button>
+      <div className="flex justify-center gap-6">
+        <button className="text-sm text-muted-foreground hover:text-[#003252] transition-colors flex items-center gap-1.5" onClick={downloadPDF}>
+          <Download className="w-3.5 h-3.5" /> Download Results
+        </button>
+        <button className="text-sm text-muted-foreground hover:text-[#003252] transition-colors flex items-center gap-1.5" onClick={onReset} data-testid="button-start-over">
+          <RotateCcw className="w-3.5 h-3.5" /> Start Over
+        </button>
       </div>
     </div>
   );
