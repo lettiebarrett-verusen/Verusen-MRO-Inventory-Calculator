@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRO Optimization Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0f0f0e; --paper: #f5f2eb; --paper-dark: #ece8df;
+    --accent: #c84b2f; --accent-light: #f0e8e5;
+    --green: #1a7a4a; --green-light: #e4f2eb;
+    --blue: #2a5f9e; --blue-light: #e8eef7;
+    --muted: #6b6660; --border: #d5d0c7;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); overflow-x: hidden; }
+
+  /* HEADER */
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 18px 48px; display: flex; align-items: center; justify-content: space-between; background: rgba(245,242,235,0.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 1.2rem; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  header nav a { font-size: 0.85rem; font-weight: 500; color: var(--muted); text-decoration: none; margin-left: 32px; transition: color 0.2s; }
+  header nav a:hover { color: var(--ink); }
+  .btn-nav { background: var(--ink) !important; color: var(--paper) !important; padding: 8px 20px; border-radius: 4px; }
+
+  /* HERO */
+  .hero { padding: 140px 48px 80px; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 3.5vw, 3.4rem); line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 24px; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero > div > p { font-size: 1.05rem; line-height: 1.7; color: var(--muted); margin-bottom: 36px; font-weight: 300; }
+  .hero-cta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--accent); color: white; padding: 14px 32px; border: none; border-radius: 4px; font-size: 0.95rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+  .btn-primary:hover { background: #a83a21; transform: translateY(-1px); }
+  .btn-ghost { font-size: 0.9rem; color: var(--muted); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border); padding-bottom: 2px; transition: color 0.2s, border-color 0.2s; }
+  .btn-ghost:hover { color: var(--ink); border-color: var(--ink); }
+  .hero-stat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 20px; position: relative; overflow: hidden; opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s forwards; }
+  .stat-card:nth-child(1){animation-delay:.1s} .stat-card:nth-child(2){animation-delay:.2s} .stat-card:nth-child(3){animation-delay:.3s} .stat-card:nth-child(4){animation-delay:.4s}
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 2rem; letter-spacing: -0.04em; color: var(--ink); line-height: 1; margin-bottom: 6px; }
+  .stat-num.green { color: var(--green); }
+  .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 400; line-height: 1.4; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0 48px; }
+
+  /* CALCULATOR */
+  .calc-section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 40px; display: flex; align-items: center; gap: 16px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .calc-wrapper { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 24px rgba(15,15,14,0.06); }
+
+  /* Progress */
+  .calc-progress { background: var(--paper-dark); border-bottom: 1px solid var(--border); }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; padding: 16px 24px; font-size: 0.8rem; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--border); }
+  .progress-step:last-child { border-right: none; }
+  .progress-step.active { color: var(--accent); border-bottom-color: var(--accent); background: white; }
+  .progress-step.done { color: var(--green); border-bottom-color: var(--green); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 0.7rem; font-family: 'DM Mono', monospace; display: flex; align-items: center; justify-content: center; font-weight: 500; flex-shrink: 0; }
+  .progress-step.active .step-num { background: var(--accent); color: white; }
+  .progress-step.done .step-num { background: var(--green); color: white; }
+
+  /* Panels */
+  .calc-panel { display: none; padding: 40px; }
+  .calc-panel.active { display: block; }
+  .panel-title { font-family: 'DM Serif Display', serif; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 6px; }
+  .panel-subtitle { font-size: 0.9rem; color: var(--muted); font-weight: 300; }
+
+  /* Pain cards */
+  .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  .pain-card { border: 2px solid var(--border); border-radius: 8px; padding: 28px 24px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .pain-card:hover { border-color: var(--accent); background: var(--accent-light); }
+  .pain-card.selected { border-color: var(--accent); background: var(--accent-light); }
+  .check-badge { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: transparent; transition: all 0.15s; }
+  .pain-card.selected .check-badge { background: var(--accent); border-color: var(--accent); color: white; }
+  .pain-icon { font-size: 1.6rem; margin-bottom: 14px; }
+  .pain-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .pain-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+  /* Input sections */
+  .inputs-section-head { font-family: 'DM Mono', monospace; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 28px 0 14px; display: flex; align-items: center; gap: 12px; }
+  .inputs-section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .inputs-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .input-group { display: flex; flex-direction: column; }
+  .input-group label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; color: var(--ink); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .required-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+  .optional-tag { font-size: 0.68rem; color: var(--muted); font-weight: 400; background: var(--paper-dark); padding: 1px 6px; border-radius: 3px; }
+  .input-wrap { position: relative; }
+  .input-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--muted); pointer-events: none; }
+  .input-suffix { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--muted); pointer-events: none; }
+  input[type="number"], input[type="text"], select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; color: var(--ink); background: var(--paper); transition: border-color 0.2s, background 0.2s; appearance: none; }
+  input.has-prefix { padding-left: 28px; }
+  input.has-suffix { padding-right: 32px; }
+  input:focus, select:focus { outline: none; border-color: var(--accent); background: white; }
+  input.warning-field { border-color: #d4922a !important; background: #fdf8f0 !important; }
+  input.error-field { border-color: var(--accent) !important; }
+  .input-hint { font-size: 0.72rem; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .warning-hint { font-size: 0.72rem; color: #a06010; margin-top: 4px; display: none; }
+  .warning-hint.visible { display: block; }
+
+  /* Pct row */
+  .pct-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .pct-total-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+  .pct-total-label { font-size: 0.75rem; color: var(--muted); }
+  .pct-total-val { font-family: 'DM Mono', monospace; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+  .pct-total-val.ok { color: var(--green); }
+  .pct-total-val.bad { color: var(--accent); }
+
+  /* Results */
+  .results-hero { background: var(--ink); margin: -40px -40px 32px; padding: 40px; color: white; position: relative; overflow: hidden; }
+  .results-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; background: rgba(200,75,47,0.15); }
+  .results-hero-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+  .results-total { font-family: 'DM Serif Display', serif; font-size: clamp(2.5rem,5vw,4rem); letter-spacing: -0.04em; color: white; line-height: 1; margin-bottom: 8px; }
+  .results-total span { color: #f0a090; }
+  .results-hero p { font-size: 0.9rem; color: rgba(255,255,255,0.6); font-weight: 300; }
+
+  /* Result sections */
+  .result-section { margin-bottom: 24px; }
+  .result-section-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 14px; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 8px; }
+  .result-section-title.inv-color { background: var(--green-light); color: var(--green); }
+  .result-section-title.spend-color { background: var(--accent-light); color: var(--accent); }
+  .result-section-title.downtime-color { background: var(--blue-light); color: var(--blue); }
+  .result-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; }
+  .result-card { background: white; padding: 18px; }
+  .result-card.full-width { grid-column: 1 / -1; }
+  .result-card-label { font-size: 0.7rem; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; font-family: 'DM Mono', monospace; }
+  .result-card-value { font-family: 'DM Serif Display', serif; font-size: 1.5rem; letter-spacing: -0.04em; line-height: 1; margin-bottom: 3px; }
+  .result-card-value.green { color: var(--green); }
+  .result-card-value.red { color: var(--accent); }
+  .result-card-value.blue { color: var(--blue); }
+  .result-card-value.orange { color: #c87a2f; }
+  .result-card-sub { font-size: 0.73rem; color: var(--muted); line-height: 1.3; }
+
+  /* Downtime compare table */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; }
+  .compare-table th { background: var(--blue-light); color: var(--blue); font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 10px 14px; text-align: left; font-weight: 500; }
+  .compare-table td { padding: 10px 14px; border-top: 1px solid var(--border); background: white; }
+  .compare-table td:first-child { color: var(--muted); font-size: 0.82rem; }
+  .compare-table td.current-val { font-family: 'DM Mono', monospace; color: var(--ink); }
+  .compare-table td.opt-val { font-family: 'DM Mono', monospace; color: var(--green); font-weight: 500; }
+
+  .methodology-note { background: var(--paper-dark); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin: 28px 0; display: flex; gap: 10px; }
+  .methodology-note strong { color: var(--ink); }
+
+  /* Gate */
+  .gate-box { border: 2px solid var(--ink); border-radius: 8px; padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  .gate-copy h3 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; letter-spacing: -0.03em; margin-bottom: 10px; }
+  .gate-copy p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .gate-bullets { list-style: none; }
+  .gate-bullets li { font-size: 0.82rem; color: var(--muted); padding: 4px 0; display: flex; align-items: baseline; gap: 8px; }
+  .gate-bullets li::before { content: '→'; color: var(--accent); font-size: 0.75rem; flex-shrink: 0; }
+  .gate-form { display: flex; flex-direction: column; gap: 12px; }
+  .gate-form input { padding: 11px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; background: var(--paper); transition: all 0.2s; }
+  .gate-form input:focus { outline: none; border-color: var(--ink); background: white; }
+  .gate-form .btn-primary { width: 100%; text-align: center; }
+  .gate-divider { text-align: center; font-size: 0.75rem; color: var(--muted); position: relative; }
+  .gate-divider::before, .gate-divider::after { content: ''; position: absolute; top: 50%; width: calc(50% - 24px); height: 1px; background: var(--border); }
+  .gate-divider::before { left: 0; } .gate-divider::after { right: 0; }
+  .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--ink); padding: 11px 20px; border-radius: 6px; font-size: 0.88rem; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; text-align: center; width: 100%; }
+  .btn-secondary:hover { border-color: var(--ink); background: var(--paper-dark); }
+
+  /* Nav */
+  .calc-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; border-top: 1px solid var(--border); background: var(--paper-dark); }
+  .btn-back { background: none; border: none; font-size: 0.88rem; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+  .btn-back:hover { color: var(--ink); }
+  .btn-next { background: var(--ink); color: white; padding: 12px 28px; border: none; border-radius: 4px; font-size: 0.9rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-next:hover { background: #2a2a28; }
+
+  /* Social proof */
+  .proof-section { background: var(--ink); padding: 60px 48px; color: white; }
+  .proof-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr; gap: 64px; align-items: center; }
+  .proof-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 16px; }
+  .proof-stat-big { font-family: 'DM Serif Display', serif; font-size: 3.5rem; letter-spacing: -0.05em; color: white; line-height: 1; margin-bottom: 8px; }
+  .proof-stat-big span { color: #f0a090; }
+  .proof-stat-sub { font-size: 0.85rem; color: rgba(255,255,255,0.5); font-weight: 300; line-height: 1.5; }
+  .testimonial-block { border-left: 2px solid rgba(255,255,255,0.15); padding-left: 32px; }
+  .testimonial-text { font-family: 'DM Serif Display', serif; font-size: 1.3rem; line-height: 1.55; color: rgba(255,255,255,0.9); letter-spacing: -0.02em; margin-bottom: 20px; font-style: italic; }
+  .testimonial-author { font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'DM Mono', monospace; }
+
+  .footer-cta { padding: 80px 48px; text-align: center; max-width: 600px; margin: 0 auto; }
+  .footer-cta h2 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; letter-spacing: -0.04em; margin-bottom: 16px; }
+  .footer-cta p { font-size: 0.95rem; color: var(--muted); line-height: 1.7; font-weight: 300; margin-bottom: 32px; }
+  footer { border-top: 1px solid var(--border); padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--ink); text-decoration: none; }
+  .footer-logo span { color: var(--accent); }
+  footer p { font-size: 0.75rem; color: var(--muted); }
+
+  /* ── JOURNEY CHART ── */
+  .journey-chart-wrap {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 28px 20px;
+    margin-bottom: 28px;
+    display: none; /* shown by JS after calculate */
+  }
+  .journey-chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .journey-chart-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .journey-chart-subtitle {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+  .journey-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .orange-dot { background: #c87a2f; }
+  .green-dot  { background: var(--green); }
+  .blue-dot   { background: var(--blue); }
+
+  .journey-canvas-wrap {
+    position: relative;
+    height: 260px;
+  }
+  .journey-canvas-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Phase milestone pills below chart */
+  .journey-phases {
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .journey-phase {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    border-left: 3px solid var(--border);
+  }
+  .journey-phase.phase-orange { border-left-color: #c87a2f; }
+  .journey-phase.phase-green  { border-left-color: var(--green); }
+  .journey-phase.phase-purple { border-left-color: #7b3fa0; }
+  .phase-amount.purple { color: #7b3fa0; }
+
+  /* ── JOURNEY TOTALS ── */
+  .journey-totals { margin-top: 16px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .journey-totals-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--paper-dark); padding: 8px 16px; border-bottom: 1px solid var(--border); }
+  .journey-totals-grid { display: grid; gap: 0; background: var(--border); }
+  .journey-total-bucket { background: white; padding: 14px 16px; border-right: 1px solid var(--border); }
+  .journey-total-bucket:last-child { border-right: none; }
+  .journey-total-bucket-label { font-size: 0.72rem; color: var(--muted); line-height: 1.4; margin-bottom: 6px; font-weight: 500; }
+  .journey-total-bucket-value { font-family: 'DM Serif Display', serif; font-size: 1.3rem; letter-spacing: -0.03em; line-height: 1; }
+  .journey-total-bucket-value.orange { color: #c87a2f; }
+  .journey-total-bucket-value.green  { color: var(--green); }
+  .journey-total-bucket-value.blue   { color: var(--blue); }
+  .journey-total-bucket-value.purple { color: #7b3fa0; }
+  .journey-total-grand { background: var(--ink); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .journey-total-grand-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .journey-total-grand-value { font-family: 'DM Serif Display', serif; font-size: 1.6rem; letter-spacing: -0.04em; color: white; }
+  @media (max-width: 768px) { .journey-totals-grid { grid-template-columns: 1fr 1fr !important; } }
+  .phase-timing {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 56px;
+  }
+  .phase-body {}
+  .phase-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 1px;
+  }
+  .phase-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .phase-amount {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-left: auto;
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+  .phase-amount.up   { color: #c87a2f; }
+  .phase-amount.down { color: var(--green); }
+  .phase-amount.blue { color: var(--blue); }
+
+  @media (max-width: 768px) {
+    .journey-chart-wrap { padding: 20px 16px 16px; }
+    .journey-canvas-wrap { height: 200px; }
+  }
+
+  /* ── SECTION TOTAL + BREAKDOWN TABLE LAYOUT ── */
+  .section-total-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    background: white; border: 1px solid var(--border); border-top: none; padding: 20px 22px;
+  }
+  .orange-row { background: #fdf8f2; border-top: 1px solid var(--border) !important; margin-top: 1px; }
+  .section-total-left { flex: 1; }
+  .section-total-label { font-size: 0.88rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .section-total-sub { font-size: 0.75rem; color: var(--muted); line-height: 1.4; font-weight: 300; }
+  .section-total-value { font-family: 'DM Serif Display', serif; font-size: 2rem; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; flex-shrink: 0; }
+  .section-total-value.green  { color: var(--green); }
+  .section-total-value.red    { color: var(--accent); }
+  .section-total-value.blue   { color: var(--blue); }
+  .section-total-value.orange { color: #c87a2f; }
+  .breakdown-label {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    background: var(--paper-dark); padding: 8px 22px;
+    border: 1px solid var(--border); border-top: none;
+  }
+  .breakdown-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-top: none; overflow: hidden; margin-bottom: 0; }
+  .breakdown-table thead th { background: white; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding: 8px 14px; text-align: left; font-weight: 500; border-bottom: 1px solid var(--border); }
+  .breakdown-table tbody tr { border-top: 1px solid var(--border); }
+  .breakdown-table tbody tr:first-child { border-top: none; }
+  .breakdown-table tbody td { padding: 10px 14px; background: white; vertical-align: top; }
+  .initiative-name { font-size: 0.82rem; font-weight: 600; color: var(--ink); white-space: nowrap; width: 220px; }
+  .initiative-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
+  .amt-col { text-align: right !important; white-space: nowrap; font-family: 'DM Mono', monospace; font-size: 0.88rem; font-weight: 500; width: 120px; }
+  .green-amt { color: var(--green); }
+  .red-amt   { color: var(--accent); }
+  .blue-amt  { color: var(--blue); }
+  .breakdown-total-row td { background: var(--paper-dark) !important; font-weight: 600; font-size: 0.82rem; color: var(--ink); border-top: 2px solid var(--border) !important; }
+  .breakdown-total-row .amt-col { font-size: 0.95rem; }
+  .result-section { margin-bottom: 24px; border-radius: 8px; overflow: hidden; }
+
+  /* ── BLUR GATE SYSTEM ── */
+  #results-preview {
+    position: relative;
+  }
+
+  /* Wrapper that holds the blurred ghost + gate card */
+  .blur-gate-wrapper {
+    position: relative;
+    margin: 0 -40px -40px;
+    overflow: hidden;
+  }
+
+  /* Fade from transparent to white, sits over the real content bottom edge */
+  .blur-gate-fade {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Ghost blurred content below the fade */
+  .blur-gate-blurred {
+    filter: blur(6px);
+    -webkit-filter: blur(6px);
+    user-select: none;
+    pointer-events: none;
+    padding: 24px 40px 40px;
+    background: white;
+    opacity: 0.7;
+  }
+
+  .ghost-section { margin-bottom: 20px; }
+  .ghost-section-bar { height: 36px; border-radius: 6px 6px 0 0; margin-bottom: 1px; }
+  .inv-color-ghost { background: var(--green-light); }
+  .spend-color-ghost { background: var(--accent-light); }
+  .ghost-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; }
+  .ghost-card { background: white; padding: 18px; }
+  .ghost-label { height: 10px; background: var(--paper-dark); border-radius: 3px; margin-bottom: 10px; width: 60%; }
+  .ghost-value { height: 28px; background: var(--paper-dark); border-radius: 3px; margin-bottom: 8px; width: 50%; }
+  .ghost-sub { height: 8px; background: var(--paper-dark); border-radius: 3px; width: 80%; }
+
+  /* The gate card — centered over the blur */
+  .blur-gate-card {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(520px, calc(100% - 48px));
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 36px;
+    box-shadow: 0 8px 48px rgba(15,15,14,0.18), 0 2px 12px rgba(15,15,14,0.08);
+    z-index: 10;
+    text-align: center;
+  }
+
+  .blur-gate-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+  }
+  .blur-gate-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .blur-gate-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+  .blur-gate-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .blur-gate-bullet {
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bullet-check {
+    width: 18px; height: 18px;
+    background: var(--green);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .blur-gate-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+  }
+  .blur-gate-form input {
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .blur-gate-form input:focus { outline: none; border-color: var(--ink); background: white; }
+
+  /* Padding below the blurred area to give gate card room */
+  .blur-gate-spacer { height: 520px; }
+
+  @media (max-width: 768px) {
+    .blur-gate-wrapper { margin: 0 -24px -24px; }
+    .blur-gate-blurred { padding: 20px 20px 32px; }
+    .ghost-cards { grid-template-columns: 1fr 1fr; }
+    .blur-gate-card { padding: 24px; top: 28px; }
+    .blur-gate-spacer { height: 680px; }
+  }
+    header { padding: 14px 20px; }
+    .hero { grid-template-columns: 1fr; padding: 120px 20px 60px; gap: 40px; }
+    .hero-stat-cards { grid-template-columns: 1fr 1fr; }
+    .calc-section { padding: 40px 20px; }
+    .calc-panel { padding: 24px; }
+    .inputs-grid, .inputs-grid.three-col, .pct-row { grid-template-columns: 1fr 1fr; }
+    .gate-box { grid-template-columns: 1fr; gap: 20px; }
+    .results-hero { margin: -24px -24px 24px; padding: 28px 24px; }
+    .proof-section { padding: 40px 20px; }
+    .proof-inner { grid-template-columns: 1fr; gap: 32px; }
+    .divider { margin: 0 20px; }
+    .footer-cta { padding: 60px 20px; }
+    footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
+    .calc-nav { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="logo">MRO<span>Optimize</span></a>
+  <nav>
+    <a href="#calculator">Calculator</a>
+    <a href="#" class="btn-nav">Book a Call</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">MRO Optimization Assessment</div>
+    <h1>Find out how much your MRO program is <em>leaving on the table</em></h1>
+    <p>Answer a few questions and get a precise savings estimate across inventory, spend, and downtime — in under 3 minutes.</p>
+    <div class="hero-cta">
+      <a href="#calculator" class="btn-primary">Start the Assessment →</a>
+      <a href="#" class="btn-ghost">See a sample report</a>
+    </div>
+  </div>
+  <div class="hero-stat-cards">
+    <div class="stat-card"><div class="stat-num">35%</div><div class="stat-label">Average excess MRO inventory carried by manufacturers</div></div>
+    <div class="stat-card green"><div class="stat-num green">$2.4M</div><div class="stat-label">Average annual savings identified per client engagement</div></div>
+    <div class="stat-card"><div class="stat-num">18%</div><div class="stat-label">Typical MRO spend captured by maverick purchasing</div></div>
+    <div class="stat-card green"><div class="stat-num green">4.2×</div><div class="stat-label">Median ROI on MRO consolidation programs in year one</div></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="calc-section" id="calculator">
+  <div class="section-label">MRO Optimization Calculator</div>
+  <div class="calc-wrapper">
+
+    <div class="calc-progress">
+      <div class="progress-steps">
+        <div class="progress-step active" id="step-tab-1" onclick="goToStep(1)"><div class="step-num">1</div> Your Priorities</div>
+        <div class="progress-step" id="step-tab-2" onclick="goToStep(2)"><div class="step-num">2</div> Your Profile</div>
+        <div class="progress-step" id="step-tab-3" onclick="goToStep(3)"><div class="step-num">3</div> Your Savings</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="calc-panel active" id="panel-1">
+      <div class="panel-title">What's your biggest MRO pain right now?</div>
+      <div class="panel-subtitle">We'll tailor your results to lead with what matters most to you.</div>
+      <div class="pain-grid">
+        <div class="pain-card" onclick="selectPain(this,'inventory')">
+          <div class="pain-icon">📦</div>
+          <h3>Inventory Bloat</h3>
+          <p>Too much cash tied up in parts. Duplicate SKUs across plants. No visibility into what you actually have.</p>
+        </div>
+        <div class="pain-card" onclick="selectPain(this,'spend')">
+          <div class="pain-icon">💸</div>
+          <h3>Spend Leakage</h3>
+          <p>Maverick buying. Supplier consolidation opportunities. Too many catalogs, not enough contract compliance.</p>
+        </div>
+        <div class="pain-card" onclick="selectPain(this,'downtime')">
+          <div class="pain-icon">⚠️</div>
+          <h3>Downtime Risk</h3>
+          <p>Critical parts aren't there when needed. Stockouts causing production delays and emergency purchases.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="calc-panel" id="panel-2">
+      <div class="panel-title">Tell us about your operation</div>
+      <div class="panel-subtitle">Required fields are marked with a red dot. Optional fields improve accuracy — defaults are industry benchmarks.</div>
+
+      <!-- ALWAYS SHOWN -->
+      <div class="inputs-section-head" style="margin-top:28px">Core Information</div>
+      <div class="inputs-grid">
+        <div class="input-group">
+          <label><div class="required-dot"></div> Industry</label>
+          <select id="inp-industry">
+            <option value="">Select your industry...</option>
+            <option value="aerospace">Aerospace &amp; Defense</option>
+            <option value="chemicals">Chemicals &amp; Process Industries</option>
+            <option value="construction">Construction &amp; Infrastructure</option>
+            <option value="energy">Energy &amp; Utilities</option>
+            <option value="industrial">Industrial &amp; Environmental Services</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="mining">Mining &amp; Materials</option>
+            <option value="transportation">Transportation &amp; Logistics</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label><div class="required-dot"></div> Number of Sites</label>
+          <input type="text" inputmode="numeric" class="comma-input" id="inp-sites" placeholder="e.g. 6">
+          <div class="input-hint">Facilities that hold or consume MRO inventory</div>
+        </div>
+      </div>
+
+      <!-- INVENTORY + SPEND SHARED FIELDS -->
+      <div id="inv-spend-inputs" style="display:none">
+        <div class="inputs-section-head">Inventory Profile</div>
+        <div class="inputs-grid">
+          <div class="input-group">
+            <label><div class="required-dot"></div> Value of On-Hand Inventory</label>
+            <div class="input-wrap"><span class="input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="has-prefix comma-input" id="inp-onhand" placeholder="e.g. 4,000,000">
+            </div>
+          </div>
+          <div class="input-group">
+            <label><div class="required-dot"></div> Number of On-Hand SKUs</label>
+            <input type="text" inputmode="numeric" class="comma-input" id="inp-skus" placeholder="e.g. 12,000">
+            <div class="input-hint">Total unique part numbers in your MRO catalog</div>
+            <div class="warning-hint" id="warn-skus">⚠ Value per SKU ($<span id="warn-skus-val"></span>) is outside the typical $500–$2,000 range — results may be less precise.</div>
+          </div>
+        </div>
+
+        <div class="inputs-section-head">Inventory Mix <span style="font-family:'DM Sans',sans-serif;font-weight:300;text-transform:none;letter-spacing:0;font-size:0.75rem;color:var(--muted);margin-left:4px">— optional, must total 100%</span></div>
+        <div class="pct-row">
+          <div class="input-group">
+            <label>Active &amp; Slow <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-active" placeholder="67" min="0" max="100" oninput="updatePctTotal()">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 67%</div>
+          </div>
+          <div class="input-group">
+            <label>Non-Moving / Obsolete <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-nonmoving" placeholder="23" min="0" max="100" oninput="updatePctTotal()">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 23%</div>
+          </div>
+          <div class="input-group">
+            <label>Special Items <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-special" placeholder="10" min="0" max="100" oninput="updatePctTotal()">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 10%</div>
+          </div>
+        </div>
+        <div class="pct-total-row">
+          <span class="pct-total-label">Total:</span>
+          <span class="pct-total-val" id="pct-total-display">—</span>
+        </div>
+      </div>
+
+      <!-- SPEND-ONLY FIELDS -->
+      <div id="spend-only-inputs" style="display:none">
+        <div class="inputs-section-head">Spend &amp; Carrying Costs</div>
+        <div class="inputs-grid">
+          <div class="input-group">
+            <label><div class="required-dot"></div> Annual MRO Replenishment Spend</label>
+            <div class="input-wrap"><span class="input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="has-prefix comma-input" id="inp-spend" placeholder="e.g. 2,500,000">
+            </div>
+            <div class="input-hint">Total annual purchasing spend on MRO restocking</div>
+            <div class="warning-hint" id="warn-spend">⚠ Typical range is 35–75% of on-hand inventory value.</div>
+          </div>
+          <div class="input-group">
+            <label>Average Holding Cost Rate <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-holding" placeholder="15" min="0" max="100">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 15% of inventory value per year</div>
+          </div>
+          <div class="input-group">
+            <label>Weighted Avg. Cost of Capital (WACC) <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-wacc" placeholder="7" min="0" max="100">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 7%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOWNTIME FIELDS -->
+      <div id="downtime-inputs" style="display:none">
+        <div class="inputs-section-head">Downtime Profile</div>
+        <div class="inputs-grid">
+          <div class="input-group">
+            <label><div class="required-dot"></div> Avg. Unplanned Downtime Hours / Site / Year</label>
+            <input type="text" inputmode="numeric" class="comma-input" id="inp-dt-hours" placeholder="e.g. 600">
+            <div class="input-hint">Suggested range: 300–1,200 hrs/year</div>
+            <div class="warning-hint" id="warn-dt-hours">⚠ Value is outside the typical 300–1,200 hr range.</div>
+          </div>
+          <div class="input-group">
+            <label><div class="required-dot"></div> Avg. Downtime Cost / Hour / Site</label>
+            <div class="input-wrap"><span class="input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="has-prefix comma-input" id="inp-dt-cost" placeholder="e.g. 12,000">
+            </div>
+            <div class="input-hint">Suggested range: $5,600–$22,000/hr</div>
+            <div class="warning-hint" id="warn-dt-cost">⚠ Value is outside the typical $5,600–$22,000/hr range.</div>
+          </div>
+          <div class="input-group">
+            <label>Current Service Level — Critical Spares <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-svc-current" placeholder="88" min="75" max="100">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 88% (minimum: 75%)</div>
+          </div>
+          <div class="input-group">
+            <label>Desired Service Level — Critical Spares <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-svc-target" placeholder="95" min="0" max="98">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 95% (maximum: 98%)</div>
+          </div>
+          <div class="input-group">
+            <label>% Downtime Attributed to Stockouts <span class="optional-tag">optional</span></label>
+            <div class="input-wrap">
+              <input type="number" class="has-suffix" id="inp-stockout-pct" placeholder="50" min="0" max="50">
+              <span class="input-suffix">%</span>
+            </div><div class="input-hint">Default: 50% (maximum: 50%)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="calc-panel" id="panel-3">
+
+      <!-- ALWAYS VISIBLE: total + first preview section -->
+      <div class="results-hero">
+        <div class="results-hero-label">Total Estimated Annual Opportunity</div>
+        <div class="results-total">$<span id="res-grand-total">—</span></div>
+        <p id="res-headline">Based on your inputs and industry benchmarks.</p>
+        <button onclick="setStep(2)" style="margin-top:16px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.75);padding:8px 18px;border-radius:4px;font-size:0.8rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.background='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.75)'">← Adjust my inputs</button>
+      </div>
+
+      <!-- JOURNEY CHART -->
+      <div class="journey-chart-wrap" id="journey-chart-wrap">
+        <div class="journey-chart-header">
+          <div>
+            <div class="journey-chart-title">Your Optimization Journey</div>
+            <div class="journey-chart-subtitle">Projected value trajectory through Month 12 and beyond as each initiative is completed</div>
+          </div>
+          <div class="journey-legend">
+            <div class="legend-item"><span class="legend-dot orange-dot"></span>Risk Mitigation Savings</div>
+            <div class="legend-item"><span class="legend-dot green-dot"></span>Inventory Reduction Savings</div>
+            <div class="legend-item"><span class="legend-dot blue-dot"></span>Spend Reduction/Avoidance Savings</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#7b3fa0"></span>Downtime Reduction Savings</div>
+            <div class="legend-item"><span style="display:inline-block;width:22px;height:2px;border-top:2px dashed #2a5f9e;margin-right:2px;vertical-align:middle"></span>Ongoing savings</div>
+          </div>
+        </div>
+        <div class="journey-canvas-wrap">
+          <canvas id="journeyChart"></canvas>
+        </div>
+        <div class="journey-phases" id="journey-phases">
+          <!-- populated by JS -->
+        </div>
+        <!-- Bucket totals summary -->
+        <div class="journey-totals" id="journey-totals" style="display:none">
+          <div class="journey-totals-label">Total Value Across All Savings Buckets</div>
+          <div class="journey-totals-grid" id="journey-totals-grid"><!-- populated by JS --></div>
+        </div>
+      </div>
+
+      <!-- PREVIEW: first result section shown fully, fades into blur -->
+      <div id="results-preview">
+        <!-- INVENTORY OUTPUTS -->
+        <div class="result-section" id="res-section-inv" style="display:none">
+          <div class="result-section-title inv-color">📦 &nbsp;Inventory Imbalance</div>
+
+          <!-- Total callout -->
+          <div class="section-total-row">
+            <div class="section-total-left">
+              <div class="section-total-label">Total Inventory Value Reduction Opportunity</div>
+              <div class="section-total-sub">One-time reduction in on-hand inventory value through right-sizing initiatives</div>
+            </div>
+            <div class="section-total-value green" id="res-inv-total">$—</div>
+          </div>
+
+          <!-- Risk callout (separate — not part of reduction total) -->
+          <div class="section-total-row orange-row">
+            <div class="section-total-left">
+              <div class="section-total-label">⚠ Risk Reduction Investment Required</div>
+              <div class="section-total-sub">Active material investment to cover critical stockout gaps — this increases inventory value before reductions begin</div>
+            </div>
+            <div class="section-total-value orange" id="res-inv-risk">$—</div>
+          </div>
+
+          <!-- Breakdown table -->
+          <div class="breakdown-label">Components of the $<span id="res-inv-total-2">—</span> inventory reduction</div>
+          <table class="breakdown-table">
+            <thead><tr><th>Initiative</th><th>Description</th><th class="amt-col">Amount</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="initiative-name">Active Material Reduction</td>
+                <td class="initiative-desc">Excess active &amp; slow-moving stock removed from balance sheet</td>
+                <td class="amt-col green-amt" id="res-inv-active-dec">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Deduplication</td>
+                <td class="initiative-desc">Cross-site SKU rationalization eliminates duplicate stock holdings</td>
+                <td class="amt-col green-amt" id="res-inv-dedup">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Parts Pooling &amp; Network Sharing</td>
+                <td class="initiative-desc">Consolidated cross-site inventory reduces per-site overstocking</td>
+                <td class="amt-col green-amt" id="res-inv-pooling">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">VMI Disposition</td>
+                <td class="initiative-desc">Vendor-managed inventory transfers stock ownership off your books</td>
+                <td class="amt-col green-amt" id="res-inv-vmi">$—</td>
+              </tr>
+              <tr class="breakdown-total-row">
+                <td colspan="2">Total</td>
+                <td class="amt-col green-amt" id="res-inv-total-3">$—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SPEND OUTPUTS -->
+        <div class="result-section" id="res-section-spend" style="display:none">
+          <div class="result-section-title spend-color">💸 &nbsp;Spend Leakage</div>
+
+          <!-- Total callout -->
+          <div class="section-total-row">
+            <div class="section-total-left">
+              <div class="section-total-label">Total Annual Spend Reduction &amp; Avoidance</div>
+              <div class="section-total-sub">Ongoing annual savings from eliminating leakage across your MRO spend categories</div>
+            </div>
+            <div class="section-total-value red" id="res-spend-total">$—</div>
+          </div>
+
+          <!-- Breakdown table -->
+          <div class="breakdown-label">Components of the $<span id="res-spend-total-2">—</span> annual spend reduction</div>
+          <table class="breakdown-table">
+            <thead><tr><th>Initiative</th><th>Description</th><th class="amt-col">Amount</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="initiative-name">Carrying / Holding Cost Savings</td>
+                <td class="initiative-desc">Annual cost of carrying inventory eliminated as on-hand value drops</td>
+                <td class="amt-col red-amt" id="res-spend-holding">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">WACC Savings</td>
+                <td class="initiative-desc">Capital cost freed as inventory reduction releases working capital</td>
+                <td class="amt-col red-amt" id="res-spend-wacc">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">PPV &amp; Tailspend Savings</td>
+                <td class="initiative-desc">Price variance and tail spend consolidation through supplier rationalization</td>
+                <td class="amt-col red-amt" id="res-spend-ppv">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Replenishment Suppression</td>
+                <td class="initiative-desc">Reduced reorder activity as optimized inventory eliminates unnecessary restocking</td>
+                <td class="amt-col red-amt" id="res-spend-replen">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Additional Repairable Materials</td>
+                <td class="initiative-desc">Parts identified as repairable rather than replaced, reducing new spend</td>
+                <td class="amt-col red-amt" id="res-spend-repair">$—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Expediting Cost Reduction</td>
+                <td class="initiative-desc">Emergency and rush order costs avoided through better stock positioning</td>
+                <td class="amt-col red-amt" id="res-spend-expedite">$—</td>
+              </tr>
+              <tr class="breakdown-total-row">
+                <td colspan="2">Total</td>
+                <td class="amt-col red-amt" id="res-spend-total-3">$—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- DOWNTIME OUTPUTS -->
+        <div class="result-section" id="res-section-downtime" style="display:none">
+          <div class="result-section-title downtime-color">⚠️ &nbsp;Downtime Risk</div>
+
+          <!-- Total callout -->
+          <div class="section-total-row">
+            <div class="section-total-left">
+              <div class="section-total-label">Total Estimated Downtime Cost Avoidance</div>
+              <div class="section-total-sub">Annual savings from reducing stockout-driven unplanned downtime through improved critical spares service levels</div>
+            </div>
+            <div class="section-total-value blue" id="res-dt-savings">$—</div>
+          </div>
+
+          <!-- Before/after table -->
+          <div class="breakdown-label">How this savings is calculated — current vs. optimized state</div>
+          <table class="breakdown-table">
+            <thead><tr><th>Metric</th><th>Current State</th><th class="amt-col">Optimized State</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="initiative-name">Org-Wide Unplanned Downtime Hours</td>
+                <td class="initiative-desc" id="res-dt-cur-hrs">—</td>
+                <td class="amt-col blue-amt" id="res-dt-opt-hrs">—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Total Unplanned Downtime Cost</td>
+                <td class="initiative-desc" id="res-dt-cur-cost">—</td>
+                <td class="amt-col blue-amt" id="res-dt-opt-cost">—</td>
+              </tr>
+              <tr>
+                <td class="initiative-name">Critical Spares Stockout Rate</td>
+                <td class="initiative-desc" id="res-dt-cur-stockout">—</td>
+                <td class="amt-col blue-amt" id="res-dt-opt-stockout">—</td>
+              </tr>
+              <tr class="breakdown-total-row">
+                <td colspan="2">Avoidable Downtime Cost (stockout-attributed portion)</td>
+                <td class="amt-col blue-amt" id="res-dt-savings-2">$—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="methodology-note">
+          <span>ℹ️</span>
+          <div><strong>How we calculated this.</strong> Sliding factors for Parts Pooling, VMI, Deduplication, and PPV Savings scale with your number of sites and SKU count using conservative industry benchmarks. Inventory mix defaults to 67% active/slow, 23% non-moving, 10% special items. Downtime savings use your service level inputs directly per the stockout rate optimization formula. Your actual results may vary. <a href="#" style="color:var(--accent)">See full methodology →</a></div>
+        </div>
+      </div>
+      <!-- END PREVIEW -->
+
+      <!-- BLUR GATE OVERLAY -->
+      <div class="blur-gate-wrapper" id="blur-gate-wrapper">
+        <div class="blur-gate-fade"></div>
+        <div class="blur-gate-blurred" id="blur-gate-blurred" aria-hidden="true">
+          <!-- Ghost content to blur — mirrors what's locked -->
+          <div class="ghost-section">
+            <div class="ghost-section-bar inv-color-ghost"></div>
+            <div class="ghost-cards">
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+            </div>
+          </div>
+          <div class="ghost-section">
+            <div class="ghost-section-bar spend-color-ghost"></div>
+            <div class="ghost-cards">
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+              <div class="ghost-card"><div class="ghost-label"></div><div class="ghost-value"></div><div class="ghost-sub"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- The actual gate card -->
+        <div class="blur-gate-card" id="blur-gate-card">
+          <div class="blur-gate-icon">🔓</div>
+          <h3 class="blur-gate-title">Unlock your full savings breakdown</h3>
+          <p class="blur-gate-sub">Your complete line-item report — including benchmarks against your industry peers and a 90-day action roadmap — is ready. Enter your details to access it.</p>
+          <div class="blur-gate-bullets">
+            <div class="blur-gate-bullet"><span class="bullet-check">✓</span> Full itemized savings analysis</div>
+            <div class="blur-gate-bullet"><span class="bullet-check">✓</span> Industry benchmark comparison</div>
+            <div class="blur-gate-bullet"><span class="bullet-check">✓</span> Prioritized 90-day action roadmap</div>
+            <div class="blur-gate-bullet"><span class="bullet-check">✓</span> Executive-ready one-page summary</div>
+          </div>
+          <div class="blur-gate-form">
+            <input type="text" placeholder="Full name" id="gate-name">
+            <input type="email" placeholder="Work email" id="gate-email">
+            <input type="text" placeholder="Company name" id="gate-company">
+            <button class="btn-primary" style="width:100%;margin-top:4px" onclick="handleGate()">Get my full report →</button>
+            <div class="gate-divider" style="margin:4px 0">or</div>
+            <button class="btn-secondary" onclick="handleCall()">Talk to an expert about these numbers</button>
+          </div>
+        </div>
+      </div>
+      <!-- END BLUR GATE -->
+      <div class="blur-gate-spacer"></div>
+
+    </div>
+
+    <div class="calc-nav">
+      <button class="btn-back" id="btn-back" onclick="prevStep()" style="visibility:hidden">← Back</button>
+      <button class="btn-next" id="btn-next" onclick="nextStep()">Continue →</button>
+    </div>
+  </div>
+</section>
+
+<section class="proof-section">
+  <div class="proof-inner">
+    <div>
+      <div class="proof-label">Industry Benchmark</div>
+      <div class="proof-stat-big">$<span>1.8M</span></div>
+      <div class="proof-stat-sub">Median first-year savings identified across MRO optimization programs in multi-site manufacturers with 5,000+ SKUs.</div>
+    </div>
+    <div class="testimonial-block">
+      <div class="testimonial-text">"We knew we had inventory problems, but we had no idea 40% of our MRO spend was going through channels we couldn't see. The analysis was the wake-up call our leadership team needed."</div>
+      <div class="testimonial-author">VP of Procurement — Fortune 500 Automotive Manufacturer</div>
+    </div>
+  </div>
+</section>
+
+<div class="footer-cta">
+  <h2>Ready to see your full picture?</h2>
+  <p>Most assessments take under 3 minutes. You'll see your savings estimate immediately — no email required to get started.</p>
+  <a href="#calculator" class="btn-primary">Start the Assessment →</a>
+</div>
+
+<footer>
+  <a href="#" class="footer-logo">MRO<span>Optimize</span></a>
+  <p>© 2025 · Built for procurement and operations teams</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  let currentStep = 1;
+  let selectedPains = new Set();
+
+  function selectPain(el, pain) {
+    selectedPains.has(pain) ? selectedPains.delete(pain) : selectedPains.add(pain);
+    el.classList.toggle('selected', selectedPains.has(pain));
+  }
+
+  function goToStep(n) { if (n < currentStep) setStep(n); }
+
+  function setStep(n) {
+    currentStep = n;
+    document.querySelectorAll('.calc-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
+    document.querySelectorAll('.progress-step').forEach((s,i) => {
+      s.classList.remove('active','done');
+      if (i+1===n) s.classList.add('active');
+      if (i+1<n)  s.classList.add('done');
+    });
+    document.getElementById('btn-back').style.visibility = n>1 ? 'visible' : 'hidden';
+    const btnNext = document.getElementById('btn-next');
+    btnNext.style.display = n===3 ? 'none' : '';
+    if (n!==3) btnNext.textContent = n===2 ? 'Calculate My Savings →' : 'Continue →';
+    if (n===2) renderInputFields();
+    window.scrollTo({top: document.getElementById('calculator').offsetTop - 80, behavior:'smooth'});
+  }
+
+  function nextStep() {
+    if (currentStep===1) {
+      if (selectedPains.size===0) { alert('Please select at least one area to continue.'); return; }
+    }
+    if (currentStep===2) {
+      if (!validateInputs()) return;
+      calculateResults();
+    }
+    if (currentStep<3) setStep(currentStep+1);
+  }
+  function prevStep() { if (currentStep>1) setStep(currentStep-1); }
+
+  function renderInputFields() {
+    const hasInvOrSpend = selectedPains.has('inventory') || selectedPains.has('spend');
+    vis('inv-spend-inputs', hasInvOrSpend);
+    vis('spend-only-inputs', selectedPains.has('spend'));
+    vis('downtime-inputs', selectedPains.has('downtime'));
+  }
+  function vis(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
+
+  function updatePctTotal() {
+    const a = pf('inp-active'), b = pf('inp-nonmoving'), c = pf('inp-special');
+    const el = document.getElementById('pct-total-display');
+    if (!a && !b && !c) { el.textContent='—'; el.className='pct-total-val'; return; }
+    const t = a+b+c;
+    el.textContent = t.toFixed(0)+'%';
+    el.className = 'pct-total-val ' + (Math.abs(t-100)<0.5 ? 'ok' : 'bad');
+  }
+
+  function validateInputs() {
+    if (!document.getElementById('inp-industry').value) {
+      document.getElementById('inp-industry').focus(); return false;
+    }
+    if (!gv('inp-sites')) { err('inp-sites'); return false; }
+
+    const hasInvOrSpend = selectedPains.has('inventory') || selectedPains.has('spend');
+    if (hasInvOrSpend) {
+      if (!gv('inp-onhand')) { err('inp-onhand'); return false; }
+      if (!gv('inp-skus'))   { err('inp-skus');   return false; }
+      const vps = gv('inp-onhand') / gv('inp-skus');
+      const warnSkus = vps < 500 || vps > 2000;
+      warn('warn-skus','inp-skus', warnSkus);
+      if (warnSkus) document.getElementById('warn-skus-val').textContent = Math.round(vps).toLocaleString('en-US');
+    }
+    if (selectedPains.has('spend')) {
+      if (!gv('inp-spend')) { err('inp-spend'); return false; }
+      const ratio = gv('inp-spend') / gv('inp-onhand');
+      warn('warn-spend','inp-spend', ratio<0.35 || ratio>0.75);
+    }
+    if (selectedPains.has('downtime')) {
+      if (!gv('inp-dt-hours')) { err('inp-dt-hours'); return false; }
+      if (!gv('inp-dt-cost'))  { err('inp-dt-cost');  return false; }
+      warn('warn-dt-hours','inp-dt-hours', gv('inp-dt-hours')<300 || gv('inp-dt-hours')>1200);
+      warn('warn-dt-cost', 'inp-dt-cost',  gv('inp-dt-cost') <5600 || gv('inp-dt-cost') >22000);
+    }
+
+    // PCT validation (soft)
+    const a=pf('inp-active'), b=pf('inp-nonmoving'), c=pf('inp-special');
+    if ((a||b||c) && Math.abs(a+b+c-100)>0.5) {
+      if (!confirm("Your inventory mix percentages don't total 100%. Continue with defaults (67% / 23% / 10%)?")) return false;
+    }
+    return true;
+  }
+
+  function pf(id)  {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    if (el.classList.contains('comma-input')) return parseFloat(el.dataset.raw) || 0;
+    const v = el.value; return v===''?0:parseFloat(v)||0;
+  }
+  function err(id) { const el=document.getElementById(id); el.classList.add('error-field'); el.focus(); setTimeout(()=>el.classList.remove('error-field'),2000); }
+  function warn(wid,iid,show) {
+    document.getElementById(wid).classList.toggle('visible',show);
+    document.getElementById(iid).classList.toggle('warning-field',show);
+  }
+
+  /* SLIDING FACTORS — sourced directly from spec spreadsheet formulas */
+  function poolingFactor(sites) {
+    if (sites <= 1) return 0;
+    if (sites <= 5) return 0.04;
+    return 0.06;
+  }
+  function vmiFactor(skus) {
+    if (skus < 50000)  return 0.05;
+    if (skus <= 100000) return 0.07;
+    return 0.09;
+  }
+  function dedupFactor(skus) {
+    if (skus < 50000)  return 0.01;
+    if (skus <= 100000) return 0.025;
+    return 0.04;
+  }
+  function ppvFactor(spend) {
+    if (spend < 50000000)  return 0.05;
+    if (spend <= 100000000) return 0.07;
+    return 0.09;
+  }
+
+  /* CALCULATIONS */
+  function calculateResults() {
+    const sites  = gv('inp-sites');
+    const onhand = gv('inp-onhand');
+    const skus   = gv('inp-skus');
+    const spend  = gv('inp-spend');
+    const holdingRate = (pf('inp-holding') || 15) / 100;
+    const waccRate    = (pf('inp-wacc')    || 7)  / 100;
+
+    // Inventory mix — entered or defaults
+    const aRaw = document.getElementById('inp-active').value;
+    const bRaw = document.getElementById('inp-nonmoving').value;
+    const cRaw = document.getElementById('inp-special').value;
+    const activePct    = (aRaw!=='' ? parseFloat(aRaw) : 67) / 100;
+    const nonMovingPct = (bRaw!=='' ? parseFloat(bRaw) : 23) / 100;
+
+    // Derived values
+    const activeVal    = onhand * activePct;
+    const nonMovingVal = onhand * nonMovingPct;
+
+    // ── INVENTORY IMBALANCE ──
+    const activeIncrease  = activeVal * 0.06;       // Risk reduction (investment needed)
+    const activeDecrease  = activeVal * 0.22;       // Reduction savings
+    const pooling         = (activeVal + nonMovingVal) * poolingFactor(sites);
+    const vmi             = activeVal * vmiFactor(skus);
+    const dedup           = (activeVal + nonMovingVal) * dedupFactor(skus);
+    const totalInvReduction = activeDecrease + pooling + vmi + dedup;
+
+    // ── SPEND LEAKAGE ──
+    const holdingSavings    = totalInvReduction * holdingRate;
+    const waccSavings       = totalInvReduction * waccRate;
+    const ppvSavings        = spend * ppvFactor(spend);
+    const replenSuppress    = totalInvReduction * 0.45;
+    const repairableMat     = activeVal * 0.0275;
+    const expediting        = spend * 0.015;
+    const totalSpend        = holdingSavings + waccSavings + ppvSavings + replenSuppress + repairableMat + expediting;
+
+    // ── DOWNTIME RISK ──
+    const dtHrsPerSite   = gv('inp-dt-hours');
+    const dtCostPerHr    = gv('inp-dt-cost');
+    const svcCurrent     = Math.min(pf('inp-svc-current') || 88, 100) / 100;
+    const svcTarget      = Math.min(pf('inp-svc-target')  || 95, 98)  / 100;
+    const stockoutPct    = Math.min(pf('inp-stockout-pct')|| 50, 50)  / 100;
+
+    const orgDtHours        = sites * dtHrsPerSite;
+    const unplannedCost     = orgDtHours * dtCostPerHr;
+    const curStockoutRate   = 1 - svcCurrent;
+    const tgtStockoutRate   = 1 - svcTarget;
+    const optimizedDtHours  = curStockoutRate>0 ? (tgtStockoutRate * orgDtHours) / curStockoutRate : 0;
+    const optimizedDtCost   = optimizedDtHours * dtCostPerHr;
+    const avoidableDtCost   = unplannedCost - optimizedDtCost;
+    const dtSavings         = avoidableDtCost * stockoutPct;
+
+    // ── GRAND TOTAL ──
+    let grand = 0;
+    if (selectedPains.has('inventory')) grand += totalInvReduction;
+    if (selectedPains.has('spend'))     grand += totalSpend;
+    if (selectedPains.has('downtime'))  grand += dtSavings;
+
+    // ── RENDER ──
+    document.getElementById('res-grand-total').textContent = fmtNum(grand);
+
+    // Build journey chart
+    buildJourneyChart(onhand, activeIncrease, activeDecrease, pooling, vmi, dedup, holdingSavings, waccSavings, ppvSavings, replenSuppress, dtSavings);
+
+    vis('res-section-inv', selectedPains.has('inventory'));
+    if (selectedPains.has('inventory')) {
+      put('res-inv-risk',       fmt(activeIncrease));
+      put('res-inv-total',      fmt(totalInvReduction));
+      put('res-inv-total-2',    fmtNum(totalInvReduction));
+      put('res-inv-total-3',    fmt(totalInvReduction));
+      put('res-inv-active-dec', fmt(activeDecrease));
+      put('res-inv-pooling',    fmt(pooling));
+      put('res-inv-vmi',        fmt(vmi));
+      put('res-inv-dedup',      fmt(dedup));
+    }
+
+    vis('res-section-spend', selectedPains.has('spend'));
+    if (selectedPains.has('spend')) {
+      put('res-spend-total',   fmt(totalSpend));
+      put('res-spend-total-2', fmtNum(totalSpend));
+      put('res-spend-total-3', fmt(totalSpend));
+      put('res-spend-holding', fmt(holdingSavings));
+      put('res-spend-wacc',    fmt(waccSavings));
+      put('res-spend-ppv',     fmt(ppvSavings));
+      put('res-spend-replen',  fmt(replenSuppress));
+      put('res-spend-repair',  fmt(repairableMat));
+      put('res-spend-expedite',fmt(expediting));
+    }
+
+    vis('res-section-downtime', selectedPains.has('downtime'));
+    if (selectedPains.has('downtime')) {
+      put('res-dt-savings',      fmt(dtSavings));
+      put('res-dt-savings-2',    fmt(dtSavings));
+      put('res-dt-cur-hrs',      fmtInt(orgDtHours)+' hrs');
+      put('res-dt-opt-hrs',      fmtInt(optimizedDtHours)+' hrs');
+      put('res-dt-cur-cost',     fmt(unplannedCost));
+      put('res-dt-opt-cost',     fmt(optimizedDtCost));
+      put('res-dt-cur-stockout', (curStockoutRate*100).toFixed(0)+'%');
+      put('res-dt-opt-stockout', (tgtStockoutRate*100).toFixed(0)+'%');
+    }
+
+    // Dynamic headline — never summarize across all three, just describe what's in view
+    const parts = [];
+    if (selectedPains.has('inventory')) parts.push(`${fmt(totalInvReduction)} in inventory value reduction`);
+    if (selectedPains.has('spend'))     parts.push(`${fmt(totalSpend)} in annual spend reduction & avoidance`);
+    if (selectedPains.has('downtime'))  parts.push(`${fmt(dtSavings)} in downtime cost savings`);
+    let headline = parts.length >= 2 ? `We identified ${parts.slice(0,-1).join(', ')} and ${parts[parts.length-1]}.`
+      : parts[0] ? `Your assessment identified ${parts[0]}.`
+      : 'Based on your inputs and industry benchmarks.';
+    put('res-headline', headline);
+  }
+
+  /* ── JOURNEY CHART ── */
+  let journeyChartInstance = null;
+
+  function buildJourneyChart(onhand, activeIncrease, activeDecrease, pooling, vmi, dedup, holdingSavings, waccSavings, ppvSavings, replenSuppress, dtSavings) {
+    const hasInv      = selectedPains.has('inventory');
+    const hasSpend    = selectedPains.has('spend');
+    const hasDowntime = selectedPains.has('downtime');
+
+    // Only show chart if inventory or spend selected
+    if (!hasInv && !hasSpend) {
+      document.getElementById('journey-chart-wrap').style.display = 'none';
+      return;
+    }
+
+    // Additional avoidance savings = carrying/holding + WACC + replenishment + expediting
+    const additionalAvoidance = hasSpend ? (holdingSavings + waccSavings + replenSuppress + (onhand * 0.67 * 0.015)) : 0;
+    const repairableMat = hasSpend ? (onhand * 0.67 * 0.0275) : 0;
+
+    const pts = [];
+    let cur = onhand;
+
+    // NOW — Starting on-hand
+    pts.push({ label: 'Now', v: cur, color: '#6b6660', extended: false,
+      tip: ['Starting On-Hand Inventory: ' + fmt(onhand)] });
+
+    if (hasInv) {
+      cur += activeIncrease;
+      pts.push({ label: 'Active Material Increases', v: cur, color: '#c87a2f', extended: false,
+        tip: ['Active Material Increases', '+' + fmt(activeIncrease), 'Investment to prevent critical stockouts'] });
+
+      cur -= activeDecrease;
+      pts.push({ label: 'Active Material Decreases', v: cur, color: '#1a7a4a', extended: false,
+        tip: ['Active Material Decreases', '-' + fmt(activeDecrease), 'Inventory Reduction Savings'] });
+
+      cur -= pooling;
+      pts.push({ label: 'Parts Pooling & Network Sharing', v: cur, color: '#1a7a4a', extended: false,
+        tip: ['Parts Pooling & Network Sharing', '-' + fmt(pooling), 'Inventory Reduction Savings'] });
+    }
+
+    if (hasSpend) {
+      cur -= repairableMat;
+      pts.push({ label: 'Repairable Materials', v: cur, color: '#2a5f9e', extended: false,
+        tip: ['Repairable Materials', '-' + fmt(repairableMat), 'Spend Reduction/Avoidance Savings'] });
+    }
+
+    if (hasInv) {
+      cur -= vmi;
+      pts.push({ label: 'VMI Disposition', v: cur, color: '#1a7a4a', extended: false,
+        tip: ['VMI Disposition', '-' + fmt(vmi), 'Inventory Reduction Savings'] });
+
+      cur -= dedup;
+      pts.push({ label: 'Deduplication', v: cur, color: '#1a7a4a', extended: false,
+        tip: ['Deduplication', '-' + fmt(dedup), 'Inventory Reduction Savings'] });
+    }
+
+    if (hasSpend) {
+      cur -= ppvSavings;
+      pts.push({ label: 'PPV & Tailspend Reduction', v: cur, color: '#2a5f9e', extended: false,
+        tip: ['PPV & Tailspend Reduction', '-' + fmt(ppvSavings), 'Spend Reduction/Avoidance Savings'] });
+    }
+
+    // Mo. 12 — Improved On-Hand
+    const improvedVal = Math.max(cur, 0);
+    pts.push({ label: 'Mo. 12 — Improved', v: improvedVal, color: '#1a7a4a', extended: false,
+      tip: ['Improved On-Hand Inventory Value: ' + fmt(improvedVal), 'All Phase 1 initiatives complete'] });
+
+    // 12–24 months — Additional Avoidance Savings steps down
+    if (hasSpend) {
+      const midV = Math.max(cur - additionalAvoidance / 2, 0);
+      pts.push({ label: 'Mo. 18', v: midV, color: '#2a5f9e', extended: true,
+        tip: ['Additional Avoidance Savings (ongoing)', 'Carrying/Holding Costs, WACC,', 'Replenishment Suppression, Expediting: ' + fmt(additionalAvoidance) + '/yr', 'Spend Reduction/Avoidance Savings'] });
+
+      cur = Math.max(cur - additionalAvoidance, 0);
+      pts.push({ label: 'Mo. 24 — Optimal', v: cur, color: '#2a5f9e', extended: true,
+        tip: ['Optimal On-Hand Inventory Value: ' + fmt(cur), 'Additional Avoidance Savings: ' + fmt(additionalAvoidance) + '/yr'] });
+
+      pts.push({ label: 'Long Term', v: cur, color: '#2a5f9e', extended: true,
+        tip: ['Long Term Optimal State', 'Ongoing savings maintained'] });
+    }
+
+    const month12Idx = pts.findIndex(p => p.label.startsWith('Mo. 12'));
+    const allLabels  = pts.map(p => p.label);
+    const allValues  = pts.map(p => Math.max(p.v, 0));
+
+    const pointColors     = pts.map(p => p.color);
+    const pointRadii      = pts.map(() => 6);
+    const pointHoverRadii = pts.map(() => 9);
+
+    if (journeyChartInstance) { journeyChartInstance.destroy(); journeyChartInstance = null; }
+    const ctx = document.getElementById('journeyChart').getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 260);
+    grad.addColorStop(0, 'rgba(26,122,74,0.15)');
+    grad.addColorStop(1, 'rgba(26,122,74,0.0)');
+
+    const gradExt = ctx.createLinearGradient(0, 0, 0, 260);
+    gradExt.addColorStop(0, 'rgba(42,95,158,0.10)');
+    gradExt.addColorStop(1, 'rgba(42,95,158,0.01)');
+
+    const mainVals = allValues.map((v, i) => (!hasSpend || i <= month12Idx) ? v : null);
+    const extVals  = allValues.map((v, i) => (hasSpend && i >= month12Idx) ? v : null);
+
+    journeyChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: allLabels,
+        datasets: [
+          {
+            label: 'Optimization Journey',
+            data: mainVals,
+            borderColor: '#1a7a4a',
+            borderWidth: 2.5,
+            backgroundColor: grad,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: pointColors,
+            pointBorderColor: 'white',
+            pointBorderWidth: 2,
+            pointRadius: pointRadii,
+            pointHoverRadius: pointHoverRadii,
+            spanGaps: false,
+          },
+          {
+            label: 'Ongoing Savings',
+            data: extVals,
+            borderColor: '#2a5f9e',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            backgroundColor: gradExt,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: pointColors,
+            pointBorderColor: 'white',
+            pointBorderWidth: 2,
+            pointRadius: pointRadii,
+            pointHoverRadius: pointHoverRadii,
+            spanGaps: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0f0f0e',
+            titleFont: { family: "'DM Mono', monospace", size: 11 },
+            bodyFont:  { family: "'DM Sans', sans-serif", size: 12 },
+            padding: 14,
+            filter: (item) => item.parsed.y !== null,
+            callbacks: {
+              title: (items) => allLabels[items[0].dataIndex],
+              label: (item) => {
+                const p = pts[item.dataIndex];
+                return p ? p.tip : [];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(213,208,199,0.5)' },
+            ticks: { font: { family: "'DM Mono', monospace", size: 9 }, color: '#6b6660', maxRotation: 35 }
+          },
+          y: {
+            grid: { color: 'rgba(213,208,199,0.5)' },
+            ticks: {
+              font: { family: "'DM Mono', monospace", size: 10 },
+              color: '#6b6660',
+              callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : v >= 1000 ? Math.round(v/1000)+'K' : v)
+            },
+            beginAtZero: false
+          }
+        }
+      },
+      plugins: [{
+        id: 'divider',
+        afterDraw(chart) {
+          if (month12Idx < 0 || !hasSpend) return;
+          const meta = chart.getDatasetMeta(0);
+          const pt = meta.data[month12Idx];
+          if (!pt) return;
+          const { ctx: c, chartArea: { top, bottom } } = chart;
+          c.save();
+          c.setLineDash([4, 4]);
+          c.strokeStyle = 'rgba(42,95,158,0.35)';
+          c.lineWidth = 1.5;
+          c.beginPath();
+          c.moveTo(pt.x, top);
+          c.lineTo(pt.x, bottom);
+          c.stroke();
+          c.setLineDash([]);
+          c.fillStyle = '#2a5f9e';
+          c.font = "500 10px 'DM Mono', monospace";
+          c.textAlign = 'left';
+          c.fillText('12-24 MO. \u2192', pt.x + 6, top + 14);
+          c.restore();
+        }
+      }]
+    });
+
+    // No phase pills — all info in tooltips
+    document.getElementById('journey-phases').innerHTML = '';
+
+    // TOTALS SUMMARY
+    const totalsEl   = document.getElementById('journey-totals');
+    const totalsGrid = document.getElementById('journey-totals-grid');
+    if (totalsEl && totalsGrid) {
+      const buckets = [
+        { label: 'Active Material Increases', color: 'orange', value: hasInv ? activeIncrease : null },
+        { label: 'Inventory Reduction Savings', color: 'green', value: hasInv ? (activeDecrease + pooling + vmi + dedup) : null },
+        { label: 'Spend Reduction/Avoidance Savings', color: 'blue', value: hasSpend ? (repairableMat + ppvSavings + holdingSavings + waccSavings + replenSuppress) : null },
+        { label: 'Downtime Reduction Savings', color: 'purple', value: hasDowntime ? dtSavings : null },
+      ].filter(b => b.value !== null);
+
+      const grandTotal = buckets.reduce((s, b) => s + b.value, 0);
+      totalsGrid.style.gridTemplateColumns = 'repeat(' + buckets.length + ', 1fr)';
+      totalsGrid.innerHTML = buckets.map(b =>
+        '<div class="journey-total-bucket"><div class="journey-total-bucket-label">' + b.label + '</div><div class="journey-total-bucket-value ' + b.color + '">' + fmt(b.value) + '</div></div>'
+      ).join('');
+
+      const prev = totalsEl.querySelector('.journey-total-grand');
+      if (prev) prev.remove();
+      totalsEl.insertAdjacentHTML('beforeend',
+        '<div class="journey-total-grand"><div class="journey-total-grand-label">Total Identified Savings</div><div class="journey-total-grand-value">' + fmt(grandTotal) + '</div></div>'
+      );
+      totalsEl.style.display = 'block';
+    }
+
+    document.getElementById('journey-chart-wrap').style.display = 'block';
+  }
+  function fmt(n)    { if(!n||isNaN(n)) return '$—'; return '$' + Math.round(n).toLocaleString('en-US'); }
+  function fmtNum(n) { if(!n||isNaN(n)) return '—';  return Math.round(n).toLocaleString('en-US'); }
+  function fmtInt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function put(id,v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+  /* ── COMMA INPUT SYSTEM ──
+     All large-number text inputs use data-raw to store the numeric value.
+     On every keystroke we reformat with commas and restore cursor position.
+  */
+  function initCommaInputs() {
+    document.querySelectorAll('input.comma-input').forEach(el => {
+      el.addEventListener('input', function(e) {
+        const pos = this.selectionStart;
+        const oldLen = this.value.length;
+        // Strip everything except digits and decimal
+        const raw = this.value.replace(/[^0-9.]/g, '');
+        // Only allow one decimal point
+        const parts = raw.split('.');
+        const intPart = parts[0];
+        const decPart = parts.length > 1 ? '.' + parts[1] : '';
+        // Format integer part with commas
+        const formatted = intPart === '' ? '' : parseInt(intPart, 10).toLocaleString('en-US') + decPart;
+        this.value = formatted;
+        // Store raw numeric for calculations
+        this.dataset.raw = raw === '' ? '' : raw;
+        // Restore cursor position accounting for added/removed commas
+        const newLen = this.value.length;
+        const newPos = Math.max(0, pos + (newLen - oldLen));
+        this.setSelectionRange(newPos, newPos);
+      });
+      // On focus, do nothing special — show formatted value
+      // On blur, re-validate format
+      el.addEventListener('blur', function() {
+        if (this.value) {
+          const raw = parseFloat(this.dataset.raw || this.value.replace(/[^0-9.]/g,''));
+          if (!isNaN(raw)) {
+            this.value = raw.toLocaleString('en-US');
+            this.dataset.raw = raw;
+          }
+        }
+      });
+    });
+  }
+
+  /* Override gv() to read data-raw for comma inputs */
+  function gv(id) {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    if (el.classList.contains('comma-input')) {
+      return parseFloat(el.dataset.raw) || 0;
+    }
+    return parseFloat(el.value) || 0;
+  }
+
+  document.addEventListener('DOMContentLoaded', initCommaInputs);
+
+  function handleGate() {
+    const name  = document.getElementById('gate-name').value;
+    const email = document.getElementById('gate-email').value;
+    const co    = document.getElementById('gate-company').value;
+    if (!name || !email || !co) { alert('Please fill in all fields.'); return; }
+
+    // Unlock: remove blur gate, show full results
+    const wrapper = document.getElementById('blur-gate-wrapper');
+    const spacer  = wrapper.nextElementSibling;
+    wrapper.style.display = 'none';
+    if (spacer && spacer.classList.contains('blur-gate-spacer')) spacer.style.display = 'none';
+
+    // Show a thank-you banner above the results
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:var(--green-light);border:1px solid var(--green);border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:12px;margin-bottom:24px;font-size:0.88rem;color:var(--green);font-weight:500;';
+    banner.innerHTML = '<span style="font-size:1.2rem">✅</span> Full report unlocked! A copy will be sent to <strong>' + email + '</strong>.';
+    document.getElementById('results-preview').insertAdjacentElement('afterend', banner);
+
+    // Replace with your actual CRM/HubSpot submission here
+  }
+  function handleCall() { alert('Redirecting to booking page...'); }
+</script>
+</body>
+</html>
