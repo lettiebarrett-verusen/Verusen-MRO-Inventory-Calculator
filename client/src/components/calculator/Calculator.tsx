@@ -113,7 +113,7 @@ export function Calculator() {
                     onClick={() => { if (isDone) goToStep(s.num as Step); }}
                     className={`flex-1 flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-[3px] border-r border-r-gray-200 last:border-r-0 transition-all ${
                       isActive
-                        ? "text-[#0075c9] border-b-[#0075c9] bg-white"
+                        ? (step === 3 ? "text-[#3ec26d] border-b-[#3ec26d] bg-white" : "text-[#0075c9] border-b-[#0075c9] bg-white")
                         : isDone
                           ? "text-[#3ec26d] border-b-[#3ec26d] cursor-pointer hover:bg-white"
                           : "text-muted-foreground border-b-transparent"
@@ -121,7 +121,9 @@ export function Calculator() {
                     data-testid={`step-tab-${s.num}`}
                   >
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                      isActive
+                      isActive && step === 3
+                        ? "bg-[#3ec26d] text-white"
+                        : isActive
                         ? "bg-[#0075c9] text-white"
                         : isDone
                           ? "bg-[#3ec26d] text-white"
