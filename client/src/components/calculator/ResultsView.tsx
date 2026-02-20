@@ -2,9 +2,7 @@ import { type CalculationResult, type CalculatorInputs, type PainPoint } from "@
 import { Button } from "@/components/ui/button";
 import { Download, Phone, RotateCcw, Award, ArrowLeft, Info } from "lucide-react";
 import { JourneyChart } from "./JourneyChart";
-import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
 import { jsPDF } from "jspdf";
-import { useState } from "react";
 
 interface ResultsViewProps {
   results: CalculationResult;
@@ -469,57 +467,6 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
   );
 }
 
-function TreemapContent(props: any) {
-  const { x, y, width, height, name, value, color } = props;
-  if (width < 2 || height < 2) return null;
-
-  const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r},${g},${b},${alpha})`;
-  };
-
-  const baseColor = color || "#003252";
-  const idx = props.index || 0;
-  const opacities = [1, 0.82, 0.65, 0.5, 0.38, 0.28];
-  const opacity = opacities[idx % opacities.length];
-  const fill = hexToRgba(baseColor, opacity);
-
-  const showLabel = width > 50 && height > 30;
-  const showValue = width > 40 && height > 20;
-
-  return (
-    <g>
-      <rect x={x} y={y} width={width} height={height} fill={fill} stroke="white" strokeWidth={2} rx={4} />
-      {showLabel && (
-        <text x={x + width / 2} y={y + height / 2 - (showValue ? 6 : 0)} textAnchor="middle" dominantBaseline="central" fill="white" fontSize={width > 100 ? 11 : 9} fontWeight="600">
-          {width > 100 ? name : name.split(' ').slice(0, 2).join(' ')}
-        </text>
-      )}
-      {showValue && (
-        <text x={x + width / 2} y={y + height / 2 + 10} textAnchor="middle" dominantBaseline="central" fill="rgba(255,255,255,0.85)" fontSize={width > 100 ? 12 : 10} fontWeight="700">
-          {fmt(value)}
-        </text>
-      )}
-    </g>
-  );
-}
-
-function TreemapTooltipContent({ active, payload }: any) {
-  if (active && payload && payload.length) {
-    const d = payload[0].payload;
-    return (
-      <div className="bg-[#003252] text-white rounded-lg px-4 py-3 shadow-lg text-sm max-w-xs">
-        <p className="font-semibold mb-1">{d.name}</p>
-        <p className="text-white/70 text-xs mb-1">{d.desc}</p>
-        <p className="font-bold">{fmt(d.value)}</p>
-      </div>
-    );
-  }
-  return null;
-}
-
 function ResultSection({
   title,
   icon,
@@ -530,7 +477,9 @@ function ResultSection({
   riskLabel,
   riskSub,
   riskValue,
+  breakdownLabel,
   rows,
+  totalRowValue,
 }: {
   title: string;
   icon: string;
@@ -545,15 +494,8 @@ function ResultSection({
   rows: { name: string; desc: string; value: number }[];
   totalRowValue: number;
 }) {
-  const [hovered, setHovered] = useState<string | null>(null);
   const colorClass = color === "green" ? "text-[#3ec26d]" : "text-[#0075c9]";
   const headerBg = color === "green" ? "bg-[#3ec26d]/5 text-[#3ec26d] border-[#3ec26d]/20" : "bg-[#0075c9]/5 text-[#0075c9] border-[#0075c9]/20";
-  const baseHex = color === "green" ? "#3ec26d" : "#0075c9";
-
-  const treemapData = rows
-    .filter(r => r.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .map((r, i) => ({ ...r, size: r.value, color: baseHex, index: i }));
 
   return (
     <div className="mb-8">
@@ -579,36 +521,31 @@ function ResultSection({
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 border-t-0 rounded-b-lg p-4">
-        <div className="h-52">
-          <ResponsiveContainer width="100%" height="100%">
-            <Treemap
-              data={treemapData}
-              dataKey="size"
-              nameKey="name"
-              content={<TreemapContent color={baseHex} />}
-              onMouseEnter={(node: any) => setHovered(node?.name || null)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              <Tooltip content={<TreemapTooltipContent />} />
-            </Treemap>
-          </ResponsiveContainer>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-          {treemapData.map((r, i) => {
-            const opacities = [1, 0.82, 0.65, 0.5, 0.38, 0.28];
-            const op = opacities[i % opacities.length];
-            const isHov = hovered === r.name;
-            return (
-              <div key={r.name} className={`flex items-center gap-1.5 text-xs transition-opacity ${isHov ? 'opacity-100' : 'opacity-80'}`}>
-                <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: baseHex, opacity: op }} />
-                <span className="text-muted-foreground">{r.name}</span>
-                <span className={`font-mono font-medium ${colorClass}`}>{fmt(r.value)}</span>
-              </div>
-            );
-          })}
-        </div>
+      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
+        {breakdownLabel}
       </div>
+      <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
+        <thead>
+          <tr className="bg-white">
+            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Initiative</th>
+            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Description</th>
+            <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200 w-28">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i} className="border-b border-gray-100">
+              <td className="px-4 py-2.5 font-medium text-[#003252] whitespace-nowrap">{row.name}</td>
+              <td className="px-4 py-2.5 text-muted-foreground">{row.desc}</td>
+              <td className={`px-4 py-2.5 text-right font-mono font-medium ${colorClass}`}>{fmt(row.value)}</td>
+            </tr>
+          ))}
+          <tr className="bg-gray-50 font-semibold">
+            <td className="px-4 py-2.5 text-[#003252]" colSpan={2}>Total</td>
+            <td className={`px-4 py-2.5 text-right font-mono ${colorClass}`}>{fmt(totalRowValue)}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
