@@ -439,7 +439,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       <div className="bg-gray-50 rounded-2xl p-8 md:p-10 text-center border border-gray-200 mb-8">
         <h3 className="text-2xl font-bold text-[#003252] mb-4">What's Next?</h3>
         <p className="max-w-2xl mx-auto text-muted-foreground mb-8">
-          Most organizations underestimate how much inventory value is tied up across sites, SKUs, and material categories. A deeper conversation typically reveals even greater opportunity.
+          Most teams underestimate how much inventory value is tied up across their enterprise. A deeper conversation typically reveals even greater opportunity.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
           <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all" asChild>
