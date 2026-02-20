@@ -105,7 +105,6 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden">
-        <div className="absolute top-[-60px] right-[-60px] w-[300px] h-[300px] rounded-full bg-[#0075c9]/15" />
         <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium" data-testid="text-results-label">
           Total MRO Optimization Opportunity
         </p>
