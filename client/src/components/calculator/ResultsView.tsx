@@ -1,6 +1,6 @@
 import { type CalculationResult, type CalculatorInputs, type PainPoint } from "@/lib/calculator-logic";
 import { Button } from "@/components/ui/button";
-import { Download, Phone, RotateCcw, Award, ArrowLeft, Info } from "lucide-react";
+import { Download, Phone, RotateCcw, Brain, ArrowLeft, Info } from "lucide-react";
 import { JourneyChart } from "./JourneyChart";
 import { jsPDF } from "jspdf";
 
@@ -449,7 +449,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           </Button>
           <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all" asChild>
             <a href="https://verusen.com/ai-agent-explainability-for-mro-inventory-optimization/" target="_blank" rel="noopener noreferrer">
-              <Award className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
+              <Brain className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
             </a>
           </Button>
         </div>
