@@ -442,18 +442,18 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           Most organizations underestimate how much inventory value is tied up across sites, SKUs, and material categories. A deeper conversation typically reveals even greater opportunity.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
-          <Button size="lg" className="h-12 px-8 bg-[#003252] hover:bg-[#003252]/90" asChild>
+          <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#3ec26d] hover:bg-[#35a85e] shadow-lg shadow-[#3ec26d]/25 transition-all" asChild>
             <a href="https://verusen.com/talk-to-an-mro-expert/" target="_blank" rel="noopener noreferrer">
-              <Phone className="mr-2 h-4 w-4" /> Talk to an Expert
+              <Phone className="mr-2 h-5 w-5" /> Talk to an Expert
             </a>
           </Button>
-          <Button size="lg" variant="outline" className="h-12 px-8" asChild>
+          <Button size="lg" className="h-14 px-10 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all" asChild>
             <a href="https://verusen.com/ai-agent-explainability-for-mro-inventory-optimization/" target="_blank" rel="noopener noreferrer">
-              <Award className="mr-2 h-4 w-4" /> Learn About Verusen's Explainability AI Agent
+              <Award className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
             </a>
           </Button>
-          <Button size="lg" variant="ghost" className="h-12 px-8 text-muted-foreground" onClick={downloadPDF}>
-            <Download className="mr-2 h-4 w-4" /> Download Results
+          <Button size="lg" variant="outline" className="h-14 px-10 text-base font-semibold border-2 border-gray-300 hover:border-[#003252] hover:text-[#003252] transition-all" onClick={downloadPDF}>
+            <Download className="mr-2 h-5 w-5" /> Download Results
           </Button>
         </div>
       </div>
