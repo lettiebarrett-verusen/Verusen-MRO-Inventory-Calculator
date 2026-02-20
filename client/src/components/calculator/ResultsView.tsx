@@ -449,7 +449,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           </Button>
           <Button size="lg" className="h-14 flex-1 text-base font-bold bg-[#003252] hover:bg-[#003252]/90 shadow-lg shadow-[#003252]/25 transition-all justify-center" asChild>
             <a href="https://verusen.com/ai-agent-explainability-for-mro-inventory-optimization/" target="_blank" rel="noopener noreferrer">
-              <Brain className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
+              <Brain className="mr-2 h-5 w-5" /> Explore the AI
             </a>
           </Button>
         </div>
