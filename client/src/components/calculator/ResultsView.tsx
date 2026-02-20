@@ -452,13 +452,13 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
               <Award className="mr-2 h-5 w-5" /> Explore the AI Behind the Savings
             </a>
           </Button>
-          <Button size="lg" variant="outline" className="h-14 px-10 text-base font-semibold border-2 border-gray-300 hover:border-[#003252] hover:text-[#003252] transition-all" onClick={downloadPDF}>
-            <Download className="mr-2 h-5 w-5" /> Download Results
-          </Button>
         </div>
       </div>
 
-      <div className="text-center">
+      <div className="flex justify-center gap-4">
+        <Button variant="ghost" className="text-muted-foreground" onClick={downloadPDF}>
+          <Download className="mr-2 h-4 w-4" /> Download Results
+        </Button>
         <Button variant="ghost" onClick={onReset} className="text-muted-foreground" data-testid="button-start-over">
           <RotateCcw className="mr-2 h-4 w-4" /> Start Over
         </Button>
