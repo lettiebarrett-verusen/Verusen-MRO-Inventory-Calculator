@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Phone, RotateCcw, Brain, ArrowLeft, Info } from "lucide-react";
 import { JourneyChart } from "./JourneyChart";
 import { jsPDF } from "jspdf";
+import { VERUSEN_LOGO_BASE64 } from "@/lib/verusen-logo";
 
 interface ResultsViewProps {
   results: CalculationResult;
@@ -52,21 +53,22 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     };
 
     doc.setFillColor(0, 50, 82);
-    doc.rect(0, 0, pw, 60, "F");
-    doc.setFontSize(8);
+    doc.rect(0, 0, pw, 70, "F");
+    try { doc.addImage(VERUSEN_LOGO_BASE64, "PNG", mx + 3, 5, 40, 9.6); } catch {}
+    doc.setFontSize(7);
     doc.setTextColor(160, 185, 210);
-    doc.text("TOTAL MRO OPTIMIZATION OPPORTUNITY", mx + 5, 15);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pw - mx - 5, 11, { align: "right" });
+    doc.setFontSize(8);
+    doc.text("TOTAL MRO OPTIMIZATION OPPORTUNITY", mx + 5, 24);
     doc.setFontSize(26);
     doc.setTextColor(255, 255, 255);
-    doc.text(fmt(results.grandTotal), mx + 5, 30);
+    doc.text(fmt(results.grandTotal), mx + 5, 38);
     doc.setFontSize(8);
     doc.setTextColor(160, 185, 210);
-    doc.text("Powered by your data, Verusen\u2019s advanced AI modeling, and industry benchmarks.", mx + 5, 40);
-    doc.setFontSize(7);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pw - mx - 5, 15, { align: "right" });
+    doc.text("Powered by your data, Verusen\u2019s advanced AI modeling, and industry benchmarks.", mx + 5, 48);
 
     const bucketW = cw / buckets.length;
-    const bucketY = 48;
+    const bucketY = 56;
     buckets.forEach((b, i) => {
       const bx = mx + i * bucketW;
       doc.setFillColor(20, 60, 95);
@@ -80,7 +82,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       doc.text(fmt(b.value), bx + 3, bucketY + 10);
     });
 
-    let y = 70;
+    let y = 78;
 
     const drawSectionHeader = (title: string, _icon: string, color: string, yPos: number) => {
       const [r, g, b] = hexToRgb(color);
