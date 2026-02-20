@@ -238,8 +238,8 @@ function GatedResults({
         <p className="text-sm text-white/60 relative">Based on your inputs and industry benchmarks.</p>
       </div>
 
-      <div className="relative mb-8">
-        <div className="blur-[6px] pointer-events-none select-none">
+      <div className="relative">
+        <div className="blur-[6px] pointer-events-none select-none" aria-hidden="true">
           {selectedPains.has("inventory") && results.inventory && (
             <div className="mb-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#3ec26d] bg-[#3ec26d]/5 px-4 py-2.5 rounded-t-lg border border-[#3ec26d]/20 border-b-0">
@@ -326,30 +326,13 @@ function GatedResults({
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white pointer-events-none" />
-      </div>
 
-      <div className="border-2 border-[#003252] rounded-xl p-6 md:p-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-xl font-bold text-[#003252] mb-3">Unlock Your Full Savings Report</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Get the complete breakdown of your optimization opportunities, including detailed savings by category and a personalized action plan.
+        <div className="absolute inset-0 flex items-start justify-center pt-6" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,1) 70%)' }}>
+          <div className="w-full max-w-md mx-4 bg-white border-2 border-[#003252] rounded-xl shadow-2xl p-6">
+            <h3 className="text-lg font-bold text-[#003252] mb-1 text-center">Unlock Your Full Savings Report</h3>
+            <p className="text-xs text-muted-foreground mb-4 text-center">
+              Get the complete breakdown, optimization timeline, and downloadable PDF.
             </p>
-            <ul className="space-y-2">
-              {[
-                "Detailed savings breakdown by initiative",
-                "Optimization journey timeline",
-                "Downloadable PDF report",
-                "Personalized next steps",
-              ].map((item, i) => (
-                <li key={i} className="text-sm text-muted-foreground flex items-baseline gap-2">
-                  <span className="text-[#0075c9]">→</span> {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
             <LeadForm onComplete={onLeadSubmit} onBack={onAdjustInputs} isSubmitting={isSubmitting} compact />
           </div>
         </div>
