@@ -55,14 +55,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
   const pctTotal = values.activePercent + values.obsoletePercent + values.specialPercent;
   const pctOk = Math.abs(pctTotal - 100) < 0.5;
 
-  const skuWarning = hasInvOrSpend && values.totalInventoryValue > 0 && values.skuCount > 0
-    ? (() => {
-        const vps = values.totalInventoryValue / values.skuCount;
-        return vps < 500 || vps > 2000
-          ? `Value per SKU ($${Math.round(vps).toLocaleString()}) is outside the typical $500–$2,000 range — results may be less precise.`
-          : null;
-      })()
-    : null;
+  const skuWarning: string | null = null;
 
   const spendWarning = hasSpend && values.totalInventoryValue > 0 && values.annualSpend && values.annualSpend > 0
     ? (() => {

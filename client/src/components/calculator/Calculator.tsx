@@ -239,16 +239,94 @@ function GatedResults({
       </div>
 
       <div className="relative mb-8">
-        <div className="blur-sm pointer-events-none select-none opacity-60">
-          <div className="bg-gray-100 h-48 rounded-lg flex items-center justify-center text-muted-foreground">
-            <div className="text-center space-y-2">
-              <div className="h-4 bg-gray-300 rounded w-48 mx-auto" />
-              <div className="h-4 bg-gray-300 rounded w-64 mx-auto" />
-              <div className="h-4 bg-gray-300 rounded w-40 mx-auto" />
+        <div className="blur-[6px] pointer-events-none select-none">
+          {selectedPains.has("inventory") && results.inventory && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#3ec26d] bg-[#3ec26d]/5 px-4 py-2.5 rounded-t-lg border border-[#3ec26d]/20 border-b-0">
+                <span>📦</span> Inventory Imbalance
+              </div>
+              <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
+                <div>
+                  <p className="font-semibold text-[#003252]">Total Inventory Value Reduction</p>
+                  <p className="text-xs text-muted-foreground">One-time reduction in on-hand inventory value</p>
+                </div>
+                <p className="text-2xl font-bold text-[#3ec26d]">{fmt(results.inventory.totalInvReduction)}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-px bg-gray-200 border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">Active Reduction</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.activeDecrease)}</p>
+                </div>
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">Parts Pooling</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.pooling)}</p>
+                </div>
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">VMI Disposition</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.vmi)}</p>
+                </div>
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">Deduplication</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.dedup)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedPains.has("spend") && results.spend && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
+                <span>💸</span> Spend Leakage
+              </div>
+              <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
+                <div>
+                  <p className="font-semibold text-[#003252]">Total Annual Spend Reduction</p>
+                  <p className="text-xs text-muted-foreground">Ongoing annual savings from spend optimization</p>
+                </div>
+                <p className="text-2xl font-bold text-[#ed9b29]">{fmt(results.spend.totalSpend)}</p>
+              </div>
+              <div className="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">Holding Costs</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.spend.holdingSavings)}</p>
+                </div>
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">PPV Savings</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.spend.ppvSavings)}</p>
+                </div>
+                <div className="bg-white p-3">
+                  <p className="text-xs text-muted-foreground">Expediting</p>
+                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.spend.expediting)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedPains.has("downtime") && results.downtime && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0075c9] bg-[#0075c9]/5 px-4 py-2.5 rounded-t-lg border border-[#0075c9]/20 border-b-0">
+                <span>⚠️</span> Downtime Risk
+              </div>
+              <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0 rounded-b-lg">
+                <div>
+                  <p className="font-semibold text-[#003252]">Total Downtime Cost Avoidance</p>
+                  <p className="text-xs text-muted-foreground">Annual savings from reducing stockout-driven downtime</p>
+                </div>
+                <p className="text-2xl font-bold text-[#0075c9]">{fmt(results.downtime.dtSavings)}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
+            <p className="text-sm font-bold text-[#003252] mb-2">Your Optimization Journey</p>
+            <div className="h-24 flex items-end gap-1">
+              {[100, 95, 88, 80, 72, 65, 58, 52].map((h, i) => (
+                <div key={i} className="flex-1 bg-[#003252]/20 rounded-t" style={{ height: `${h}%` }} />
+              ))}
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white pointer-events-none" />
       </div>
 
       <div className="border-2 border-[#003252] rounded-xl p-6 md:p-8">
