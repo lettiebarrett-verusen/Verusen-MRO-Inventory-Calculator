@@ -292,17 +292,18 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     doc.text(methLines, mx + 4, y + 10);
     y += 26;
 
-    y = checkPage(22, y);
+    y = checkPage(26, y);
     doc.setFillColor(0, 50, 82);
-    doc.roundedRect(mx, y, cw, 18, 2, 2, "F");
+    doc.roundedRect(mx, y, cw, 22, 2, 2, "F");
     doc.setFontSize(9);
     doc.setTextColor(255, 255, 255);
     doc.text("Ready to unlock your MRO optimization potential?", pw / 2, y + 8, { align: "center" });
     doc.setFontSize(7);
     doc.setTextColor(160, 185, 210);
-    doc.text("Visit verusen.com or talk to an expert today.", pw / 2, y + 14, { align: "center" });
+    doc.text("Schedule a deeper conversation with our team by visiting", pw / 2, y + 14, { align: "center" });
+    doc.text("https://verusen.com/talk-to-an-mro-expert/", pw / 2, y + 18, { align: "center" });
 
-    doc.save("MRO-Optimization-Results.pdf");
+    doc.save("Verusen AI for MRO Optimization Savings.pdf");
   };
 
   return (
