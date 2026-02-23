@@ -7,9 +7,10 @@ export const industryOptions = [
   "Energy & Utilities",
   "Industrial & Environmental Services",
   "Manufacturing",
-  "Mining & Materials",
-  "Transportation & Logistics",
+  "Mining & Metals",
+  "Oil & Gas",
   "Other",
+  "Transportation & Logistics",
 ] as const;
 
 export type PainPoint = "inventory" | "spend" | "downtime";
