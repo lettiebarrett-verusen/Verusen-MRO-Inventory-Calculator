@@ -7,7 +7,7 @@ export const industryOptions = [
   "Energy & Utilities",
   "Industrial & Environmental Services",
   "Manufacturing",
-  "Mining & Metals",
+  "Mining & Materials",
   "Oil & Gas",
   "Other",
   "Transportation & Logistics",
