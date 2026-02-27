@@ -99,7 +99,7 @@ export function Calculator() {
   ];
 
   return (
-    <div id="calculator-section" className="py-8 bg-white relative">
+    <div id="calculator-section" className="py-8 bg-transparent relative">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="bg-gray-50 border-b border-gray-200">
