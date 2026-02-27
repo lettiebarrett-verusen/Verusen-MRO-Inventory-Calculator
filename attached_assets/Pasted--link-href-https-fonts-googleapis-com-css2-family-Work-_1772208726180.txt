@@ -1,0 +1,169 @@
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  .vr-section { padding: 80px 24px; }
+  .vr-inner { max-width: 1080px; margin: 0 auto; }
+  .vr-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #3ec26d; margin-bottom: 14px; font-family: 'Work Sans', sans-serif; }
+  .vr-title { font-family: 'Work Sans', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.7rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 18px; color: #ffffff; }
+  .vr-body { font-family: 'Work Sans', sans-serif; font-size: 1rem; color: rgba(255,255,255,0.65); line-height: 1.75; max-width: 600px; }
+  .vr-why-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+  .vr-pain-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 36px; }
+  .vr-pain-card { display: flex; gap: 18px; align-items: flex-start; padding: 22px 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+  .vr-pain-card:hover { background: rgba(62,194,109,0.06); border-color: rgba(62,194,109,0.25); transform: translateX(4px); }
+  .vr-pain-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+  .vr-ic-blue { background: rgba(62,194,109,0.15); }
+  .vr-ic-cyan { background: rgba(62,194,109,0.10); }
+  .vr-ic-amber { background: rgba(251,140,0,0.15); }
+  .vr-pain-title { font-family: 'Work Sans', sans-serif; font-size: 0.92rem; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+  .vr-pain-desc { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.55; }
+  .vr-badge { display: flex; align-items: flex-start; gap: 14px; background: rgba(62,194,109,0.07); border: 1px solid rgba(62,194,109,0.2); border-radius: 10px; padding: 18px 20px; margin-top: 28px; }
+  .vr-badge-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+  .vr-badge-text { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.5; }
+  .vr-badge-text strong { color: #ffffff; display: block; margin-bottom: 3px; font-size: 0.88rem; }
+  .vr-matters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; margin-top: 52px; }
+  .vr-matters-item { background: rgba(255,255,255,0.02); padding: 34px 28px; display: flex; gap: 18px; align-items: flex-start; transition: background 0.2s; }
+  .vr-matters-item:hover { background: rgba(255,255,255,0.05); }
+  .vr-matters-num { font-family: 'Work Sans', sans-serif; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.06em; line-height: 1; color: rgba(62,194,109,0.35); flex-shrink: 0; width: 40px; text-align: right; }
+  .vr-matters-title { font-family: 'Work Sans', sans-serif; font-size: 0.92rem; font-weight: 700; color: #ffffff; margin-bottom: 7px; line-height: 1.35; }
+  .vr-matters-desc { font-family: 'Work Sans', sans-serif; font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.6; }
+  .vr-callout { display: flex; align-items: flex-start; gap: 20px; margin-top: 40px; padding: 28px 32px; background: rgba(62,194,109,0.06); border: 1px solid rgba(62,194,109,0.18); border-radius: 12px; }
+  .vr-callout-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+  .vr-callout-text { font-family: 'Work Sans', sans-serif; font-size: 0.9rem; color: rgba(255,255,255,0.65); line-height: 1.65; }
+  .vr-callout-text strong { color: #ffffff; }
+  .vr-cta { text-align: center; padding: 80px 24px; }
+  .vr-cta-inner { max-width: 560px; margin: 0 auto; }
+  .vr-cta-inner .vr-body { margin: 0 auto 32px; max-width: 460px; }
+  .vr-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .vr-btn-primary { display: inline-flex; align-items: center; gap: 6px; background: #3ec26d; color: #0a1628; text-decoration: none; padding: 13px 26px; border-radius: 7px; font-family: 'Work Sans', sans-serif; font-size: 0.88rem; font-weight: 700; transition: all 0.2s; box-shadow: 0 4px 18px rgba(62,194,109,0.3); }
+  .vr-btn-primary:hover { background: #31a85a; transform: translateY(-1px); }
+  .vr-btn-secondary { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); text-decoration: none; padding: 13px 26px; border-radius: 7px; font-family: 'Work Sans', sans-serif; font-size: 0.88rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.18); transition: all 0.2s; }
+  .vr-btn-secondary:hover { background: rgba(255,255,255,0.12); }
+  .vr-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 0; }
+  .vr-fade { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .vr-fade.visible { opacity: 1; transform: translateY(0); }
+  .vr-fade.d1 { transition-delay: 0.1s; }
+  .vr-fade.d2 { transition-delay: 0.2s; }
+  .vr-fade.d3 { transition-delay: 0.3s; }
+  @media (max-width: 780px) {
+    .vr-why-layout { grid-template-columns: 1fr; gap: 40px; }
+    .vr-matters-grid { grid-template-columns: 1fr; }
+    .vr-callout { flex-direction: column; gap: 12px; }
+    .vr-section { padding: 60px 20px; }
+  }
+</style>
+
+<hr class="vr-divider">
+<div class="vr-section">
+  <div class="vr-inner">
+    <div class="vr-why-layout">
+      <div>
+        <div class="vr-label vr-fade">Why Use This Calculator</div>
+        <h2 class="vr-title vr-fade d1">Three problems.<br>One assessment.</h2>
+        <p class="vr-body vr-fade d2">Most MRO organizations struggle with at least one of these issues — often all three at once.</p>
+        <div class="vr-pain-cards">
+          <div class="vr-pain-card vr-fade d1">
+            <div class="vr-pain-icon vr-ic-blue">📦</div>
+            <div>
+              <div class="vr-pain-title">Inventory Bloat</div>
+              <div class="vr-pain-desc">Excess stock ties up working capital, inflates carrying costs, and masks the true cost of poor materials management.</div>
+            </div>
+          </div>
+          <div class="vr-pain-card vr-fade d2">
+            <div class="vr-pain-icon vr-ic-cyan">💸</div>
+            <div>
+              <div class="vr-pain-title">Spend Leakage</div>
+              <div class="vr-pain-desc">Duplicate purchases, tail spend, and uncontrolled replenishment quietly drain procurement budgets across sites.</div>
+            </div>
+          </div>
+          <div class="vr-pain-card vr-fade d3">
+            <div class="vr-pain-icon vr-ic-amber">⚡</div>
+            <div>
+              <div class="vr-pain-title">Downtime Risk</div>
+              <div class="vr-pain-desc">Critical spares stockouts translate directly to unplanned downtime — often costing orders of magnitude more than the part itself.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="vr-fade d2">
+        <div class="vr-label">Powered by Verusen AI</div>
+        <h2 class="vr-title">Data-driven.<br>Not guesswork.</h2>
+        <p class="vr-body">This calculator uses Verusen's AI learnings, industry best practices, and proven modeling logic to estimate what smarter MRO inventory and materials management could mean for your business.</p>
+        <p class="vr-body" style="margin-top:14px;">Rather than generic benchmarks, the assessment adapts to your inputs — number of sites, on-hand inventory value, SKU count, annual spend, and downtime exposure — to surface an opportunity specific to your operation.</p>
+        <div class="vr-badge">
+          <div class="vr-badge-icon">🤖</div>
+          <div class="vr-badge-text">
+            <strong>Built on real AI insights</strong>
+            Modeling logic derived from Verusen's AI platform and real-world MRO optimization outcomes across industrial organizations.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="vr-divider">
+<div class="vr-section">
+  <div class="vr-inner">
+    <div class="vr-label vr-fade">Why It Matters</div>
+    <h2 class="vr-title vr-fade d1">The pressure modern<br>supply chain teams face.</h2>
+    <p class="vr-body vr-fade d2">Modern maintenance and supply chain teams face mounting pressure to do more with less — across inventory, procurement, and reliability. Yet traditional approaches often rely on guesswork or manual analysis, leading to inconsistent outcomes.</p>
+    <div class="vr-matters-grid">
+      <div class="vr-matters-item vr-fade">
+        <div class="vr-matters-num">1</div>
+        <div>
+          <div class="vr-matters-title">Cut working capital tied up in inventory</div>
+          <div class="vr-matters-desc">Excess MRO stock is one of the largest hidden drains on enterprise balance sheets — and one of the most addressable opportunities available.</div>
+        </div>
+      </div>
+      <div class="vr-matters-item vr-fade d1">
+        <div class="vr-matters-num">2</div>
+        <div>
+          <div class="vr-matters-title">Improve service levels across plants and facilities</div>
+          <div class="vr-matters-desc">Right-sizing inventory means the right part is available at the right site — without overstocking everything everywhere across the network.</div>
+        </div>
+      </div>
+      <div class="vr-matters-item vr-fade d2">
+        <div class="vr-matters-num">3</div>
+        <div>
+          <div class="vr-matters-title">Reduce unplanned downtime due to stockouts</div>
+          <div class="vr-matters-desc">When critical spares aren't available, production stops. Optimizing service levels for critical parts is one of the highest-ROI moves a plant can make.</div>
+        </div>
+      </div>
+      <div class="vr-matters-item vr-fade d3">
+        <div class="vr-matters-num">4</div>
+        <div>
+          <div class="vr-matters-title">Align procurement, operations, and reliability</div>
+          <div class="vr-matters-desc">Fragmented ownership across teams leads to inconsistent decisions. A shared data foundation changes that — and this calculator starts the conversation.</div>
+        </div>
+      </div>
+    </div>
+    <div class="vr-callout vr-fade">
+      <div class="vr-callout-icon">💡</div>
+      <div class="vr-callout-text">
+        <strong>Traditional approaches rely on guesswork.</strong> Our calculator gives you a data-driven snapshot of your opportunity before deeper engagement — so you walk into any conversation already knowing your numbers.
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="vr-divider">
+<div class="vr-cta">
+  <div class="vr-cta-inner">
+    <div class="vr-label vr-fade">Ready to Go Deeper?</div>
+    <h2 class="vr-title vr-fade d1">Turn your estimate<br>into a roadmap.</h2>
+    <p class="vr-body vr-fade d2">The calculator gives you the opportunity. Verusen's team can help you build the plan — with AI-powered analysis tailored to your sites, systems, and materials data.</p>
+    <div class="vr-buttons vr-fade d3">
+      <a href="https://verusen.com/talk-to-an-mro-expert/" class="vr-btn-primary">Talk to an Expert →</a>
+      <a href="https://verusen.com/mro-inventory-optimization/" class="vr-btn-secondary">Explore the Platform</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const vrObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); vrObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.vr-fade').forEach(el => vrObs.observe(el));
+</script>
