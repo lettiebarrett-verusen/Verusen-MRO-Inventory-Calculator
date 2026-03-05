@@ -277,7 +277,7 @@ function GatedResults({
           {selectedPains.has("spend") && results.spend && (
             <div className="mb-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
-                <span>💸</span> Spend Leakage
+                <span>💸</span> Spend Reduction/Avoidance
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
                 <div>
@@ -306,7 +306,7 @@ function GatedResults({
           {selectedPains.has("downtime") && results.downtime && (
             <div className="mb-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0075c9] bg-[#0075c9]/5 px-4 py-2.5 rounded-t-lg border border-[#0075c9]/20 border-b-0">
-                <span>⚠️</span> Downtime Risk
+                <span>⚠️</span> Downtime Avoidance
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0 rounded-b-lg">
                 <div>

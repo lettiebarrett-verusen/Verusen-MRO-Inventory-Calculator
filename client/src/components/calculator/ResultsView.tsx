@@ -209,7 +209,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
     if (hasSpend && results.spend) {
       y = checkPage(60, y);
-      y = drawSectionHeader("Spend Leakage", "\uD83D\uDCB8", "#0075c9", y);
+      y = drawSectionHeader("Spend Reduction/Avoidance", "\uD83D\uDCB8", "#0075c9", y);
       y = drawTotalRow("Total Annual Spend Reduction & Avoidance", "Ongoing annual savings from eliminating leakage across your MRO spend categories", results.spend.totalSpend, "#0075c9", y);
       y = drawBreakdownTable(
         `Components of the ${fmt(results.spend.totalSpend)} annual spend reduction`,
@@ -230,7 +230,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
     if (hasDowntime && results.downtime) {
       y = checkPage(50, y);
-      y = drawSectionHeader("Downtime Risk", "\u26A0\uFE0F", "#6b7280", y);
+      y = drawSectionHeader("Downtime Avoidance", "\u26A0\uFE0F", "#6b7280", y);
       y = drawTotalRow("Total Estimated Downtime Cost Avoidance", "Annual savings from reducing stockout-driven unplanned downtime", results.downtime.dtSavings, "#6b7280", y);
 
       doc.setFillColor(245, 247, 250);
@@ -368,7 +368,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       )}
       {hasSpend && results.spend && (
         <ResultSection
-          title="Spend Leakage"
+          title="Spend Reduction/Avoidance"
           icon="💸"
           color="blue"
           totalLabel="Total Annual Spend Reduction & Avoidance"
@@ -394,7 +394,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       {hasDowntime && results.downtime && (
         <div className="mb-8">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#6b7280] bg-gray-50 px-4 py-2.5 rounded-t-lg border border-gray-200 border-b-0">
-            <span>⚠️</span> Downtime Risk
+            <span>⚠️</span> Downtime Avoidance
           </div>
           <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
             <div>
