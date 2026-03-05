@@ -52,22 +52,12 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
     points.push({ label: "Pooling", value: cur, tip: `Parts Pooling: -${fmt(inv.pooling)}`, color: "#3ec26d" });
   }
 
-  if (hasSpend && spend) {
-    cur -= spend.repairableMaterials;
-    points.push({ label: "Repairable", value: cur, tip: `Repairable Materials: -${fmt(spend.repairableMaterials)}`, color: "#0075c9" });
-  }
-
   if (hasInv && inv) {
     cur -= inv.vmi;
     points.push({ label: "VMI", value: cur, tip: `VMI Disposition: -${fmt(inv.vmi)}`, color: "#3ec26d" });
 
     cur -= inv.dedup;
     points.push({ label: "Dedup", value: cur, tip: `Deduplication: -${fmt(inv.dedup)}`, color: "#3ec26d" });
-  }
-
-  if (hasSpend && spend) {
-    cur -= spend.ppvSavings;
-    points.push({ label: "PPV", value: cur, tip: `PPV & Tailspend: -${fmt(spend.ppvSavings)}`, color: "#0075c9" });
   }
 
   const improvedVal = Math.max(cur, 0);
