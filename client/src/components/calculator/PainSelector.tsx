@@ -10,8 +10,8 @@ const painOptions: { id: PainPoint; icon: typeof Package; title: string; descrip
   {
     id: "inventory",
     icon: Package,
-    title: "Inventory Bloat",
-    description: "Too much cash tied up in parts. Duplicate SKUs across plants. No visibility into what you actually have.",
+    title: "Inventory Imbalance",
+    description: "Too much of the wrong part, but not enough of the critical ones. No visibility into what you actually have.",
   },
   {
     id: "spend",
