@@ -154,7 +154,7 @@ export function calculateSavings(inputs: CalculatorInputs, selectedPains: Set<Pa
   let downtimeResult: DowntimeResults | null = null;
 
   const activeIncrease = activeVal * 0.04;
-  const activeDecrease = activeVal * 0.22;
+  const activeDecrease = activeVal * 0.15;
   const pooling = (activeVal + nonMovingVal) * poolingFactor(siteCount);
   const vmi = activeVal * vmiFactor(skuCount);
   const dedup = (activeVal + nonMovingVal) * dedupFactor(skuCount);
