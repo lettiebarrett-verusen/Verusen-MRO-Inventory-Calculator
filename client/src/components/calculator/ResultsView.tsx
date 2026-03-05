@@ -30,7 +30,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     hasInv && results.inventory ? { label: "Active Material Increases", color: "#ed9b29", value: results.inventory.activeIncrease } : null,
     hasInv && results.inventory ? { label: "Inventory Reduction Savings", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
     hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
-    hasDowntime && results.downtime ? { label: "Downtime Reduction", color: "#6b7280", value: results.downtime.dtSavings } : null,
+    hasDowntime && results.downtime ? { label: "Downtime\nReduction", color: "#6b7280", value: results.downtime.dtSavings } : null,
   ].filter(Boolean) as { label: string; color: string; value: number }[];
 
   const downloadPDF = () => {
@@ -189,7 +189,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
     if (hasInv && results.inventory) {
       y = checkPage(60, y);
-      y = drawSectionHeader("Inventory Imbalance", "\uD83D\uDCE6", "#3ec26d", y);
+      y = drawSectionHeader("MRO Inventory Optimization", "\uD83D\uDCE6", "#3ec26d", y);
       y = drawTotalRow("Total Inventory Value Reduction Opportunity", "One-time reduction in on-hand inventory value through right-sizing initiatives", results.inventory.totalInvReduction, "#3ec26d", y);
       y = drawRiskRow("Active Materials Increase", "Active material investment to cover critical stockout gaps", results.inventory.activeIncrease, y);
       y = drawBreakdownTable(
@@ -324,8 +324,8 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         <div className={`mt-6 grid gap-px rounded-lg overflow-hidden border border-white/15`} style={{ gridTemplateColumns: `repeat(${buckets.length}, 1fr)` }}>
           {buckets.map((b) => (
             <div key={b.label} className="bg-white/5 backdrop-blur px-3 py-3">
-              <p className="text-[10px] uppercase tracking-wider text-white/50 mb-1 leading-tight">{b.label}</p>
-              <p className="text-base md:text-lg font-bold whitespace-nowrap" style={{ color: b.color }}>{fmt(b.value)}</p>
+              <p className="text-[10px] uppercase tracking-wider text-white/50 mb-1 leading-tight whitespace-pre-line">{b.label}</p>
+              <p className="text-base md:text-lg font-bold whitespace-nowrap" style={{ color: b.color, filter: "brightness(1.3)" }}>{fmt(b.value)}</p>
             </div>
           ))}
         </div>
@@ -339,11 +339,10 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         </button>
       </div>
 
-      <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
-
       {hasInv && results.inventory && (
         <ResultSection
-          title="Inventory Imbalance"
+          title="MRO Inventory Optimization"
+          chart={<JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />}
           icon="📦"
           color="green"
           totalLabel="Total Inventory Value Reduction Opportunity"
@@ -363,6 +362,10 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         />
       )}
 
+      {hasSpend && results.spend && hasInv && <div className="border-t-2 border-gray-200 my-10" />}
+      {hasSpend && results.spend && !hasInv && (
+        <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
+      )}
       {hasSpend && results.spend && (
         <ResultSection
           title="Spend Leakage"
@@ -384,6 +387,10 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         />
       )}
 
+      {hasDowntime && results.downtime && (hasInv || hasSpend) && <div className="border-t-2 border-gray-200 my-10" />}
+      {hasDowntime && results.downtime && !hasInv && !hasSpend && (
+        <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
+      )}
       {hasDowntime && results.downtime && (
         <div className="mb-8">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#6b7280] bg-gray-50 px-4 py-2.5 rounded-t-lg border border-gray-200 border-b-0">
@@ -483,6 +490,7 @@ function ResultSection({
   breakdownLabel,
   rows,
   totalRowValue,
+  chart,
 }: {
   title: string;
   icon: string;
@@ -496,6 +504,7 @@ function ResultSection({
   breakdownLabel: string;
   rows: { name: string; desc: string; value: number }[];
   totalRowValue: number;
+  chart?: React.ReactNode;
 }) {
   const colorClass = color === "green" ? "text-[#3ec26d]" : "text-[#0075c9]";
   const headerBg = color === "green" ? "bg-[#3ec26d]/5 text-[#3ec26d] border-[#3ec26d]/20" : "bg-[#0075c9]/5 text-[#0075c9] border-[#0075c9]/20";
@@ -505,6 +514,12 @@ function ResultSection({
       <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-t-lg border border-b-0 ${headerBg}`}>
         <span>{icon}</span> {title}
       </div>
+
+      {chart && (
+        <div className="border border-gray-200 border-t-0 bg-white p-4">
+          {chart}
+        </div>
+      )}
 
       <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
         <div>

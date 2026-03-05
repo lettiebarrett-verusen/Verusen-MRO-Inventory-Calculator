@@ -244,7 +244,7 @@ function GatedResults({
           {selectedPains.has("inventory") && results.inventory && (
             <div className="mb-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#3ec26d] bg-[#3ec26d]/5 px-4 py-2.5 rounded-t-lg border border-[#3ec26d]/20 border-b-0">
-                <span>📦</span> Inventory Imbalance
+                <span>📦</span> MRO Inventory Optimization
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
                 <div>
