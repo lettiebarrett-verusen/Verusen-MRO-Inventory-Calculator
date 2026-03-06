@@ -127,7 +127,6 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   const legendItems = [
     ...(hasInv ? [{ label: "Active Material Increases", color: "#6b7280" }] : []),
     ...(hasInv ? [{ label: "Inventory Reduction", color: "#3ec26d" }] : []),
-    ...(hasSpend ? [{ label: "Spend Reduction", color: "#0075c9" }] : []),
   ];
 
   return (
