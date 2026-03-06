@@ -28,9 +28,9 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
   const buckets = [
     hasInv && results.inventory ? { label: "Active Material Increases", color: "#6b7280", value: results.inventory.activeIncrease } : null,
-    hasInv && results.inventory ? { label: "Inventory Reduction", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
+    hasInv && results.inventory ? { label: "Inventory\nReduction", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
     hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
-    hasDowntime && results.downtime ? { label: "Downtime Reduction", color: "#ed9b29", value: results.downtime.dtSavings } : null,
+    hasDowntime && results.downtime ? { label: "Downtime\nReduction", color: "#ed9b29", value: results.downtime.dtSavings } : null,
   ].filter(Boolean) as { label: string; color: string; value: number }[];
 
   const downloadPDF = () => {
@@ -310,14 +310,14 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden">
-        <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium" data-testid="text-results-label">
+      <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden text-center">
+        <p className="text-sm uppercase tracking-widest text-white mb-3 font-semibold" data-testid="text-results-label">
           Total MRO Optimization Opportunity
         </p>
         <p className="text-4xl md:text-5xl font-extrabold text-white mb-2 relative" data-testid="text-grand-total">
           {fmt(results.grandTotal)}
         </p>
-        <p className="text-sm text-white/70 relative max-w-2xl leading-relaxed">
+        <p className="text-sm text-white/70 relative max-w-2xl mx-auto leading-relaxed">
           Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.
         </p>
 
@@ -325,14 +325,14 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           {buckets.map((b) => (
             <div key={b.label} className="bg-white/5 backdrop-blur px-3 py-3 text-center">
               <p className="text-lg md:text-xl font-bold whitespace-nowrap mb-1" style={{ color: b.color, filter: "brightness(1.3)" }}>{fmt(b.value)}</p>
-              <p className="text-[10px] uppercase tracking-wider text-white/90 leading-tight">{b.label}</p>
+              <p className="text-[10px] uppercase tracking-wider text-white/90 leading-tight whitespace-pre-line">{b.label}</p>
             </div>
           ))}
         </div>
 
         <button
           onClick={onAdjustInputs}
-          className="mt-4 text-sm text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded px-4 py-2 transition-all flex items-center gap-2"
+          className="mt-4 text-sm text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded px-4 py-2 transition-all inline-flex items-center gap-2"
           data-testid="button-adjust-inputs"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Adjust my inputs
