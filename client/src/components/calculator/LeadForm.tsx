@@ -110,7 +110,7 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false, compact = f
           />
 
           <Button type="submit" className="w-full bg-[#003252] hover:bg-[#003252]/90 h-11" disabled={isSubmitting} data-testid="button-reveal-savings">
-            {isSubmitting ? "Submitting..." : "Get My Full Savings"} {!isSubmitting && <ArrowRight className="ml-2 w-4 h-4" />}
+            {isSubmitting ? "Submitting..." : "Get My Full AI Analysis"} {!isSubmitting && <ArrowRight className="ml-2 w-4 h-4" />}
           </Button>
 
           <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
@@ -212,7 +212,7 @@ export function LeadForm({ onComplete, onBack, isSubmitting = false, compact = f
           />
 
           <Button type="submit" size="lg" className="w-full mt-6 h-12 text-lg bg-[#003252] hover:bg-[#003252]/90" disabled={isSubmitting} data-testid="button-reveal-savings">
-            {isSubmitting ? "Submitting..." : "Get My Full Savings"} {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5" />}
+            {isSubmitting ? "Submitting..." : "Get My Full AI Analysis"} {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5" />}
           </Button>
 
           <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1 mt-4">

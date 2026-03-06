@@ -267,7 +267,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
                   className="pl-7"
                   value={values.annualSpend ? formatNumberWithCommas(values.annualSpend) : ''}
                   onChange={e => updateField("annualSpend", parseFormattedNumber(e.target.value))}
-                  placeholder="e.g. 2,500,000"
+                  placeholder="e.g. 14,000,000"
                 />
               </div>
             </FieldGroup>

@@ -330,7 +330,7 @@ function GatedResults({
 
         <div className="absolute inset-0 flex items-start justify-center pt-6" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,1) 70%)' }}>
           <div className="w-full max-w-md mx-4 bg-white border-2 border-[#003252] rounded-xl shadow-2xl p-6">
-            <h3 className="text-lg font-bold text-[#003252] mb-1 text-center">Unlock Your Full Savings Report</h3>
+            <h3 className="text-lg font-bold text-[#003252] mb-1 text-center">Access Your Full AI MRO Optimization Analysis</h3>
             <p className="text-xs text-muted-foreground mb-4 text-center">
               Get the complete breakdown, optimization timeline, and downloadable PDF.
             </p>
