@@ -169,7 +169,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
                   className="pl-7"
                   value={values.totalInventoryValue ? formatNumberWithCommas(values.totalInventoryValue) : ''}
                   onChange={e => updateField("totalInventoryValue", parseFormattedNumber(e.target.value))}
-                  placeholder="e.g. 4,000,000"
+                  placeholder="e.g. 40,000,000"
                 />
               </div>
             </FieldGroup>
@@ -187,7 +187,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
             </FieldGroup>
           </div>
 
-          <SectionHead>Inventory Mix <span className="text-xs font-normal text-muted-foreground ml-2">— optional, must total 100%</span></SectionHead>
+          <SectionHead>Inventory Mix <span className="text-xs font-normal italic text-white/80 ml-2">— optional, must total 100%</span></SectionHead>
           <div className="grid grid-cols-3 gap-3 mb-2">
             <FieldGroup label="Active & Slow" optional>
               <div className="relative">
