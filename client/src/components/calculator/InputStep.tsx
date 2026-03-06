@@ -141,7 +141,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
           </Select>
         </FieldGroup>
 
-        <FieldGroup label="Number of Sites" required error={errors.siteCount}>
+        <FieldGroup label="Sites" required error={errors.siteCount}>
           <Input
             id="inp-siteCount"
             data-testid="input-site-count"
@@ -158,7 +158,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
         <>
           <SectionHead>Inventory Profile</SectionHead>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
-            <FieldGroup label="Value of On-Hand Inventory" required error={errors.totalInventoryValue}>
+            <FieldGroup label="On-Hand Inventory Value" required error={errors.totalInventoryValue}>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
                 <Input

@@ -305,7 +305,7 @@ function GatedResults({
 
           {selectedPains.has("downtime") && results.downtime && (
             <div className="mb-4">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0075c9] bg-[#0075c9]/5 px-4 py-2.5 rounded-t-lg border border-[#0075c9]/20 border-b-0">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
                 <span>⚠️</span> Downtime Avoidance
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0 rounded-b-lg">
@@ -313,7 +313,7 @@ function GatedResults({
                   <p className="font-semibold text-[#003252]">Total Downtime Cost Avoidance</p>
                   <p className="text-xs text-muted-foreground">Annual savings from reducing stockout-driven downtime</p>
                 </div>
-                <p className="text-2xl font-bold text-[#0075c9]">{fmt(results.downtime.dtSavings)}</p>
+                <p className="text-2xl font-bold text-[#ed9b29]">{fmt(results.downtime.dtSavings)}</p>
               </div>
             </div>
           )}
