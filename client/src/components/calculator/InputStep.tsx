@@ -394,7 +394,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
 
 function SectionHead({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-3 mt-6 bg-[#003252] rounded-md px-4 py-2">
+    <div className="mb-3 mt-6 bg-[#0075c9] rounded-md px-4 py-2">
       <span className="text-xs font-semibold uppercase tracking-wider text-white">{children}</span>
     </div>
   );
