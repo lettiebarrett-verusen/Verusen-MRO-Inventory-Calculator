@@ -254,7 +254,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
 
       {hasSpend && (
         <>
-          <SectionHead>Spend & Carrying Costs</SectionHead>
+          <SectionHead>Spend Profile</SectionHead>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <FieldGroup label="Annual MRO Replenishment Spend" required error={errors.annualSpend} warning={spendWarning}>
               <div className="relative">
