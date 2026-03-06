@@ -63,18 +63,6 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   const improvedVal = Math.max(cur, 0);
   steps.push({ label: "Mo. 12", delta: improvedVal, color: "#003252", tip: `Improved On-Hand: ${fmt(improvedVal)}`, isTotal: true });
 
-  if (hasSpend && spend) {
-    const additionalAvoidance = spend.holdingSavings + spend.waccSavings + spend.replenishmentSuppression + spend.expediting;
-
-    steps.push({ label: "Mo. 18", delta: -additionalAvoidance / 2, color: "#0075c9", tip: `Additional Avoidance: -${fmt(additionalAvoidance)}/yr` });
-    const mo18Val = Math.max(improvedVal - additionalAvoidance / 2, 0);
-
-    const mo24Val = Math.max(improvedVal - additionalAvoidance, 0);
-    steps.push({ label: "Mo. 24", delta: mo24Val, color: "#003252", tip: `Optimal On-Hand Inv: ${fmt(mo24Val)}`, isTotal: true });
-
-    steps.push({ label: "Long Term", delta: mo24Val, color: "#003252", tip: `Optimal On-Hand Inv: ${fmt(mo24Val)}`, isTotal: true });
-  }
-
   let running = 0;
   const data: WaterfallPoint[] = steps.map((s, i) => {
     const isLast = i === steps.length - 1;
