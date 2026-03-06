@@ -187,7 +187,10 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
             </FieldGroup>
           </div>
 
-          <SectionHead>Inventory Mix <span className="text-xs font-normal italic text-white/80 ml-2">— optional, must total 100%</span></SectionHead>
+          <div className="flex items-center gap-3 mb-3 mt-6">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Inventory Mix <span className="font-normal italic">— optional, must total 100%</span></span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
           <div className="grid grid-cols-3 gap-3 mb-2">
             <FieldGroup label="Active & Slow" optional>
               <div className="relative">
