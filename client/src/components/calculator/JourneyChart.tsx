@@ -18,13 +18,15 @@ const fmtCompact = (v: number) => {
   return `$${v}`;
 };
 
-type PointColor = "#ed9b29" | "#3ec26d" | "#0075c9" | "#003252" | "#6b7280";
-
-interface ChartPoint {
-  label: string;
-  value: number;
+interface WaterfallPoint {
+  name: string;
+  base: number;
+  change: number;
+  total: number;
   tip: string;
-  color: PointColor;
+  color: string;
+  isTotal: boolean;
+  isLast: boolean;
 }
 
 export function JourneyChart({ results, selectedPains, totalInventoryValue }: JourneyChartProps) {
@@ -36,49 +38,80 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   const inv = results.inventory;
   const spend = results.spend;
 
-  const points: ChartPoint[] = [];
+  const steps: { label: string; delta: number; color: string; tip: string; isTotal?: boolean }[] = [];
   let cur = totalInventoryValue;
 
-  points.push({ label: "Now", value: cur, tip: `Starting On-Hand: ${fmt(cur)}`, color: "#003252" });
+  steps.push({ label: "Now", delta: cur, color: "#003252", tip: `Starting On-Hand: ${fmt(cur)}`, isTotal: true });
 
   if (hasInv && inv) {
+    steps.push({ label: "Active+", delta: inv.activeIncrease, color: "#6b7280", tip: `Active Material Increases: +${fmt(inv.activeIncrease)}` });
     cur += inv.activeIncrease;
-    points.push({ label: "Active+", value: cur, tip: `Active Material Increases: +${fmt(inv.activeIncrease)}`, color: "#6b7280" });
 
+    steps.push({ label: "Active-", delta: -inv.activeDecrease, color: "#3ec26d", tip: `Active Material Decreases: -${fmt(inv.activeDecrease)}` });
     cur -= inv.activeDecrease;
-    points.push({ label: "Active-", value: cur, tip: `Active Material Decreases: -${fmt(inv.activeDecrease)}`, color: "#3ec26d" });
 
+    steps.push({ label: "Pooling", delta: -inv.pooling, color: "#3ec26d", tip: `Parts Pooling: -${fmt(inv.pooling)}` });
     cur -= inv.pooling;
-    points.push({ label: "Pooling", value: cur, tip: `Parts Pooling: -${fmt(inv.pooling)}`, color: "#3ec26d" });
-  }
 
-  if (hasInv && inv) {
+    steps.push({ label: "VMI", delta: -inv.vmi, color: "#3ec26d", tip: `VMI Disposition: -${fmt(inv.vmi)}` });
     cur -= inv.vmi;
-    points.push({ label: "VMI", value: cur, tip: `VMI Disposition: -${fmt(inv.vmi)}`, color: "#3ec26d" });
 
+    steps.push({ label: "Dedup", delta: -inv.dedup, color: "#3ec26d", tip: `Deduplication: -${fmt(inv.dedup)}` });
     cur -= inv.dedup;
-    points.push({ label: "Dedup", value: cur, tip: `Deduplication: -${fmt(inv.dedup)}`, color: "#3ec26d" });
   }
 
   const improvedVal = Math.max(cur, 0);
-  points.push({ label: "Mo. 12", value: improvedVal, tip: `Improved On-Hand: ${fmt(improvedVal)}`, color: "#003252" });
+  steps.push({ label: "Mo. 12", delta: improvedVal, color: "#003252", tip: `Improved On-Hand: ${fmt(improvedVal)}`, isTotal: true });
 
   if (hasSpend && spend) {
     const additionalAvoidance = spend.holdingSavings + spend.waccSavings + spend.replenishmentSuppression + spend.expediting;
-    const midV = Math.max(cur - additionalAvoidance / 2, 0);
-    points.push({ label: "Mo. 18", value: midV, tip: `Additional Avoidance: -${fmt(additionalAvoidance)}/yr`, color: "#0075c9" });
 
-    cur = Math.max(cur - additionalAvoidance, 0);
-    points.push({ label: "Mo. 24", value: cur, tip: `Optimal On-Hand Inv: ${fmt(cur)}`, color: "#003252" });
-    points.push({ label: "Long Term", value: cur, tip: `Optimal On-Hand Inv: ${fmt(cur)}`, color: "#003252" });
+    steps.push({ label: "Mo. 18", delta: -additionalAvoidance / 2, color: "#0075c9", tip: `Additional Avoidance: -${fmt(additionalAvoidance)}/yr` });
+    const mo18Val = Math.max(improvedVal - additionalAvoidance / 2, 0);
+
+    const mo24Val = Math.max(improvedVal - additionalAvoidance, 0);
+    steps.push({ label: "Mo. 24", delta: mo24Val, color: "#003252", tip: `Optimal On-Hand Inv: ${fmt(mo24Val)}`, isTotal: true });
+
+    steps.push({ label: "Long Term", delta: mo24Val, color: "#003252", tip: `Optimal On-Hand Inv: ${fmt(mo24Val)}`, isTotal: true });
   }
 
-  const lastIdx = points.length - 1;
-  const data = points.map((p, i) => ({ name: p.label, value: Math.max(p.value, 0), tip: p.tip, barColor: p.color, isLast: i === lastIdx }));
+  let running = 0;
+  const data: WaterfallPoint[] = steps.map((s, i) => {
+    const isLast = i === steps.length - 1;
+    if (s.isTotal) {
+      const point: WaterfallPoint = {
+        name: s.label,
+        base: 0,
+        change: s.delta,
+        total: s.delta,
+        tip: s.tip,
+        color: s.color,
+        isTotal: true,
+        isLast,
+      };
+      running = s.delta;
+      return point;
+    } else {
+      const base = s.delta >= 0 ? running : running + s.delta;
+      const change = Math.abs(s.delta);
+      running += s.delta;
+      return {
+        name: s.label,
+        base: Math.max(base, 0),
+        change,
+        total: running,
+        tip: s.tip,
+        color: s.color,
+        isTotal: false,
+        isLast,
+      };
+    }
+  });
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const d = payload[0].payload;
+      const d = payload[0]?.payload;
+      if (!d) return null;
       return (
         <div className="bg-[#003252] text-white rounded-lg px-4 py-3 shadow-lg text-sm max-w-xs">
           <p className="font-semibold mb-1">{d.name}</p>
@@ -89,26 +122,14 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
     return null;
   };
 
-  const DotWithArrow = (props: any) => {
-    const { x, y, width, payload } = props;
-    if (x === undefined || y === undefined) return null;
-    const cx = x + width / 2;
-    const cy = y;
+  const CustomBar = (props: any) => {
+    const { x, y, width, height, payload } = props;
+    if (!payload) return null;
 
-    if (payload.isLast) {
-      return (
-        <g>
-          <polygon
-            points={`${cx + 12},${cy} ${cx - 4},${cy - 7} ${cx - 4},${cy + 7}`}
-            fill={payload.barColor || "#003252"}
-            stroke="white"
-            strokeWidth={1.5}
-          />
-        </g>
-      );
-    }
     return (
-      <circle cx={cx} cy={cy} r={5} fill={payload.barColor || "#003252"} stroke="white" strokeWidth={2} />
+      <g>
+        <rect x={x} y={y} width={width} height={Math.max(height, 1)} rx={3} ry={3} fill={payload.color} opacity={0.85} />
+      </g>
     );
   };
 
@@ -136,9 +157,9 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
           </div>
         </div>
 
-        <div className="h-64">
+        <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 15, right: 20, left: 20, bottom: 5 }}>
+            <BarChart data={data} margin={{ top: 15, right: 20, left: 20, bottom: 5 }} stackOffset="none">
               <XAxis
                 dataKey="name"
                 tick={{ fontSize: 10, fill: "#6b7280" }}
@@ -152,17 +173,10 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
                 tickFormatter={(v: number) => fmtCompact(v)}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]} shape={(props: any) => {
-                const { x, y, width, height, payload } = props;
-                return (
-                  <g>
-                    <rect x={x} y={y} width={width} height={height} rx={4} ry={4} fill={payload.barColor} opacity={0.85} />
-                    <DotWithArrow x={x} y={y} width={width} payload={payload} />
-                  </g>
-                );
-              }}>
+              <Bar dataKey="base" stackId="waterfall" fill="transparent" isAnimationActive={false} />
+              <Bar dataKey="change" stackId="waterfall" isAnimationActive={false} shape={<CustomBar />}>
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.barColor} />
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
