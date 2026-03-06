@@ -11,13 +11,13 @@ const painOptions: { id: PainPoint; icon: typeof Package; title: string; descrip
     id: "inventory",
     icon: Package,
     title: "Inventory Imbalance",
-    description: "Too much of the wrong part, but not enough of the critical ones. No visibility into what you actually have.",
+    description: "Too many of the wrong parts and not enough of the right ones. No visibility into the inventory you actually have.",
   },
   {
     id: "spend",
     icon: DollarSign,
     title: "Spend Leakage",
-    description: "Maverick buying. Supplier consolidation opportunities. Too many catalogs, not enough contract compliance.",
+    description: "Maverick, rogue buying. Tail spend and supplier consolidation opportunities. No contract adherence.",
   },
   {
     id: "downtime",

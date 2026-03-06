@@ -123,7 +123,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
         Tell us about your operation
       </h2>
       <p className="text-sm text-muted-foreground mb-6">
-        Required fields are marked with a red dot. Optional fields improve accuracy — defaults are industry benchmarks.
+        Required fields are marked with a red dot. Defaults are industry benchmarks.
       </p>
 
       <SectionHead>Core Information</SectionHead>
@@ -141,7 +141,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
           </Select>
         </FieldGroup>
 
-        <FieldGroup label="Number of Sites" required error={errors.siteCount} hint="Facilities that hold or consume MRO inventory">
+        <FieldGroup label="Number of Sites" required error={errors.siteCount}>
           <Input
             id="inp-siteCount"
             data-testid="input-site-count"
@@ -174,7 +174,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
               </div>
             </FieldGroup>
 
-            <FieldGroup label="Number of On-Hand SKUs" required error={errors.skuCount} hint="Total unique part numbers in your MRO catalog" warning={skuWarning}>
+            <FieldGroup label="Number of On-Hand SKUs" required error={errors.skuCount} warning={skuWarning}>
               <Input
                 id="inp-skuCount"
                 data-testid="input-sku-count"
@@ -253,7 +253,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
         <>
           <SectionHead>Spend & Carrying Costs</SectionHead>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
-            <FieldGroup label="Annual MRO Replenishment Spend" required error={errors.annualSpend} hint="Total annual purchasing spend on MRO restocking" warning={spendWarning}>
+            <FieldGroup label="Annual MRO Replenishment Spend" required error={errors.annualSpend} warning={spendWarning}>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
                 <Input
@@ -394,9 +394,8 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
 
 function SectionHead({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 mb-3 mt-6">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{children}</span>
-      <div className="flex-1 h-px bg-border" />
+    <div className="mb-3 mt-6 bg-[#003252] rounded-md px-4 py-2">
+      <span className="text-xs font-semibold uppercase tracking-wider text-white">{children}</span>
     </div>
   );
 }
