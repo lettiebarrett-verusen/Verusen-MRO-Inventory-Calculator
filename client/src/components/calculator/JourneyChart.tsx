@@ -61,7 +61,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   }
 
   const improvedVal = Math.max(cur, 0);
-  steps.push({ label: "Mo. 12", delta: improvedVal, color: "#003252", tip: `Improved On-Hand: ${fmt(improvedVal)}`, isTotal: true });
+  steps.push({ label: "Target", delta: improvedVal, color: "#0075c9", tip: `Optimal On-Hand Inventory (Mo. 12): ${fmt(improvedVal)}`, isTotal: true });
 
   let running = 0;
   const data: WaterfallPoint[] = steps.map((s, i) => {
@@ -117,6 +117,9 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
     return (
       <g>
         <rect x={x} y={y} width={width} height={Math.max(height, 1)} rx={3} ry={3} fill={payload.color} opacity={0.85} />
+        {payload.isLast && (
+          <text x={x + width / 2} y={y - 6} textAnchor="middle" fontSize={14}>🎯</text>
+        )}
       </g>
     );
   };
