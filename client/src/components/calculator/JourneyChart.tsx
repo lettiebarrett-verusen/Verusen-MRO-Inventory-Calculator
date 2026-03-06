@@ -1,5 +1,5 @@
 import { type CalculationResult, type PainPoint } from "@/lib/calculator-logic";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 interface JourneyChartProps {
   results: CalculationResult;
@@ -18,7 +18,7 @@ const fmtCompact = (v: number) => {
   return `$${v}`;
 };
 
-type PointColor = "#ed9b29" | "#3ec26d" | "#0075c9" | "#003252";
+type PointColor = "#ed9b29" | "#3ec26d" | "#0075c9" | "#003252" | "#6b7280";
 
 interface ChartPoint {
   label: string;
@@ -43,7 +43,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
 
   if (hasInv && inv) {
     cur += inv.activeIncrease;
-    points.push({ label: "Active+", value: cur, tip: `Active Material Increases: +${fmt(inv.activeIncrease)}`, color: "#ed9b29" });
+    points.push({ label: "Active+", value: cur, tip: `Active Material Increases: +${fmt(inv.activeIncrease)}`, color: "#6b7280" });
 
     cur -= inv.activeDecrease;
     points.push({ label: "Active-", value: cur, tip: `Active Material Decreases: -${fmt(inv.activeDecrease)}`, color: "#3ec26d" });
@@ -74,7 +74,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   }
 
   const lastIdx = points.length - 1;
-  const data = points.map((p, i) => ({ name: p.label, value: Math.max(p.value, 0), tip: p.tip, dotColor: p.color, isLast: i === lastIdx }));
+  const data = points.map((p, i) => ({ name: p.label, value: Math.max(p.value, 0), tip: p.tip, barColor: p.color, isLast: i === lastIdx }));
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -89,15 +89,18 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
     return null;
   };
 
-  const CustomDot = (props: any) => {
-    const { cx, cy, payload } = props;
-    if (!cx || !cy) return null;
+  const DotWithArrow = (props: any) => {
+    const { x, y, width, payload } = props;
+    if (x === undefined || y === undefined) return null;
+    const cx = x + width / 2;
+    const cy = y;
+
     if (payload.isLast) {
       return (
         <g>
           <polygon
             points={`${cx + 12},${cy} ${cx - 4},${cy - 7} ${cx - 4},${cy + 7}`}
-            fill={payload.dotColor || "#003252"}
+            fill={payload.barColor || "#003252"}
             stroke="white"
             strokeWidth={1.5}
           />
@@ -105,12 +108,12 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
       );
     }
     return (
-      <circle cx={cx} cy={cy} r={5} fill={payload.dotColor || "#003252"} stroke="white" strokeWidth={2} />
+      <circle cx={cx} cy={cy} r={5} fill={payload.barColor || "#003252"} stroke="white" strokeWidth={2} />
     );
   };
 
   const legendItems = [
-    ...(hasInv ? [{ label: "Active Material Increases", color: "#ed9b29" }] : []),
+    ...(hasInv ? [{ label: "Active Material Increases", color: "#6b7280" }] : []),
     ...(hasInv ? [{ label: "Inventory Reduction", color: "#3ec26d" }] : []),
     ...(hasSpend ? [{ label: "Spend Reduction", color: "#0075c9" }] : []),
   ];
@@ -135,7 +138,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
 
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 10, right: 20, left: 20, bottom: 5 }}>
+            <BarChart data={data} margin={{ top: 15, right: 20, left: 20, bottom: 5 }}>
               <XAxis
                 dataKey="name"
                 tick={{ fontSize: 10, fill: "#6b7280" }}
@@ -148,16 +151,21 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
                 tickLine={false}
                 tickFormatter={(v: number) => fmtCompact(v)}
               />
-              <Tooltip content={<CustomTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#003252"
-                strokeWidth={2.5}
-                dot={<CustomDot />}
-                activeDot={{ r: 8, fill: "#0075c9", stroke: "white", strokeWidth: 2 }}
-              />
-            </LineChart>
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]} shape={(props: any) => {
+                const { x, y, width, height, payload } = props;
+                return (
+                  <g>
+                    <rect x={x} y={y} width={width} height={height} rx={4} ry={4} fill={payload.barColor} opacity={0.85} />
+                    <DotWithArrow x={x} y={y} width={width} payload={payload} />
+                  </g>
+                );
+              }}>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.barColor} />
+                ))}
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
