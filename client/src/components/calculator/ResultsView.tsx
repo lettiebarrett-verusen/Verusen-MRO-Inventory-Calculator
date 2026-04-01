@@ -44,6 +44,31 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     if (adjustBtn) adjustBtn.style.display = 'none';
     if (footerBtns) footerBtns.style.display = 'none';
 
+    const savedStyles: { el: HTMLElement; prop: string; val: string }[] = [];
+    const allEls = el.querySelectorAll('*');
+    const propsToCheck = ['color', 'background-color', 'border-color', 'outline-color', 'box-shadow'];
+    allEls.forEach((node) => {
+      const htmlEl = node as HTMLElement;
+      const computed = getComputedStyle(htmlEl);
+      propsToCheck.forEach((prop) => {
+        const val = computed.getPropertyValue(prop);
+        if (val && (val.includes('oklab') || val.includes('oklch'))) {
+          const canvas2 = document.createElement('canvas');
+          canvas2.width = 1; canvas2.height = 1;
+          const ctx2 = canvas2.getContext('2d');
+          if (ctx2) {
+            ctx2.fillStyle = val;
+            ctx2.fillRect(0, 0, 1, 1);
+            const [r, g, b, a] = ctx2.getImageData(0, 0, 1, 1).data;
+            const fallback = a < 255 ? `rgba(${r},${g},${b},${(a / 255).toFixed(2)})` : `rgb(${r},${g},${b})`;
+            const camel = prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+            savedStyles.push({ el: htmlEl, prop: camel, val: (htmlEl.style as any)[camel] });
+            (htmlEl.style as any)[camel] = fallback;
+          }
+        }
+      });
+    });
+
     try {
       const canvas = await html2canvas(el, {
         scale: 2,
@@ -87,6 +112,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
       doc.save("Verusen AI for MRO Optimization Savings.pdf");
     } finally {
+      savedStyles.forEach(({ el: sEl, prop, val }) => { (sEl.style as any)[prop] = val; });
       if (adjustBtn) adjustBtn.style.display = '';
       if (footerBtns) footerBtns.style.display = '';
     }
