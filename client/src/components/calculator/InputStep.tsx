@@ -2,7 +2,7 @@ import { useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { type CalculatorInputs, type PainPoint, industryOptions } from "@/lib/calculator-logic";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 
 function formatNumberWithCommas(value: number | string): string {
   const num = typeof value === 'string' ? parseFloat(value.replace(/,/g, '')) : value;
@@ -42,6 +42,9 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pctUserEdited, setPctUserEdited] = useState(false);
+  const [showInvBenchmarks, setShowInvBenchmarks] = useState(false);
+  const [showSpendBenchmarks, setShowSpendBenchmarks] = useState(false);
+  const [showDowntimeBenchmarks, setShowDowntimeBenchmarks] = useState(false);
 
   const hasInvOrSpend = selectedPains.has("inventory") || selectedPains.has("spend");
   const hasSpend = selectedPains.has("spend");
@@ -187,68 +190,67 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
             </FieldGroup>
           </div>
 
-          <div className="flex items-center gap-3 mb-3 mt-6">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Inventory Mix <span className="font-normal italic">— optional, must total 100%</span></span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-          <div className="grid grid-cols-3 gap-3 mb-2">
-            <FieldGroup label="Active & Slow" optional>
-              <div className="relative">
-                <Input
-                  data-testid="input-active-percent"
-                  type="number"
-                  className="pr-7"
-                  value={values.activePercent || ''}
-                  onChange={e => { setPctUserEdited(true); updateField("activePercent", parseFloat(e.target.value) || 0); }}
-                  placeholder="67"
-                  min={0}
-                  max={100}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Default: 67%</span>
-            </FieldGroup>
+          <BenchmarkToggle label="Adjust Inventory Mix" open={showInvBenchmarks} onToggle={() => setShowInvBenchmarks(!showInvBenchmarks)}>
+            <p className="text-xs text-muted-foreground mb-3">Must total 100%. Defaults are industry benchmarks.</p>
+            <div className="grid grid-cols-3 gap-3 mb-2">
+              <FieldGroup label="Active & Slow" optional>
+                <div className="relative">
+                  <Input
+                    data-testid="input-active-percent"
+                    type="number"
+                    className="pr-7"
+                    value={values.activePercent || ''}
+                    onChange={e => { setPctUserEdited(true); updateField("activePercent", parseFloat(e.target.value) || 0); }}
+                    placeholder="67"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+                <span className="text-xs text-muted-foreground">Default: 67%</span>
+              </FieldGroup>
 
-            <FieldGroup label="Non-Moving / Obsolete" optional>
-              <div className="relative">
-                <Input
-                  data-testid="input-obsolete-percent"
-                  type="number"
-                  className="pr-7"
-                  value={values.obsoletePercent || ''}
-                  onChange={e => { setPctUserEdited(true); updateField("obsoletePercent", parseFloat(e.target.value) || 0); }}
-                  placeholder="23"
-                  min={0}
-                  max={100}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Default: 23%</span>
-            </FieldGroup>
+              <FieldGroup label="Non-Moving / Obsolete" optional>
+                <div className="relative">
+                  <Input
+                    data-testid="input-obsolete-percent"
+                    type="number"
+                    className="pr-7"
+                    value={values.obsoletePercent || ''}
+                    onChange={e => { setPctUserEdited(true); updateField("obsoletePercent", parseFloat(e.target.value) || 0); }}
+                    placeholder="23"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+                <span className="text-xs text-muted-foreground">Default: 23%</span>
+              </FieldGroup>
 
-            <FieldGroup label="Special Items" optional>
-              <div className="relative">
-                <Input
-                  data-testid="input-special-percent"
-                  type="number"
-                  className="pr-7"
-                  value={values.specialPercent || ''}
-                  onChange={e => { setPctUserEdited(true); updateField("specialPercent", parseFloat(e.target.value) || 0); }}
-                  placeholder="10"
-                  min={0}
-                  max={100}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Default: 10%</span>
-            </FieldGroup>
-          </div>
-          <div className="flex justify-end items-center gap-2 mb-6">
-            <span className="text-xs text-muted-foreground">Total:</span>
-            <span className={`text-xs font-mono font-medium ${pctOk ? 'text-[#3ec26d]' : pctUserEdited ? 'text-red-500' : 'text-muted-foreground'}`}>
-              {pctUserEdited ? `${pctTotal}%` : '—'}
-            </span>
-          </div>
+              <FieldGroup label="Special Items" optional>
+                <div className="relative">
+                  <Input
+                    data-testid="input-special-percent"
+                    type="number"
+                    className="pr-7"
+                    value={values.specialPercent || ''}
+                    onChange={e => { setPctUserEdited(true); updateField("specialPercent", parseFloat(e.target.value) || 0); }}
+                    placeholder="10"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+                <span className="text-xs text-muted-foreground">Default: 10%</span>
+              </FieldGroup>
+            </div>
+            <div className="flex justify-end items-center gap-2">
+              <span className="text-xs text-muted-foreground">Total:</span>
+              <span className={`text-xs font-mono font-medium ${pctOk ? 'text-[#3ec26d]' : pctUserEdited ? 'text-red-500' : 'text-muted-foreground'}`}>
+                {pctUserEdited ? `${pctTotal}%` : '—'}
+              </span>
+            </div>
+          </BenchmarkToggle>
         </>
       )}
 
@@ -271,39 +273,42 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
                 />
               </div>
             </FieldGroup>
-            <FieldGroup label="Average Holding Cost Rate" optional hint="Default: 15% of inventory value per year">
-              <div className="relative">
-                <Input
-                  data-testid="input-holding-rate"
-                  type="number"
-                  className="pr-7"
-                  value={values.holdingCostRate || ''}
-                  onChange={e => updateField("holdingCostRate", parseFloat(e.target.value) || 0)}
-                  placeholder="15"
-                  min={0}
-                  max={100}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-            </FieldGroup>
           </div>
-          <div className="grid md:grid-cols-2 gap-4 mb-6">
-            <FieldGroup label="Weighted Avg. Cost of Capital (WACC)" optional hint="Default: 7%">
-              <div className="relative">
-                <Input
-                  data-testid="input-wacc-rate"
-                  type="number"
-                  className="pr-7"
-                  value={values.waccRate || ''}
-                  onChange={e => updateField("waccRate", parseFloat(e.target.value) || 0)}
-                  placeholder="7"
-                  min={0}
-                  max={100}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-            </FieldGroup>
-          </div>
+
+          <BenchmarkToggle label="Adjust Spend Assumptions" open={showSpendBenchmarks} onToggle={() => setShowSpendBenchmarks(!showSpendBenchmarks)}>
+            <div className="grid md:grid-cols-2 gap-4">
+              <FieldGroup label="Average Holding Cost Rate" optional hint="Default: 15% of inventory value per year">
+                <div className="relative">
+                  <Input
+                    data-testid="input-holding-rate"
+                    type="number"
+                    className="pr-7"
+                    value={values.holdingCostRate || ''}
+                    onChange={e => updateField("holdingCostRate", parseFloat(e.target.value) || 0)}
+                    placeholder="15"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+              </FieldGroup>
+              <FieldGroup label="Weighted Avg. Cost of Capital (WACC)" optional hint="Default: 7%">
+                <div className="relative">
+                  <Input
+                    data-testid="input-wacc-rate"
+                    type="number"
+                    className="pr-7"
+                    value={values.waccRate || ''}
+                    onChange={e => updateField("waccRate", parseFloat(e.target.value) || 0)}
+                    placeholder="7"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+              </FieldGroup>
+            </div>
+          </BenchmarkToggle>
         </>
       )}
 
@@ -338,59 +343,83 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
               </div>
             </FieldGroup>
           </div>
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
-            <FieldGroup label="Current Service Level — Critical Spares" optional hint="Default: 88% (minimum: 75%)">
-              <div className="relative">
-                <Input
-                  data-testid="input-svc-current"
-                  type="number"
-                  className="pr-7"
-                  value={values.currentServiceLevel || ''}
-                  onChange={e => updateField("currentServiceLevel", parseFloat(e.target.value) || 0)}
-                  placeholder="88"
-                  min={75}
-                  max={100}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-            </FieldGroup>
-            <FieldGroup label="Desired Service Level — Critical Spares" optional hint="Default: 95% (maximum: 98%)">
-              <div className="relative">
-                <Input
-                  data-testid="input-svc-target"
-                  type="number"
-                  className="pr-7"
-                  value={values.targetServiceLevel || ''}
-                  onChange={e => updateField("targetServiceLevel", parseFloat(e.target.value) || 0)}
-                  placeholder="95"
-                  min={0}
-                  max={98}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-            </FieldGroup>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4 mb-6">
-            <FieldGroup label="% Downtime Attributed to Stockouts" optional hint="Default: 50% (maximum: 50%)">
-              <div className="relative">
-                <Input
-                  data-testid="input-stockout-pct"
-                  type="number"
-                  className="pr-7"
-                  value={values.stockoutPercent || ''}
-                  onChange={e => updateField("stockoutPercent", parseFloat(e.target.value) || 0)}
-                  placeholder="50"
-                  min={0}
-                  max={50}
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
-              </div>
-            </FieldGroup>
-          </div>
+
+          <BenchmarkToggle label="Adjust Service Level Assumptions" open={showDowntimeBenchmarks} onToggle={() => setShowDowntimeBenchmarks(!showDowntimeBenchmarks)}>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <FieldGroup label="Current Service Level — Critical Spares" optional hint="Default: 88% (minimum: 75%)">
+                <div className="relative">
+                  <Input
+                    data-testid="input-svc-current"
+                    type="number"
+                    className="pr-7"
+                    value={values.currentServiceLevel || ''}
+                    onChange={e => updateField("currentServiceLevel", parseFloat(e.target.value) || 0)}
+                    placeholder="88"
+                    min={75}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+              </FieldGroup>
+              <FieldGroup label="Desired Service Level — Critical Spares" optional hint="Default: 95% (maximum: 98%)">
+                <div className="relative">
+                  <Input
+                    data-testid="input-svc-target"
+                    type="number"
+                    className="pr-7"
+                    value={values.targetServiceLevel || ''}
+                    onChange={e => updateField("targetServiceLevel", parseFloat(e.target.value) || 0)}
+                    placeholder="95"
+                    min={0}
+                    max={98}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+              </FieldGroup>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <FieldGroup label="% Downtime Attributed to Stockouts" optional hint="Default: 50% (maximum: 50%)">
+                <div className="relative">
+                  <Input
+                    data-testid="input-stockout-pct"
+                    type="number"
+                    className="pr-7"
+                    value={values.stockoutPercent || ''}
+                    onChange={e => updateField("stockoutPercent", parseFloat(e.target.value) || 0)}
+                    placeholder="50"
+                    min={0}
+                    max={50}
+                  />
+                  <span className="absolute right-3 top-2.5 text-sm text-muted-foreground">%</span>
+                </div>
+              </FieldGroup>
+            </div>
+          </BenchmarkToggle>
         </>
       )}
 
       <button type="button" id="step2-submit" onClick={handleSubmit} className="hidden" />
+    </div>
+  );
+}
+
+function BenchmarkToggle({ label, open, onToggle, children }: { label: string; open: boolean; onToggle: () => void; children: React.ReactNode }) {
+  return (
+    <div className="mb-6">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex items-center gap-2 text-sm text-[#0075c9] hover:text-[#003252] font-medium transition-colors mb-3"
+        data-testid={`toggle-${label.toLowerCase().replace(/\s+/g, '-')}`}
+      >
+        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+        {label}
+      </button>
+      {open && (
+        <div className="pl-2 border-l-2 border-gray-200 ml-1">
+          {children}
+        </div>
+      )}
     </div>
   );
 }
