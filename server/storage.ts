@@ -21,48 +21,53 @@ export interface IStorage {
   getCalculationsByLeadId(leadId: string): Promise<Calculation[]>;
 }
 
+function requireDb() {
+  if (!db) throw new Error("Database is not configured (DATABASE_URL not set)");
+  return db;
+}
+
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await requireDb().select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await requireDb().select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const [user] = await requireDb().insert(users).values(insertUser).returning();
     return user;
   }
 
   async createLead(insertLead: InsertLead): Promise<Lead> {
-    const [lead] = await db.insert(leads).values(insertLead).returning();
+    const [lead] = await requireDb().insert(leads).values(insertLead).returning();
     return lead;
   }
 
   async getLead(id: string): Promise<Lead | undefined> {
-    const [lead] = await db.select().from(leads).where(eq(leads.id, id));
+    const [lead] = await requireDb().select().from(leads).where(eq(leads.id, id));
     return lead || undefined;
   }
 
   async getLeadByEmail(email: string): Promise<Lead | undefined> {
-    const [lead] = await db.select().from(leads).where(eq(leads.email, email));
+    const [lead] = await requireDb().select().from(leads).where(eq(leads.email, email));
     return lead || undefined;
   }
 
   async updateLeadHubspotStatus(id: string, status: string): Promise<void> {
-    await db.update(leads).set({ hubspotSynced: status }).where(eq(leads.id, id));
+    await requireDb().update(leads).set({ hubspotSynced: status }).where(eq(leads.id, id));
   }
 
   async createCalculation(insertCalculation: InsertCalculation): Promise<Calculation> {
-    const [calculation] = await db.insert(calculations).values(insertCalculation).returning();
+    const [calculation] = await requireDb().insert(calculations).values(insertCalculation).returning();
     return calculation;
   }
 
   async getCalculationsByLeadId(leadId: string): Promise<Calculation[]> {
-    return db.select().from(calculations).where(eq(calculations.leadId, leadId));
+    return requireDb().select().from(calculations).where(eq(calculations.leadId, leadId));
   }
 }
 
