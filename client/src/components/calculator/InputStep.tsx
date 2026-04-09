@@ -144,7 +144,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
           </Select>
         </FieldGroup>
 
-        <FieldGroup label="Sites" required error={errors.siteCount}>
+        <FieldGroup label="Number of Locations" required error={errors.siteCount}>
           <Input
             id="inp-siteCount"
             data-testid="input-site-count"
