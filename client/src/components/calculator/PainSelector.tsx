@@ -46,7 +46,7 @@ export function PainSelector({ selected, onToggle }: PainSelectorProps) {
               type="button"
               data-testid={`card-pain-${option.id}`}
               onClick={() => onToggle(option.id)}
-              className={`relative text-left p-6 rounded-lg border-2 transition-all duration-200 ${
+              className={`relative text-left p-4 md:p-6 rounded-lg border-2 transition-all duration-200 ${
                 isSelected
                   ? "border-[#0075c9] bg-[#0075c9]/5 shadow-md"
                   : "border-gray-200 bg-white hover:border-[#0075c9]/40 hover:bg-[#0075c9]/5"

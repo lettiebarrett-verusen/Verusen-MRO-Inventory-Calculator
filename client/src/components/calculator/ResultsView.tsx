@@ -383,7 +383,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
-      <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden text-center">
+      <div className="bg-[#003252] rounded-xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden text-center">
         <p className="text-sm uppercase tracking-widest text-white mb-3 font-semibold" data-testid="text-results-label">
           Total MRO Optimization Opportunity
         </p>
@@ -394,7 +394,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.
         </p>
 
-        <div className={`mt-6 grid gap-px rounded-lg overflow-hidden border border-white/15`} style={{ gridTemplateColumns: `repeat(${buckets.length}, 1fr)` }}>
+        <div className={`mt-4 sm:mt-6 grid gap-px rounded-lg overflow-hidden border border-white/15 ${buckets.length <= 2 ? 'grid-cols-' + buckets.length : 'grid-cols-2 sm:grid-cols-' + buckets.length}`}>
           {buckets.map((b) => (
             <div key={b.label} className="bg-white/5 backdrop-blur px-3 py-3 text-center">
               <p className="text-lg md:text-xl font-bold whitespace-nowrap mb-1" style={{ color: b.color, filter: "brightness(1.3)" }}>{fmt(b.value)}</p>
@@ -469,46 +469,48 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
             <span>⚠️</span> Downtime Avoidance
           </div>
-          <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-white border border-gray-200 border-t-0">
             <div>
-              <p className="font-semibold text-[#003252]">Total Estimated Downtime Cost Avoidance</p>
+              <p className="font-semibold text-[#003252] text-sm sm:text-base">Total Estimated Downtime Cost Avoidance</p>
               <p className="text-xs text-muted-foreground">Annual savings from reducing stockout-driven unplanned downtime</p>
             </div>
-            <p className="text-2xl font-bold text-[#ed9b29]" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
+            <p className="text-xl sm:text-2xl font-bold text-[#ed9b29]" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
           </div>
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
             How this savings is calculated — current vs. optimized state
           </div>
-          <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
-            <thead>
-              <tr className="bg-white">
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Metric</th>
-                <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Current State</th>
-                <th className="text-right text-xs font-medium text-[#ed9b29] uppercase tracking-wider px-4 py-2 border-b border-gray-200">Optimized State</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-gray-100">
-                <td className="px-4 py-2.5 font-medium text-[#003252]">Org-Wide Unplanned Downtime Hours</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="px-4 py-2.5 font-medium text-[#003252]">Total Unplanned Downtime Cost</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{fmt(results.downtime.unplannedCost)}</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="px-4 py-2.5 font-medium text-[#003252]">Critical Spares Stockout Rate</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
-              </tr>
-              <tr className="bg-gray-50 font-semibold">
-                <td className="px-4 py-2.5 text-[#003252]" colSpan={2}>Avoidable Downtime Cost (stockout-attributed portion)</td>
-                <td className="px-4 py-2.5 text-right font-mono text-[#ed9b29]">{fmt(results.downtime.dtSavings)}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden min-w-[480px]">
+              <thead>
+                <tr className="bg-white">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Metric</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Current State</th>
+                  <th className="text-right text-xs font-medium text-[#ed9b29] uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Optimized State</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Org-Wide Unplanned Downtime Hours</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Total Unplanned Downtime Cost</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmt(results.downtime.unplannedCost)}</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Critical Spares Stockout Rate</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
+                </tr>
+                <tr className="bg-gray-50 font-semibold">
+                  <td className="px-3 sm:px-4 py-2.5 text-[#003252]" colSpan={2}>Avoidable Downtime Cost (stockout-attributed portion)</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29]">{fmt(results.downtime.dtSavings)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -519,7 +521,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-2xl p-8 md:p-10 text-center border border-gray-200 mb-8">
+      <div className="bg-gray-50 rounded-2xl p-5 sm:p-8 md:p-10 text-center border border-gray-200 mb-8">
         <h3 className="text-2xl font-bold text-[#003252] mb-4">What's Next?</h3>
         <p className="max-w-2xl mx-auto text-muted-foreground mb-8">
           Most teams underestimate how much inventory value is tied up across their enterprise. A deeper conversation typically reveals even greater opportunity.
@@ -594,49 +596,51 @@ function ResultSection({
         </div>
       )}
 
-      <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-white border border-gray-200 border-t-0">
         <div>
-          <p className="font-semibold text-[#003252]">{totalLabel}</p>
+          <p className="font-semibold text-[#003252] text-sm sm:text-base">{totalLabel}</p>
           <p className="text-xs text-muted-foreground">{totalSub}</p>
         </div>
-        <p className={`text-2xl font-bold ${colorClass}`}>{fmt(totalValue)}</p>
+        <p className={`text-xl sm:text-2xl font-bold ${colorClass}`}>{fmt(totalValue)}</p>
       </div>
 
       {riskLabel && riskValue !== undefined && (
-        <div className="flex items-center justify-between p-5 bg-[#6b7280]/5 border border-gray-200 border-t-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-[#6b7280]/5 border border-gray-200 border-t-0">
           <div>
-            <p className="font-semibold text-[#003252]">⚠ {riskLabel}</p>
+            <p className="font-semibold text-[#003252] text-sm sm:text-base">⚠ {riskLabel}</p>
             <p className="text-xs text-muted-foreground">{riskSub}</p>
           </div>
-          <p className="text-2xl font-bold text-[#6b7280]">{fmt(riskValue)}</p>
+          <p className="text-xl sm:text-2xl font-bold text-[#6b7280]">{fmt(riskValue)}</p>
         </div>
       )}
 
       <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
         {breakdownLabel}
       </div>
-      <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
-        <thead>
-          <tr className="bg-white">
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Initiative</th>
-            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200">Description</th>
-            <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2 border-b border-gray-200 w-28">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => (
-            <tr key={i} className="border-b border-gray-100">
-              <td className="px-4 py-2.5 font-medium text-[#003252] whitespace-nowrap">{row.name}</td>
-              <td className="px-4 py-2.5 text-muted-foreground">{row.desc}</td>
-              <td className={`px-4 py-2.5 text-right font-mono font-medium ${colorClass}`}>{fmt(row.value)}</td>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden min-w-[500px]">
+          <thead>
+            <tr className="bg-white">
+              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Initiative</th>
+              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200 hidden sm:table-cell">Description</th>
+              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200 w-28">Amount</th>
             </tr>
-          ))}
-          <tr className="bg-gray-50 font-semibold">
-            <td className="px-4 py-2.5 text-[#003252]" colSpan={2}>Total</td>
-            <td className={`px-4 py-2.5 text-right font-mono ${colorClass}`}>{fmt(totalRowValue)}</td>
-          </tr>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={i} className="border-b border-gray-100">
+                <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">{row.name}</td>
+                <td className="px-3 sm:px-4 py-2.5 text-muted-foreground hidden sm:table-cell">{row.desc}</td>
+                <td className={`px-3 sm:px-4 py-2.5 text-right font-mono font-medium ${colorClass}`}>{fmt(row.value)}</td>
+              </tr>
+            ))}
+            <tr className="bg-gray-50 font-semibold">
+              <td className="px-3 sm:px-4 py-2.5 text-[#003252]" colSpan={2}>Total</td>
+              <td className={`px-3 sm:px-4 py-2.5 text-right font-mono ${colorClass}`}>{fmt(totalRowValue)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

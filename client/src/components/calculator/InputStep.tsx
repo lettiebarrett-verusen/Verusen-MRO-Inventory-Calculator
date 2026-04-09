@@ -192,7 +192,7 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
 
           <BenchmarkToggle label="Adjust Inventory Mix" open={showInvBenchmarks} onToggle={() => setShowInvBenchmarks(!showInvBenchmarks)}>
             <p className="text-xs text-muted-foreground mb-3">Must total 100%. Defaults are industry benchmarks.</p>
-            <div className="grid grid-cols-3 gap-3 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
               <FieldGroup label="Active & Slow" optional>
                 <div className="relative">
                   <Input

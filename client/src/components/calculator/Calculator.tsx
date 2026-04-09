@@ -233,7 +233,7 @@ function GatedResults({
 
   return (
     <div>
-      <div className="bg-[#003252] rounded-xl p-8 mb-8 relative overflow-hidden">
+      <div className="bg-[#003252] rounded-xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden">
         <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium">Total MRO Optimization Opportunity</p>
         <p className="text-4xl md:text-5xl font-extrabold text-white mb-2 relative" data-testid="text-gated-total">{fmt(results.grandTotal)}</p>
         <p className="text-sm text-white/70 relative max-w-2xl leading-relaxed">Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.</p>
@@ -254,21 +254,21 @@ function GatedResults({
                 <p className="text-2xl font-bold text-[#3ec26d]">{fmt(results.inventory.totalInvReduction)}</p>
               </div>
               <div className="grid grid-cols-2 gap-px bg-gray-200 border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">Active Reduction</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.activeDecrease)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Active Reduction</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.inventory.activeDecrease)}</p>
                 </div>
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">Parts Pooling</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.pooling)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Parts Pooling</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.inventory.pooling)}</p>
                 </div>
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">VMI Disposition</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.vmi)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">VMI Disposition</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.inventory.vmi)}</p>
                 </div>
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">Deduplication</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.inventory.dedup)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Deduplication</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.inventory.dedup)}</p>
                 </div>
               </div>
             </div>
@@ -287,17 +287,17 @@ function GatedResults({
                 <p className="text-2xl font-bold text-[#ed9b29]">{fmt(results.spend.totalSpend)}</p>
               </div>
               <div className="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200 border-t-0 rounded-b-lg overflow-hidden">
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">Holding Costs</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.spend.holdingSavings)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Holding Costs</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.spend.holdingSavings)}</p>
                 </div>
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">PPV Savings</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.spend.ppvSavings)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">PPV Savings</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.spend.ppvSavings)}</p>
                 </div>
-                <div className="bg-white p-3">
-                  <p className="text-xs text-muted-foreground">Expediting</p>
-                  <p className="text-sm font-semibold text-[#003252]">{fmt(results.spend.expediting)}</p>
+                <div className="bg-white p-2 sm:p-3">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Expediting</p>
+                  <p className="text-xs sm:text-sm font-semibold text-[#003252]">{fmt(results.spend.expediting)}</p>
                 </div>
               </div>
             </div>
@@ -328,8 +328,8 @@ function GatedResults({
           </div>
         </div>
 
-        <div className="absolute inset-0 flex items-start justify-center pt-6" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,1) 70%)' }}>
-          <div className="w-full max-w-md mx-4 bg-white border-2 border-[#003252] rounded-xl shadow-2xl p-6">
+        <div className="absolute inset-0 flex items-start justify-center pt-4 sm:pt-6" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,1) 70%)' }}>
+          <div className="w-full max-w-md mx-3 sm:mx-4 bg-white border-2 border-[#003252] rounded-xl shadow-2xl p-4 sm:p-6">
             <h3 className="text-lg font-bold text-[#003252] mb-1 text-center">Access Your Full AI MRO Optimization Analysis</h3>
             <p className="text-xs text-muted-foreground mb-4 text-center">
               Get the complete breakdown, optimization timeline, and downloadable PDF.
