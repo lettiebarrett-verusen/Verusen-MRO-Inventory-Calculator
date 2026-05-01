@@ -4,11 +4,11 @@ import { PainSelector } from "./PainSelector";
 import { InputStep } from "./InputStep";
 import { LeadForm } from "./LeadForm";
 import { ResultsView } from "./ResultsView";
-import { type CalculatorInputs, type LeadInputs, type PainPoint, calculateSavings, type CalculationResult } from "@/lib/calculator-logic";
+import { type CalculatorInputs, type LeadInputs, type PainPoint, calculateSavings, type CalculationResult, industrySlugMap, industryOptions } from "@/lib/calculator-logic";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 
-async function submitLead(data: { lead: LeadInputs; calculation: any }) {
+async function submitLead(data: { lead: LeadInputs; calculation: any; industry: string; campaign: string }) {
   const response = await fetch("/api/leads", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -18,11 +18,28 @@ async function submitLead(data: { lead: LeadInputs; calculation: any }) {
   return response.json();
 }
 
+function getUrlParams(): { industry: string; campaign: string } {
+  if (typeof window === "undefined") return { industry: "", campaign: "" };
+  const params = new URLSearchParams(window.location.search);
+  const industryParam = (params.get("industry") || "").toLowerCase().trim();
+  const mappedIndustry = industrySlugMap[industryParam] || "";
+  // Also accept exact full-name match for direct matches
+  const exactIndustry = industryOptions.find(opt => opt.toLowerCase() === industryParam) || "";
+  return {
+    industry: mappedIndustry || exactIndustry || "",
+    campaign: (params.get("campaign") || "").trim(),
+  };
+}
+
 type Step = 1 | 2 | 3;
 
 export function Calculator() {
+  const initialParams = getUrlParams();
   const [step, setStep] = useState<Step>(1);
   const [selectedPains, setSelectedPains] = useState<Set<PainPoint>>(new Set());
+  const [industry, setIndustry] = useState<string>(initialParams.industry);
+  const [campaign] = useState<string>(initialParams.campaign);
+  const [industryError, setIndustryError] = useState<string | undefined>(undefined);
   const [inputs, setInputs] = useState<CalculatorInputs | null>(null);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [gateUnlocked, setGateUnlocked] = useState(false);
@@ -47,7 +64,17 @@ export function Calculator() {
     document.getElementById('calculator-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const handleIndustryChange = (val: string) => {
+    setIndustry(val);
+    if (val) setIndustryError(undefined);
+  };
+
   const handleStep1Next = () => {
+    if (!industry) {
+      setIndustryError("Please select your industry");
+      document.getElementById('inp-industry-step1')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     if (selectedPains.size === 0) {
       alert("Please select at least one area to continue.");
       return;
@@ -66,6 +93,8 @@ export function Calculator() {
     if (!inputs || !results) return;
     leadMutation.mutate({
       lead: leadData,
+      industry,
+      campaign,
       calculation: {
         siteCount: inputs.siteCount,
         totalInventoryValue: inputs.totalInventoryValue,
@@ -86,6 +115,8 @@ export function Calculator() {
   const handleReset = () => {
     setStep(1);
     setSelectedPains(new Set());
+    setIndustry(initialParams.industry);
+    setIndustryError(undefined);
     setInputs(null);
     setResults(null);
     setGateUnlocked(false);
@@ -142,7 +173,13 @@ export function Calculator() {
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
-                  <PainSelector selected={selectedPains} onToggle={togglePain} />
+                  <PainSelector
+                    selected={selectedPains}
+                    onToggle={togglePain}
+                    industry={industry}
+                    onIndustryChange={handleIndustryChange}
+                    industryError={industryError}
+                  />
                 </motion.div>
               )}
 

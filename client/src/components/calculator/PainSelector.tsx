@@ -1,9 +1,13 @@
-import { type PainPoint } from "@/lib/calculator-logic";
+import { type PainPoint, industryOptions } from "@/lib/calculator-logic";
 import { Package, DollarSign, AlertTriangle, Check } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PainSelectorProps {
   selected: Set<PainPoint>;
   onToggle: (pain: PainPoint) => void;
+  industry: string;
+  onIndustryChange: (industry: string) => void;
+  industryError?: string;
 }
 
 const painOptions: { id: PainPoint; icon: typeof Package; title: string; description: string }[] = [
@@ -27,9 +31,33 @@ const painOptions: { id: PainPoint; icon: typeof Package; title: string; descrip
   },
 ];
 
-export function PainSelector({ selected, onToggle }: PainSelectorProps) {
+export function PainSelector({ selected, onToggle, industry, onIndustryChange, industryError }: PainSelectorProps) {
   return (
     <div>
+      <div className="mb-6">
+        <label className="block text-sm font-semibold text-[#003252] mb-2" htmlFor="inp-industry-step1">
+          What industry are you in?
+          <span className="text-red-500 ml-1">*</span>
+        </label>
+        <Select onValueChange={onIndustryChange} value={industry}>
+          <SelectTrigger
+            data-testid="select-industry"
+            id="inp-industry-step1"
+            className={industryError ? "border-red-500" : ""}
+          >
+            <SelectValue placeholder="Select your industry..." />
+          </SelectTrigger>
+          <SelectContent>
+            {industryOptions.map((opt) => (
+              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {industryError && (
+          <p className="text-xs text-red-500 mt-1.5" data-testid="error-industry">{industryError}</p>
+        )}
+      </div>
+
       <h2 className="text-2xl font-bold text-[#003252] mb-1" data-testid="text-pain-title">
         What's your biggest MRO pain right now?
       </h2>

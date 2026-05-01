@@ -13,6 +13,8 @@ const submitLeadSchema = z.object({
     company: z.string().min(2),
     jobFunction: z.string().min(1),
   }),
+  industry: z.string().optional().default(""),
+  campaign: z.string().optional().default(""),
   calculation: z.object({
     siteCount: z.number().min(1),
     totalInventoryValue: z.number().min(1000),
@@ -44,7 +46,7 @@ export async function registerRoutes(
       const fullName = `${data.lead.firstName} ${data.lead.lastName}`;
       
       syncLeadToHubSpot(
-        { name: fullName, email: data.lead.email, company: data.lead.company, jobFunction: data.lead.jobFunction },
+        { name: fullName, email: data.lead.email, company: data.lead.company, jobFunction: data.lead.jobFunction, industry: data.industry, campaign: data.campaign },
         data.calculation
       ).then(result => {
         if (result.success) {
@@ -106,7 +108,7 @@ export async function registerRoutes(
     console.log("Testing HubSpot form submission...");
     try {
       const result = await syncLeadToHubSpot(
-        { name: "Test User", email: "test@test.com", company: "Test Co", jobFunction: "operations" },
+        { name: "Test User", email: "test@test.com", company: "Test Co", jobFunction: "operations", industry: "Food & Beverage", campaign: "test-campaign" },
         { siteCount: 1, totalInventoryValue: 1000000, skuCount: 1000, activePercent: 50, obsoletePercent: 30, specialPercent: 20, activeMaterialIncreases: -30000, activeMaterialDecreases: 110000, networkOptimization: 0, vmiDisposition: 25000, deduplication: 8000, totalReduction: 113000 }
       );
       console.log("HubSpot test result:", result);

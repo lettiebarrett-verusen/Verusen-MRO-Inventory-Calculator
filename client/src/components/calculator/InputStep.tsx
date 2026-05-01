@@ -1,5 +1,5 @@
 import { useState, useCallback, forwardRef, useImperativeHandle } from "react";
-import { type CalculatorInputs, type PainPoint, industryOptions } from "@/lib/calculator-logic";
+import { type CalculatorInputs, type PainPoint } from "@/lib/calculator-logic";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, ChevronDown } from "lucide-react";
@@ -23,7 +23,6 @@ interface InputStepProps {
 }
 
 export function InputStep({ selectedPains, onComplete, defaultValues }: InputStepProps) {
-  const [industry, setIndustry] = useState("");
   const [values, setValues] = useState<CalculatorInputs>({
     siteCount: defaultValues?.siteCount || 0,
     totalInventoryValue: defaultValues?.totalInventoryValue || 0,
@@ -83,7 +82,6 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!industry) errs.industry = "Please select an industry";
     if (!values.siteCount || values.siteCount < 1) errs.siteCount = "Required";
 
     if (hasInvOrSpend) {
@@ -131,19 +129,6 @@ export function InputStep({ selectedPains, onComplete, defaultValues }: InputSte
 
       <SectionHead>Core Information</SectionHead>
       <div className="grid md:grid-cols-2 gap-4 mb-6">
-        <FieldGroup label="Industry" required error={errors.industry}>
-          <Select onValueChange={setIndustry} value={industry}>
-            <SelectTrigger data-testid="select-industry" id="inp-industry">
-              <SelectValue placeholder="Select your industry..." />
-            </SelectTrigger>
-            <SelectContent>
-              {industryOptions.map((opt) => (
-                <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldGroup>
-
         <FieldGroup label="Number of Locations" required error={errors.siteCount}>
           <Input
             id="inp-siteCount"

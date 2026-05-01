@@ -69,6 +69,15 @@ The `shared/` directory contains code used by both frontend and backend:
 - HubSpot CRM integration for lead syncing (status tracked in database)
 - OpenGraph meta tags for social sharing
 
+### URL Parameters (for ABM Campaigns)
+The calculator supports URL query parameters for embedding on industry-specific landing pages:
+- `?industry=<slug>` — pre-selects industry on Step 1 (slugs include: `food-beverage`, `oil-gas`, `pharma`, `manufacturing`, `mining`, `aerospace`, `chemicals`, `construction`, `energy`, `industrial`, `transportation`)
+- `?campaign=<name>` — tags lead in HubSpot with `lead_source_campaign` property for campaign attribution
+
+Example: `https://verusenai-mro-inventory-calculator.onrender.com/?industry=food-beverage&campaign=fb-q2-2026`
+
+To add new campaign attribution, create a custom HubSpot property `lead_source_campaign` (single-line text). The integration silently falls back if the property doesn't exist.
+
 ### Development Tools
 - Replit-specific Vite plugins for development experience
 - Custom meta images plugin for deployment URL handling

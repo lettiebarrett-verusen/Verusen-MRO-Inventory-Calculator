@@ -52,6 +52,8 @@ interface LeadData {
   email: string;
   company: string;
   jobFunction: string;
+  industry?: string;
+  campaign?: string;
 }
 
 interface CalculationData {
@@ -82,16 +84,20 @@ async function submitToHubSpotForm(lead: LeadData, calculation: CalculationData)
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
 
+    const fields: Array<{ name: string; value: string }> = [
+      { name: 'email', value: lead.email },
+      { name: 'firstname', value: firstName },
+      { name: 'lastname', value: lastName },
+      { name: 'company', value: lead.company },
+      { name: 'function', value: lead.jobFunction }
+    ];
+    if (lead.industry) fields.push({ name: 'industry', value: lead.industry });
+    if (lead.campaign) fields.push({ name: 'lead_source_campaign', value: lead.campaign });
+
     const formData = {
-      fields: [
-        { name: 'email', value: lead.email },
-        { name: 'firstname', value: firstName },
-        { name: 'lastname', value: lastName },
-        { name: 'company', value: lead.company },
-        { name: 'function', value: lead.jobFunction }
-      ],
+      fields,
       context: {
-        pageUri: process.env.NODE_ENV === 'production' 
+        pageUri: process.env.NODE_ENV === 'production'
           ? 'https://verusenai-mro-inventory-calculator.onrender.com/'
           : 'https://mro-calculator.replit.app/',
         pageName: 'MRO Inventory Calculator'
@@ -160,6 +166,8 @@ export async function syncLeadToHubSpot(lead: LeadData, calculation: Calculation
 MRO Inventory Calculator Results
 ==============================================
 Date: ${new Date().toLocaleDateString()}
+${lead.industry ? `Industry: ${lead.industry}` : ''}
+${lead.campaign ? `Campaign: ${lead.campaign}` : ''}
 
 INPUT PROFILE:
 - Number of Sites: ${calculation.siteCount}
@@ -203,29 +211,56 @@ TOTAL OPTIMIZATION OPPORTUNITY: ${formatCurrency(calculation.totalReduction)}
       console.log('Contact not found, will create new one');
     }
 
-    if (contactId) {
-      // Update existing contact
-      await client.crm.contacts.basicApi.update(contactId, {
-        properties: {
-          firstname: firstName,
-          lastname: lastName,
-          company: lead.company,
-          function: lead.jobFunction
+    const baseProps: Record<string, string> = {
+      firstname: firstName,
+      lastname: lastName,
+      company: lead.company,
+      function: lead.jobFunction,
+    };
+    if (lead.industry) baseProps.industry = lead.industry;
+    if (lead.campaign) baseProps.lead_source_campaign = lead.campaign;
+
+    // Required core props that should always succeed
+    const coreProps: Record<string, string> = {
+      firstname: firstName,
+      lastname: lastName,
+      company: lead.company,
+      function: lead.jobFunction,
+    };
+
+    // Try with all props, then fall back progressively if any are rejected by HubSpot
+    const upsertContact = async (existingId?: string) => {
+      const propsLevels: Array<Record<string, string>> = [
+        baseProps,
+        // Drop campaign first (most likely to be a missing custom property)
+        Object.fromEntries(Object.entries(baseProps).filter(([k]) => k !== 'lead_source_campaign')),
+        // Drop industry too (in case the value doesn't match HubSpot's enum)
+        Object.fromEntries(Object.entries(baseProps).filter(([k]) => k !== 'lead_source_campaign' && k !== 'industry')),
+        // Last resort: only the absolutely required fields
+        coreProps,
+      ];
+
+      let lastErr: any;
+      for (const props of propsLevels) {
+        try {
+          if (existingId) {
+            await client.crm.contacts.basicApi.update(existingId, { properties: props });
+            return existingId;
+          } else {
+            const r = await client.crm.contacts.basicApi.create({
+              properties: { email: lead.email, ...props }
+            });
+            return r.id;
+          }
+        } catch (err: any) {
+          lastErr = err;
+          console.warn('HubSpot contact write failed, will retry with reduced props:', err?.message);
         }
-      });
-    } else {
-      // Create new contact
-      const createResponse = await client.crm.contacts.basicApi.create({
-        properties: {
-          email: lead.email,
-          firstname: firstName,
-          lastname: lastName,
-          company: lead.company,
-          function: lead.jobFunction
-        }
-      });
-      contactId = createResponse.id;
-    }
+      }
+      throw lastErr;
+    };
+
+    contactId = await upsertContact(contactId);
 
     // Add a note with the calculator results
     if (contactId) {

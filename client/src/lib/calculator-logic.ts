@@ -5,13 +5,38 @@ export const industryOptions = [
   "Chemicals & Process Industries",
   "Construction & Infrastructure",
   "Energy & Utilities",
+  "Food & Beverage",
   "Industrial & Environmental Services",
   "Manufacturing",
   "Mining & Materials",
   "Oil & Gas",
-  "Other",
+  "Pharmaceuticals & Life Sciences",
   "Transportation & Logistics",
+  "Other",
 ] as const;
+
+export const industrySlugMap: Record<string, typeof industryOptions[number]> = {
+  "aerospace": "Aerospace & Defense",
+  "aerospace-defense": "Aerospace & Defense",
+  "chemicals": "Chemicals & Process Industries",
+  "construction": "Construction & Infrastructure",
+  "energy": "Energy & Utilities",
+  "energy-utilities": "Energy & Utilities",
+  "food-beverage": "Food & Beverage",
+  "food-and-beverage": "Food & Beverage",
+  "fb": "Food & Beverage",
+  "industrial": "Industrial & Environmental Services",
+  "manufacturing": "Manufacturing",
+  "mining": "Mining & Materials",
+  "oil-gas": "Oil & Gas",
+  "oil-and-gas": "Oil & Gas",
+  "pharma": "Pharmaceuticals & Life Sciences",
+  "pharmaceuticals": "Pharmaceuticals & Life Sciences",
+  "pharmaceuticals-life-sciences": "Pharmaceuticals & Life Sciences",
+  "life-sciences": "Pharmaceuticals & Life Sciences",
+  "transportation": "Transportation & Logistics",
+  "logistics": "Transportation & Logistics",
+};
 
 export type PainPoint = "inventory" | "spend" | "downtime";
 
