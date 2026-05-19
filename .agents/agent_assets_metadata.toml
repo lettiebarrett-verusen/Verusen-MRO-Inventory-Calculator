@@ -6,3 +6,9 @@ id = "FdNAUo1dxkhGVYQt51IYt"
 uri = "file://MRO_Calculator_Form_Reference.md"
 type = "text"
 title = "MRO Calculator - Full Form Reference"
+
+[[outputs]]
+id = "55lAxtfo_MPubtbG86imT"
+uri = "file://attached_assets/MRO-Calculator-Full-Content.md"
+type = "text"
+title = "MRO Calculator — Full Content & Flow (for Claude)"
