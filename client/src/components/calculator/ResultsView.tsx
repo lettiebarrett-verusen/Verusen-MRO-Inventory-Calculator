@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { type CalculationResult, type CalculatorInputs, type PainPoint } from "@/lib/calculator-logic";
 import { Button } from "@/components/ui/button";
 import { Download, Phone, RotateCcw, Brain, ArrowLeft, Info } from "lucide-react";
@@ -13,6 +13,8 @@ interface ResultsViewProps {
   onReset: () => void;
   onAdjustInputs: () => void;
   totalInventoryValue: number;
+  uploadToken?: string;
+  uploadCompany?: string;
 }
 
 const fmt = (n: number) => {
@@ -22,7 +24,7 @@ const fmt = (n: number) => {
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
 
-export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustInputs, totalInventoryValue }: ResultsViewProps) {
+export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustInputs, totalInventoryValue, uploadToken, uploadCompany }: ResultsViewProps) {
   const hasInv = selectedPains.has("inventory");
   const hasSpend = selectedPains.has("spend");
   const hasDowntime = selectedPains.has("downtime");
@@ -61,7 +63,7 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     } catch { return null; }
   };
 
-  const downloadPDF = async () => {
+  const buildPdfDoc = async (): Promise<jsPDF> => {
     const doc = new jsPDF();
     const pw = doc.internal.pageSize.getWidth();
     const ph = doc.internal.pageSize.getHeight();
@@ -378,8 +380,43 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     doc.text("Schedule a deeper conversation with our team by visiting", pw / 2, y + 14, { align: "center" });
     doc.text("https://verusen.com/talk-to-an-mro-expert/", pw / 2, y + 18, { align: "center" });
 
+    return doc;
+  };
+
+  const downloadPDF = async () => {
+    const doc = await buildPdfDoc();
     doc.save("Verusen AI for MRO Optimization Savings.pdf");
   };
+
+  // Auto-generate and upload PDF to HubSpot once after the gate unlocks.
+  const uploadedRef = useRef(false);
+  useEffect(() => {
+    if (!uploadToken || uploadedRef.current) return;
+    uploadedRef.current = true;
+    let cancelled = false;
+    (async () => {
+      try {
+        const doc = await buildPdfDoc();
+        if (cancelled) return;
+        const dataUri = doc.output('datauristring');
+        const pdfBase64 = dataUri.split(',')[1] || '';
+        if (!pdfBase64) return;
+        const safeCompany = (uploadCompany || 'Company').replace(/[^a-z0-9-]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 50) || 'Company';
+        const datePart = new Date().toISOString().slice(0, 10);
+        const filename = `Verusen-MRO-Report-${safeCompany}-${datePart}.pdf`;
+        await fetch('/api/leads/attach-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: uploadToken, filename, pdfBase64 }),
+        }).catch(() => {});
+      } catch (err) {
+        // Never surface upload errors to the user.
+        console.warn('PDF auto-upload failed:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadToken]);
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>

@@ -8,7 +8,19 @@ import { type CalculatorInputs, type LeadInputs, type PainPoint, calculateSaving
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 
-async function submitLead(data: { lead: LeadInputs; calculation: any; industry: string; campaign: string }) {
+async function submitLead(data: {
+  lead: LeadInputs;
+  industry: string;
+  campaign: string;
+  selectedPains: PainPoint[];
+  inputs: CalculatorInputs;
+  results: {
+    inventory: CalculationResult["inventory"];
+    spend: CalculationResult["spend"];
+    downtime: CalculationResult["downtime"];
+    grandTotal: number;
+  };
+}): Promise<{ success: boolean; leadId: string; calculationId: string; contactId?: string; pdfUploadToken?: string }> {
   const response = await fetch("/api/leads", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -43,11 +55,16 @@ export function Calculator() {
   const [inputs, setInputs] = useState<CalculatorInputs | null>(null);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [gateUnlocked, setGateUnlocked] = useState(false);
+  const [submittedLead, setSubmittedLead] = useState<LeadInputs | null>(null);
+  const [pdfUploadToken, setPdfUploadToken] = useState<string | undefined>(undefined);
   const inputStepRef = useRef<{ getValues: () => CalculatorInputs } | null>(null);
 
   const leadMutation = useMutation({
     mutationFn: submitLead,
-    onSuccess: () => setGateUnlocked(true),
+    onSuccess: (data) => {
+      if (data.pdfUploadToken) setPdfUploadToken(data.pdfUploadToken);
+      setGateUnlocked(true);
+    },
     onError: () => setGateUnlocked(true),
   });
 
@@ -91,23 +108,18 @@ export function Calculator() {
 
   const handleLeadSubmit = (leadData: LeadInputs) => {
     if (!inputs || !results) return;
+    setSubmittedLead(leadData);
     leadMutation.mutate({
       lead: leadData,
       industry,
       campaign,
-      calculation: {
-        siteCount: inputs.siteCount,
-        totalInventoryValue: inputs.totalInventoryValue,
-        skuCount: inputs.skuCount,
-        activePercent: inputs.activePercent,
-        obsoletePercent: inputs.obsoletePercent,
-        specialPercent: inputs.specialPercent,
-        activeMaterialIncreases: results.activeMaterialIncreases,
-        activeMaterialDecreases: results.activeMaterialDecreases,
-        networkOptimization: results.networkOptimization,
-        vmiDisposition: results.vmiDisposition,
-        deduplication: results.deduplication,
-        totalReduction: results.totalReduction,
+      selectedPains: Array.from(selectedPains),
+      inputs,
+      results: {
+        inventory: results.inventory,
+        spend: results.spend,
+        downtime: results.downtime,
+        grandTotal: results.grandTotal,
       },
     });
   };
@@ -120,6 +132,9 @@ export function Calculator() {
     setInputs(null);
     setResults(null);
     setGateUnlocked(false);
+    setSubmittedLead(null);
+    setPdfUploadToken(undefined);
+    leadMutation.reset();
     document.getElementById('calculator-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -216,6 +231,8 @@ export function Calculator() {
                     onReset={handleReset}
                     onAdjustInputs={() => goToStep(2)}
                     totalInventoryValue={inputs.totalInventoryValue}
+                    uploadToken={pdfUploadToken}
+                    uploadCompany={submittedLead?.company}
                   />
                 </motion.div>
               )}
