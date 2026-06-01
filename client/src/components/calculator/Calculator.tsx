@@ -247,14 +247,32 @@ function GatedResults({
 
   return (
     <div>
-      <div className="bg-[#003252] rounded-xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden">
-        <p className="text-xs uppercase tracking-widest text-white/50 mb-3 font-medium">Total MRO Optimization Opportunity</p>
-        <p className="text-4xl md:text-5xl font-extrabold text-white mb-2 relative" data-testid="text-gated-total">{fmt(coreTotal)}</p>
-        <p className="text-sm text-white/70 relative max-w-2xl leading-relaxed">Inventory reduction plus annual spend optimization — powered by your data, Verusen's advanced AI modeling, and industry benchmarks.</p>
+      <div className="bg-[#003252] rounded-2xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden">
+        <p className="text-center text-base sm:text-lg md:text-xl font-bold uppercase tracking-wide text-white mb-4 sm:mb-5">Total MRO Optimization Opportunity</p>
+
+        <div className="bg-white/10 rounded-xl py-5 sm:py-7 px-4 mb-3 sm:mb-4 text-center">
+          <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-gated-total">{fmt(coreTotal)}</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          {results.inventory && (
+            <div className="bg-white/10 rounded-xl py-4 px-5 text-center">
+              <p className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.inventory.totalInvReduction)}</p>
+              <p className="text-sm text-white/70 mt-0.5">Inventory Optimization</p>
+            </div>
+          )}
+          {results.spend && (
+            <div className="bg-white/10 rounded-xl py-4 px-5 text-center">
+              <p className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.spend.totalSpend)}</p>
+              <p className="text-sm text-white/70 mt-0.5">Spend Reduction</p>
+            </div>
+          )}
+        </div>
+
         {hasDowntime && results.downtime && (
-          <div className="mt-4 inline-flex items-center gap-2 bg-[#ed9b29]/15 border border-[#ed9b29]/30 rounded-full px-4 py-1.5">
-            <span className="text-[#ed9b29] text-sm font-bold">+ {fmt(results.downtime.dtSavings)}</span>
-            <span className="text-white/70 text-xs">additional downtime risk avoidance (bonus)</span>
+          <div className="mt-3 sm:mt-4 bg-[#ed9b29] rounded-xl py-3.5 px-5 flex items-center justify-center sm:justify-start gap-3 flex-wrap text-center sm:text-left">
+            <span className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.downtime.dtSavings)}</span>
+            <span className="text-sm sm:text-base text-white/90 font-medium">Additional downtime risk avoidance</span>
           </div>
         )}
       </div>
