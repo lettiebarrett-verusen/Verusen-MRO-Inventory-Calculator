@@ -111,7 +111,7 @@ const fmtCurrency = (val: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
 const painLabels: Record<string, string> = {
-  inventory: 'Inventory Reduction',
+  inventory: 'Inventory Right-Sizing',
   spend: 'Spend Reduction/Avoidance',
   downtime: 'Downtime Avoidance',
 };
@@ -140,11 +140,9 @@ function buildCalculatorNote(lead: LeadData, data: FullCalculationData): string 
   lines.push(`- Active Materials: ${data.inputs.activePercent}%`);
   lines.push(`- Obsolete/Non-Moving: ${data.inputs.obsoletePercent}%`);
   lines.push(`- Special/Critical Items: ${data.inputs.specialPercent}%`);
-  if (data.selectedPains.includes('spend')) {
-    lines.push(`- Annual MRO Spend: ${fmtCurrency(data.inputs.annualSpend || 0)}`);
-    lines.push(`- Holding Cost Rate: ${data.inputs.holdingCostRate ?? 15}%`);
-    lines.push(`- WACC Rate: ${data.inputs.waccRate ?? 7}%`);
-  }
+  lines.push(`- Annual MRO Spend: ${fmtCurrency(data.inputs.annualSpend || 0)}`);
+  lines.push(`- Holding Cost Rate: ${data.inputs.holdingCostRate ?? 15}%`);
+  lines.push(`- WACC Rate: ${data.inputs.waccRate ?? 7}%`);
   if (data.selectedPains.includes('downtime')) {
     lines.push(`- Downtime Hours/Site/Year: ${data.inputs.downtimeHoursPerSite ?? 0}`);
     lines.push(`- Downtime Cost/Hour: ${fmtCurrency(data.inputs.downtimeCostPerHour || 0)}`);
@@ -155,7 +153,7 @@ function buildCalculatorNote(lead: LeadData, data: FullCalculationData): string 
   lines.push('');
 
   if (data.inventory) {
-    lines.push('---------------- MRO INVENTORY OPTIMIZATION ----------------');
+    lines.push('---------------- INVENTORY RIGHT-SIZING ----------------');
     lines.push(`Total Inventory Value Reduction: ${fmtCurrency(data.inventory.totalInvReduction)}`);
     lines.push(`- Active Material Reduction: ${fmtCurrency(data.inventory.activeDecrease)}`);
     lines.push(`- Parts Pooling & Network Sharing: ${fmtCurrency(data.inventory.pooling)}`);

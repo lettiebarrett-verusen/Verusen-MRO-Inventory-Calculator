@@ -33,44 +33,16 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   const coreTotal = (results.inventory?.totalInvReduction ?? 0) + (results.spend?.totalSpend ?? 0);
 
-  const buckets = [
-    hasInv && results.inventory ? { label: "Stockout Mitigation Increases", color: "#6b7280", value: results.inventory.activeIncrease } : null,
-    hasInv && results.inventory ? { label: "Inventory\nRight-Sizing", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
-    hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
-  ].filter(Boolean) as { label: string; color: string; value: number }[];
-
-  const captureSvgAsImage = (container: HTMLElement | null): string | null => {
-    if (!container) return null;
-    const svg = container.querySelector('svg');
-    if (!svg) return null;
-    try {
-      const clone = svg.cloneNode(true) as SVGElement;
-      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      const w = svg.clientWidth || 600;
-      const h = svg.clientHeight || 300;
-      clone.setAttribute('width', String(w));
-      clone.setAttribute('height', String(h));
-      const data = new XMLSerializer().serializeToString(clone);
-      const canvas2 = document.createElement('canvas');
-      canvas2.width = w * 2;
-      canvas2.height = h * 2;
-      const ctx2 = canvas2.getContext('2d');
-      if (!ctx2) return null;
-      const img = new Image();
-      img.width = w * 2;
-      img.height = h * 2;
-      const blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      return url;
-    } catch { return null; }
-  };
-
   const buildPdfDoc = async (): Promise<jsPDF> => {
     const doc = new jsPDF();
     const pw = doc.internal.pageSize.getWidth();
     const ph = doc.internal.pageSize.getHeight();
     const mx = 15;
     const cw = pw - mx * 2;
+
+    const ACCENT_GREEN = "#3ec26d";
+    const ACCENT_BLUE = "#0075c9";
+    const ACCENT_ORANGE = "#ed9b29";
 
     const hexToRgb = (hex: string) => {
       const r = parseInt(hex.slice(1, 3), 16);
@@ -79,100 +51,117 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
       return [r, g, b] as const;
     };
 
+    const setOpacity = (o: number) => {
+      try { doc.setGState(new (doc as any).GState({ opacity: o })); } catch {}
+    };
+
     const checkPage = (needed: number, y: number) => {
       if (y + needed > ph - 20) { doc.addPage(); return 30; }
       return y;
     };
 
-    doc.setFillColor(0, 50, 82);
-    doc.rect(0, 0, pw, 70, "F");
-    try { doc.addImage(VERUSEN_LOGO_BASE64, "PNG", mx + 3, 5, 40, 9.6); } catch {}
-    doc.setFontSize(7);
-    doc.setTextColor(160, 185, 210);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pw - mx - 5, 11, { align: "right" });
-    doc.setFontSize(8);
-    doc.text("TOTAL MRO OPTIMIZATION OPPORTUNITY", mx + 5, 24);
-    doc.setFontSize(26);
-    doc.setTextColor(255, 255, 255);
-    doc.text(fmt(coreTotal), mx + 5, 38);
-    doc.setFontSize(8);
-    doc.setTextColor(160, 185, 210);
-    if (hasDowntime && results.downtime) {
-      doc.text(`Inventory + spend optimization  \u2022  + ${fmt(results.downtime.dtSavings)} bonus downtime avoidance`, mx + 5, 48);
-    } else {
-      doc.text("Powered by your data, Verusen\u2019s advanced AI modeling, and industry benchmarks.", mx + 5, 48);
+    // ===== HERO (mirrors the on-page navy summary card) =====
+    const panelY = 18;
+    const panelH = 24;
+    const statY = panelY + panelH + 5;
+    const statH = 16;
+
+    const statBoxes: { label: string; value: number; color: string; labelColor: readonly [number, number, number] }[] = [];
+    if (hasInv && results.inventory) {
+      statBoxes.push({ label: "Inventory Right-Sizing", value: results.inventory.totalInvReduction, color: ACCENT_GREEN, labelColor: [95, 217, 145] });
+    }
+    if (hasSpend && results.spend) {
+      statBoxes.push({ label: "Spend Reduction", value: results.spend.totalSpend, color: ACCENT_BLUE, labelColor: [108, 184, 238] });
     }
 
-    const bucketW = cw / buckets.length;
-    const bucketY = 56;
-    buckets.forEach((b, i) => {
-      const bx = mx + i * bucketW;
-      doc.setFillColor(20, 60, 95);
-      doc.rect(bx, bucketY, bucketW, 12, "F");
-      doc.setFontSize(5.5);
-      doc.setTextColor(160, 185, 210);
-      const cleanLabel = b.label.replace(/\n/g, ' ');
-      doc.text(cleanLabel.toUpperCase(), bx + 3, bucketY + 4);
-      doc.setFontSize(9);
-      const [cr, cg, cb] = hexToRgb(b.color);
-      doc.setTextColor(cr, cg, cb);
-      doc.text(fmt(b.value), bx + 3, bucketY + 10);
+    const dtBoxY = statY + statH + 5;
+    const dtBoxH = 18;
+    const heroBottom = (hasDowntime && results.downtime ? dtBoxY + dtBoxH : statY + statH) + 6;
+
+    doc.setFillColor(0, 50, 82);
+    doc.rect(0, 0, pw, heroBottom, "F");
+    try { doc.addImage(VERUSEN_LOGO_BASE64, "PNG", mx + 3, 6, 40, 9.6); } catch {}
+    doc.setFontSize(7);
+    doc.setTextColor(160, 185, 210);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pw - mx - 3, 11, { align: "right" });
+
+    // Inner total panel
+    doc.setFillColor(16, 64, 98);
+    doc.roundedRect(mx, panelY, cw, panelH, 2, 2, "F");
+    doc.setFontSize(7);
+    doc.setTextColor(150, 170, 195);
+    doc.text("TOTAL MRO OPTIMIZATION OPPORTUNITY", pw / 2, panelY + 8, { align: "center" });
+    doc.setFontSize(24);
+    doc.setTextColor(255, 255, 255);
+    doc.text(fmt(coreTotal), pw / 2, panelY + 19, { align: "center" });
+
+    // Stat boxes (green inventory / blue spend)
+    const gap = 4;
+    const sbW = statBoxes.length ? (cw - gap * (statBoxes.length - 1)) / statBoxes.length : cw;
+    statBoxes.forEach((b, i) => {
+      const bx = mx + i * (sbW + gap);
+      const [r, g, bl] = hexToRgb(b.color);
+      setOpacity(0.15); doc.setFillColor(r, g, bl); doc.rect(bx, statY, sbW, statH, "F");
+      setOpacity(0.5); doc.setDrawColor(r, g, bl); doc.setLineWidth(0.4); doc.rect(bx, statY, sbW, statH, "D");
+      setOpacity(1); doc.setLineWidth(0.2);
+      doc.setFontSize(6);
+      doc.setTextColor(b.labelColor[0], b.labelColor[1], b.labelColor[2]);
+      doc.text(b.label.toUpperCase(), bx + sbW / 2, statY + 6, { align: "center" });
+      doc.setFontSize(13);
+      doc.setTextColor(255, 255, 255);
+      doc.text(fmt(b.value), bx + sbW / 2, statY + 13, { align: "center" });
     });
 
-    let y = 78;
-
-    const drawSectionHeader = (title: string, color: string, yPos: number) => {
-      const [r, g, b] = hexToRgb(color);
-      doc.setFillColor(r + Math.round((255 - r) * 0.92), g + Math.round((255 - g) * 0.92), b + Math.round((255 - b) * 0.92));
-      doc.setDrawColor(220, 220, 220);
-      doc.rect(mx, yPos, cw, 8, "FD");
-      doc.setFontSize(7);
-      doc.setTextColor(r, g, b);
-      doc.text(title.toUpperCase(), mx + 3, yPos + 5.5);
-      return yPos + 8;
-    };
-
-    const drawTotalRow = (label: string, sub: string, value: number, color: string, yPos: number) => {
-      doc.setFillColor(255, 255, 255);
-      doc.setDrawColor(220, 220, 220);
-      doc.rect(mx, yPos, cw, 14, "FD");
-      doc.setFontSize(9);
-      doc.setTextColor(0, 50, 82);
-      doc.text(label, mx + 4, yPos + 6);
+    // Optional downtime bonus box
+    if (hasDowntime && results.downtime) {
+      setOpacity(0.25); doc.setFillColor(0, 0, 0); doc.rect(mx, dtBoxY, cw, dtBoxH, "F"); setOpacity(1);
       doc.setFontSize(6);
-      doc.setTextColor(120, 120, 120);
-      doc.text(sub, mx + 4, yPos + 11);
-      const [r, g, b] = hexToRgb(color);
-      doc.setFontSize(12);
-      doc.setTextColor(r, g, b);
-      doc.text(fmt(value), pw - mx - 4, yPos + 8, { align: "right" });
-      return yPos + 14;
-    };
+      doc.setTextColor(237, 155, 41);
+      doc.text("ADDITIONAL ESTIMATED AVOIDABLE DOWNTIME", pw / 2, dtBoxY + 5, { align: "center" });
+      doc.setFontSize(13);
+      doc.setTextColor(255, 255, 255);
+      doc.text(fmt(results.downtime.dtSavings), pw / 2, dtBoxY + 12, { align: "center" });
+      doc.setFontSize(5.5);
+      doc.setTextColor(150, 170, 195);
+      doc.text("*Not included in optimization above", pw / 2, dtBoxY + 16, { align: "center" });
+    }
 
-    const drawRiskRow = (label: string, sub: string, value: number, yPos: number) => {
-      doc.setFillColor(245, 245, 245);
-      doc.setDrawColor(220, 220, 220);
-      doc.rect(mx, yPos, cw, 14, "FD");
-      doc.setFontSize(9);
-      doc.setTextColor(0, 50, 82);
-      doc.text(`\u26A0 ${label}`, mx + 4, yPos + 6);
-      doc.setFontSize(6);
-      doc.setTextColor(120, 120, 120);
-      doc.text(sub, mx + 4, yPos + 11);
-      doc.setFontSize(12);
-      doc.setTextColor(107, 114, 128);
-      doc.text(fmt(value), pw - mx - 4, yPos + 8, { align: "right" });
-      return yPos + 14;
+    let y = heroBottom + 6;
+
+    // Disclaimer (mirrors the on-page line under the hero)
+    doc.setFontSize(6);
+    doc.setTextColor(120, 120, 120);
+    const discText = "These figures are estimates and savings projections calculated by comparing your summarized inventory and spend data against Verusen and broader industry benchmarks. Actual results may vary.";
+    const discLines = doc.splitTextToSize(discText, cw - 20);
+    doc.text(discLines, pw / 2, y, { align: "center" });
+    y += discLines.length * 3 + 5;
+
+    // Solid colored section header bar (title + sublabel left, total right)
+    const drawSectionHeader = (title: string, sublabel: string, value: number, color: string, yPos: number) => {
+      const [r, g, b] = hexToRgb(color);
+      const hH = 13;
+      doc.setFillColor(r, g, b);
+      doc.rect(mx, yPos, cw, hH, "F");
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text(title, mx + 4, yPos + 6);
+      doc.setFontSize(6.5);
+      setOpacity(0.85);
+      doc.text(sublabel, mx + 4, yPos + 10.5);
+      setOpacity(1);
+      doc.setFontSize(13);
+      doc.setTextColor(255, 255, 255);
+      doc.text(fmt(value), pw - mx - 4, yPos + 8.5, { align: "right" });
+      return yPos + hH;
     };
 
     const drawBreakdownTable = (
       headerText: string,
-      rows: { name: string; desc: string; value: number }[],
-      total: number,
+      rows: { name: string; desc: string; value: number; muted?: boolean }[],
       color: string,
       yPos: number
     ) => {
-      yPos = checkPage(10 + rows.length * 9 + 9, yPos);
+      yPos = checkPage(7 + 6 + rows.length * 9, yPos);
       doc.setFillColor(245, 247, 250);
       doc.setDrawColor(220, 220, 220);
       doc.rect(mx, yPos, cw, 7, "FD");
@@ -194,10 +183,12 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
       const [cr, cg, cb] = hexToRgb(color);
       rows.forEach((row) => {
         yPos = checkPage(9, yPos);
+        const muted = !!row.muted;
+        if (muted) { doc.setFillColor(243, 244, 246); doc.rect(mx, yPos, cw, 9, "F"); }
         doc.setDrawColor(240, 240, 240);
         doc.rect(mx, yPos, cw, 9, "D");
         doc.setFontSize(7);
-        doc.setTextColor(0, 50, 82);
+        if (muted) doc.setTextColor(107, 114, 128); else doc.setTextColor(0, 50, 82);
         doc.text(row.name, mx + 4, yPos + 4);
         doc.setFontSize(6);
         doc.setTextColor(120, 120, 120);
@@ -205,21 +196,11 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         doc.text(descLines[0], mx + 55, yPos + 4);
         if (descLines[1]) doc.text(descLines[1], mx + 55, yPos + 7.5);
         doc.setFontSize(7);
-        doc.setTextColor(cr, cg, cb);
-        doc.text(fmt(row.value), pw - mx - 4, yPos + 5, { align: "right" });
+        if (muted) doc.setTextColor(107, 114, 128); else doc.setTextColor(cr, cg, cb);
+        const valStr = row.value < 0 ? `(${fmt(Math.abs(row.value))})` : fmt(row.value);
+        doc.text(valStr, pw - mx - 4, yPos + 5, { align: "right" });
         yPos += 9;
       });
-
-      yPos = checkPage(8, yPos);
-      doc.setFillColor(245, 247, 250);
-      doc.setDrawColor(220, 220, 220);
-      doc.rect(mx, yPos, cw, 8, "FD");
-      doc.setFontSize(8);
-      doc.setTextColor(0, 50, 82);
-      doc.text("Total", mx + 4, yPos + 5.5);
-      doc.setTextColor(cr, cg, cb);
-      doc.text(fmt(total), pw - mx - 4, yPos + 5.5, { align: "right" });
-      yPos += 8;
 
       return yPos;
     };
@@ -268,30 +249,28 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
     };
 
     if (hasInv && results.inventory) {
-      y = checkPage(60, y);
-      y = drawSectionHeader("Inventory Right-Sizing", "#3ec26d", y);
+      y = checkPage(70, y);
+      y = drawSectionHeader("Inventory Right-Sizing", "Total inventory right-sizing opportunity", results.inventory.totalInvReduction, ACCENT_GREEN, y);
       y = await addChartImage(y);
-      y = drawTotalRow("Total Inventory Value Reduction Opportunity", "One-time reduction in on-hand inventory value through right-sizing initiatives", results.inventory.totalInvReduction, "#3ec26d", y);
-      y = drawRiskRow("Stockout Mitigation Increases", "Active material investment to cover critical stockout gaps", results.inventory.activeIncrease, y);
       y = drawBreakdownTable(
         `Components of the ${fmt(results.inventory.totalInvReduction)} inventory right-sizing`,
         [
+          { name: "Stockout Mitigation Increases", desc: "Active material investment to cover critical stockout gaps (added back to inventory)", value: -results.inventory.activeIncrease, muted: true },
           { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
           { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
           { name: "VMI Disposition", desc: "Vendor-managed inventory transfers stock ownership off your books", value: results.inventory.vmi },
           { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
         ],
-        results.inventory.totalInvReduction,
-        "#3ec26d",
+        ACCENT_GREEN,
         y
       );
       y += 6;
     }
 
     if (hasSpend && results.spend) {
+      if (!hasInv) y = await addChartImage(y);
       y = checkPage(60, y);
-      y = drawSectionHeader("Spend Reduction/Avoidance", "#0075c9", y);
-      y = drawTotalRow("Total Annual Spend Reduction & Avoidance", "Ongoing annual savings from eliminating leakage across your MRO spend categories", results.spend.totalSpend, "#0075c9", y);
+      y = drawSectionHeader("Spend Reduction/Avoidance", "Total annual spend reduction & avoidance", results.spend.totalSpend, ACCENT_BLUE, y);
       y = drawBreakdownTable(
         `Components of the ${fmt(results.spend.totalSpend)} annual spend reduction`,
         [
@@ -302,24 +281,22 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
           { name: "Additional Repairable Materials", desc: "Parts identified as repairable rather than replaced, reducing new spend", value: results.spend.repairableMaterials },
           { name: "Expediting Cost Reduction", desc: "Emergency and rush order costs avoided through better stock positioning", value: results.spend.expediting },
         ],
-        results.spend.totalSpend,
-        "#0075c9",
+        ACCENT_BLUE,
         y
       );
       y += 6;
     }
 
     if (hasDowntime && results.downtime) {
-      y = checkPage(50, y);
-      y = drawSectionHeader("Downtime Avoidance", "#ed9b29", y);
-      y = drawTotalRow("Total Estimated Downtime Cost Avoidance", "Annual savings from reducing stockout-driven unplanned downtime", results.downtime.dtSavings, "#ed9b29", y);
+      y = checkPage(72, y);
+      y = drawSectionHeader("Additional Downtime Avoidance Opportunity", "Annual savings from reducing stockout-driven unplanned downtime", results.downtime.dtSavings, ACCENT_ORANGE, y);
 
       doc.setFillColor(245, 247, 250);
       doc.setDrawColor(220, 220, 220);
       doc.rect(mx, y, cw, 7, "FD");
       doc.setFontSize(6);
       doc.setTextColor(120, 120, 120);
-      doc.text("HOW THIS SAVINGS IS CALCULATED \u2014 CURRENT VS. OPTIMIZED STATE", mx + 4, y + 4.5);
+      doc.text("CURRENT STATE VS. OPTIMIZED STATE", mx + 4, y + 4.5);
       y += 7;
 
       doc.setFillColor(255, 255, 255);
@@ -327,8 +304,7 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
       doc.setFontSize(6);
       doc.setTextColor(120, 120, 120);
       doc.text("METRIC", mx + 4, y + 4);
-      doc.text("CURRENT STATE", mx + 75, y + 4);
-      doc.text("OPTIMIZED STATE", pw - mx - 4, y + 4, { align: "right" });
+      doc.text("CURRENT -> OPTIMIZED", pw - mx - 4, y + 4, { align: "right" });
       y += 6;
 
       const dtRows = [
@@ -336,16 +312,22 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         { metric: "Total Unplanned Downtime Cost", current: fmt(results.downtime.unplannedCost), optimized: fmt(results.downtime.optimizedDtCost) },
         { metric: "Critical Spares Stockout Rate", current: `${(results.downtime.curStockoutRate * 100).toFixed(0)}%`, optimized: `${(results.downtime.tgtStockoutRate * 100).toFixed(0)}%` },
       ];
+      const arrowStr = "  \u2192  ";
       dtRows.forEach((row) => {
         doc.setDrawColor(240, 240, 240);
         doc.rect(mx, y, cw, 8, "D");
         doc.setFontSize(7);
         doc.setTextColor(0, 50, 82);
         doc.text(row.metric, mx + 4, y + 5);
-        doc.setTextColor(120, 120, 120);
-        doc.text(row.current, mx + 75, y + 5);
+        // Right-aligned segmented "current  ->  optimized"
         doc.setTextColor(237, 155, 41);
         doc.text(row.optimized, pw - mx - 4, y + 5, { align: "right" });
+        const optW = doc.getTextWidth(row.optimized);
+        doc.setTextColor(180, 180, 180);
+        doc.text(arrowStr, pw - mx - 4 - optW, y + 5, { align: "right" });
+        const arrowW = doc.getTextWidth(arrowStr);
+        doc.setTextColor(120, 120, 120);
+        doc.text(row.current, pw - mx - 4 - optW - arrowW, y + 5, { align: "right" });
         y += 8;
       });
 
