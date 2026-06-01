@@ -426,9 +426,9 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
-      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-3 md:mb-4 relative overflow-hidden">
+      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-6 md:mb-8 relative overflow-hidden">
         <div className="bg-white/[0.06] rounded-xl py-5 sm:py-7 px-4 text-center mb-3 sm:mb-4">
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#7fb8e0] mb-2" data-testid="text-results-label">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white/50 mb-2" data-testid="text-results-label">
             Total MRO Optimization Opportunity
           </p>
           <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
@@ -450,21 +450,15 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
             </div>
           )}
         </div>
-      </div>
 
-      {hasDowntime && results.downtime && (
-        <div className="bg-[#f6e4c4] rounded-xl px-5 sm:px-8 py-3.5 sm:py-4 mb-6 md:mb-8 text-center" data-testid="row-downtime-bonus">
-          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-center gap-x-3 gap-y-0.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-[#003252] tracking-tight" data-testid="text-downtime-bonus">
-              {fmt(results.downtime.dtSavings)}
-            </span>
-            <span className="text-xs sm:text-sm italic text-[#003252]/55">*Not included in optimization number above</span>
+        {hasDowntime && results.downtime && (
+          <div className="bg-black/25 rounded-xl py-4 px-5 text-center mt-3 sm:mt-4" data-testid="row-downtime-bonus">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ed9b29] mb-1">Additional Estimated Avoidable Downtime</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-downtime-bonus">{fmt(results.downtime.dtSavings)}</p>
+            <p className="text-xs italic text-white/50 mt-0.5">*Not included in optimization above</p>
           </div>
-          <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c47e16] mt-0.5">
-            Estimated Avoidable Downtime
-          </p>
-        </div>
-      )}
+        )}
+      </div>
 
       {hasInv && results.inventory && (
         <ResultSection
