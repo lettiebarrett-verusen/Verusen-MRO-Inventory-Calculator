@@ -426,65 +426,42 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
-      <div className="bg-[#003252] rounded-2xl p-5 sm:p-7 md:p-9 mb-4 md:mb-5 relative overflow-hidden">
-        <div className="flex items-start justify-between gap-3 mb-1.5">
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#5fb0e8]" data-testid="text-results-label">
+      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-3 md:mb-4 relative overflow-hidden">
+        <div className="bg-white/[0.06] rounded-xl py-5 sm:py-7 px-4 text-center mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#7fb8e0] mb-2" data-testid="text-results-label">
             Total MRO Optimization Opportunity
           </p>
-          <span className="hidden sm:inline-block shrink-0 text-[11px] font-semibold text-white bg-[#0075c9] rounded-full px-3 py-1">
-            Your headline number
-          </span>
+          <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
+            {fmt(coreTotal)}
+          </p>
         </div>
-
-        <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
-          {fmt(coreTotal)}
-        </p>
-        <p className="text-sm sm:text-base text-white/60 mt-1.5 mb-5 sm:mb-6">
-          Recoverable working capital across inventory &amp; spend
-        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {hasInv && results.inventory && (
-            <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5">
+            <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5 text-center">
               <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Optimization</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-inventory">{fmt(results.inventory.totalInvReduction)}</p>
             </div>
           )}
           {hasSpend && results.spend && (
-            <div className="bg-[#0075c9]/20 border border-[#0075c9]/50 rounded-xl py-4 px-5">
+            <div className="bg-[#0075c9]/20 border border-[#0075c9]/50 rounded-xl py-4 px-5 text-center">
               <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#6cb8ee] mb-1.5">Spend Reduction</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-spend">{fmt(results.spend.totalSpend)}</p>
             </div>
           )}
         </div>
-
-        <div className="text-center mt-5 sm:mt-6">
-          <button
-            onClick={onAdjustInputs}
-            className="text-sm text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded px-4 py-2 transition-all inline-flex items-center gap-2"
-            data-testid="button-adjust-inputs"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Adjust my inputs
-          </button>
-        </div>
       </div>
 
       {hasDowntime && results.downtime && (
-        <div className="bg-[#fff8ef] border border-[#ed9b29]/40 rounded-2xl p-5 sm:p-7 mb-6 md:mb-8 text-center" data-testid="row-downtime-bonus">
-          <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c47e16]">
-              Additional Downtime Avoidance Potential
-            </p>
-            <span className="text-[10px] sm:text-[11px] font-semibold text-[#c47e16] bg-[#ed9b29]/15 rounded-full px-2.5 py-0.5">
-              not included above
+        <div className="bg-[#f6e4c4] rounded-xl px-5 sm:px-8 py-3.5 sm:py-4 mb-6 md:mb-8 text-center" data-testid="row-downtime-bonus">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-center gap-x-3 gap-y-0.5">
+            <span className="text-2xl sm:text-3xl font-extrabold text-[#003252] tracking-tight" data-testid="text-downtime-bonus">
+              {fmt(results.downtime.dtSavings)}
             </span>
+            <span className="text-xs sm:text-sm italic text-[#003252]/55">*Not included in optimization number above</span>
           </div>
-          <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#003252] tracking-tight" data-testid="text-downtime-bonus">
-            {fmt(results.downtime.dtSavings)}
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">Estimated annual downtime cost reduction</p>
-          <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1.5 max-w-md mx-auto">
-            <Info className="w-3.5 h-3.5 flex-shrink-0" /> Downtime savings are shown separately — they depend on operational factors beyond inventory alone.
+          <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c47e16] mt-0.5">
+            Estimated Avoidable Downtime
           </p>
         </div>
       )}
@@ -496,11 +473,9 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
           color="green"
           totalLabel="Total inventory value reduction opportunity"
           totalValue={results.inventory.totalInvReduction}
-          riskLabel="Stockout Mitigation Increases"
-          riskSub="Active material investment to cover critical stockout gaps"
-          riskValue={results.inventory.activeIncrease}
           breakdownLabel={`Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`}
           rows={[
+            { name: "Stockout Mitigation Increases", desc: "Active material investment to cover critical stockout gaps (added back to inventory)", value: -results.inventory.activeIncrease, muted: true },
             { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
             { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
             { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
@@ -588,7 +563,9 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         </div>
       )}
 
-      <div className="border border-gray-200 rounded-xl overflow-hidden mb-6 md:mb-8" data-testid="section-your-inputs">
+      <div className="border-t-2 border-gray-200 my-10" />
+
+      <div className="border border-gray-200 rounded-xl overflow-hidden mb-6 md:mb-8 bg-white shadow-sm" data-testid="section-your-inputs">
         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-200">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#003252]/70 flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-[#003252]/50" /> Your Inputs — Used To Generate This Analysis
@@ -691,9 +668,6 @@ function ResultSection({
   color,
   totalLabel,
   totalValue,
-  riskLabel,
-  riskSub,
-  riskValue,
   breakdownLabel,
   rows,
   chart,
@@ -702,11 +676,8 @@ function ResultSection({
   color: "green" | "blue";
   totalLabel: string;
   totalValue: number;
-  riskLabel?: string;
-  riskSub?: string;
-  riskValue?: number;
   breakdownLabel: string;
-  rows: { name: string; desc: string; value: number }[];
+  rows: { name: string; desc: string; value: number; muted?: boolean }[];
   chart?: React.ReactNode;
 }) {
   const colorClass = color === "green" ? "text-[#3ec26d]" : "text-[#0075c9]";
@@ -728,16 +699,6 @@ function ResultSection({
         </div>
       )}
 
-      {riskLabel && riskValue !== undefined && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-[#6b7280]/5 border border-gray-200 border-t-0">
-          <div>
-            <p className="font-semibold text-[#003252] text-sm sm:text-base">{riskLabel}</p>
-            <p className="text-xs text-muted-foreground">{riskSub}</p>
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#6b7280]">{fmt(riskValue)}</p>
-        </div>
-      )}
-
       <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
         {breakdownLabel}
       </div>
@@ -752,10 +713,12 @@ function ResultSection({
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className="border-b border-gray-100 last:border-b-0">
-                <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">{row.name}</td>
+              <tr key={i} className={`border-b border-gray-100 last:border-b-0 ${row.muted ? "bg-gray-100" : ""}`}>
+                <td className={`px-3 sm:px-4 py-2.5 font-medium ${row.muted ? "text-[#6b7280]" : "text-[#003252]"}`}>{row.name}</td>
                 <td className="px-3 sm:px-4 py-2.5 text-muted-foreground hidden sm:table-cell">{row.desc}</td>
-                <td className={`px-3 sm:px-4 py-2.5 text-right font-mono font-medium ${colorClass}`}>{fmt(row.value)}</td>
+                <td className={`px-3 sm:px-4 py-2.5 text-right font-mono font-medium ${row.muted ? "text-[#6b7280]" : colorClass}`}>
+                  {row.value < 0 ? `−${fmt(Math.abs(row.value))}` : fmt(row.value)}
+                </td>
               </tr>
             ))}
           </tbody>
