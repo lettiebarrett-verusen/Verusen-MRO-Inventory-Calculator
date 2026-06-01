@@ -247,35 +247,37 @@ function GatedResults({
 
   return (
     <div>
-      <div className="bg-[#003252] rounded-2xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden">
-        <p className="text-center text-base sm:text-lg md:text-xl font-bold uppercase tracking-wide text-white mb-4 sm:mb-5">Total MRO Optimization Opportunity</p>
-
-        <div className="bg-white/10 rounded-xl py-5 sm:py-7 px-4 mb-3 sm:mb-4 text-center">
+      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-3 md:mb-4 relative overflow-hidden">
+        <div className="bg-white/[0.06] rounded-xl py-5 sm:py-7 px-4 text-center mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#7fb8e0] mb-2">Total MRO Optimization Opportunity</p>
           <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-gated-total">{fmt(coreTotal)}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {results.inventory && (
-            <div className="bg-white/10 rounded-xl py-4 px-5 text-center">
+            <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5 text-center">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Optimization</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.inventory.totalInvReduction)}</p>
-              <p className="text-sm text-white/70 mt-0.5">Inventory Optimization</p>
             </div>
           )}
           {results.spend && (
-            <div className="bg-white/10 rounded-xl py-4 px-5 text-center">
+            <div className="bg-[#0075c9]/20 border border-[#0075c9]/50 rounded-xl py-4 px-5 text-center">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#6cb8ee] mb-1.5">Spend Reduction</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.spend.totalSpend)}</p>
-              <p className="text-sm text-white/70 mt-0.5">Spend Reduction</p>
             </div>
           )}
         </div>
-
-        {hasDowntime && results.downtime && (
-          <div className="mt-3 sm:mt-4 bg-[#ed9b29] rounded-xl py-3.5 px-5 flex items-center justify-center sm:justify-start gap-3 flex-wrap text-center sm:text-left">
-            <span className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.downtime.dtSavings)}</span>
-            <span className="text-sm sm:text-base text-white/90 font-medium">Additional downtime risk avoidance</span>
-          </div>
-        )}
       </div>
+
+      {hasDowntime && results.downtime && (
+        <div className="bg-[#f6e4c4] rounded-xl px-5 sm:px-8 py-3.5 sm:py-4 mb-6 md:mb-8 text-center">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-center gap-x-3 gap-y-0.5">
+            <span className="text-2xl sm:text-3xl font-extrabold text-[#003252] tracking-tight">{fmt(results.downtime.dtSavings)}</span>
+            <span className="text-xs sm:text-sm italic text-[#003252]/55">*Not included in optimization number above</span>
+          </div>
+          <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c47e16] mt-0.5">Estimated Avoidable Downtime</p>
+        </div>
+      )}
 
       <div className="relative" style={{ minHeight: '480px' }}>
         <div className="blur-[6px] pointer-events-none select-none" aria-hidden="true">
