@@ -426,40 +426,39 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
-      <div className="bg-[#003252] rounded-2xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 relative overflow-hidden">
-        <p className="text-center text-base sm:text-lg md:text-xl font-bold uppercase tracking-wide text-white mb-4 sm:mb-5" data-testid="text-results-label">
-          Total MRO Optimization Opportunity
-        </p>
-
-        <div className="bg-white/10 rounded-xl py-5 sm:py-7 px-4 mb-3 sm:mb-4 text-center">
-          <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
-            {fmt(coreTotal)}
+      <div className="bg-[#003252] rounded-2xl p-5 sm:p-7 md:p-9 mb-4 md:mb-5 relative overflow-hidden">
+        <div className="flex items-start justify-between gap-3 mb-1.5">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#5fb0e8]" data-testid="text-results-label">
+            Total MRO Optimization Opportunity
           </p>
+          <span className="hidden sm:inline-block shrink-0 text-[11px] font-semibold text-white bg-[#0075c9] rounded-full px-3 py-1">
+            Your headline number
+          </span>
         </div>
+
+        <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
+          {fmt(coreTotal)}
+        </p>
+        <p className="text-sm sm:text-base text-white/60 mt-1.5 mb-5 sm:mb-6">
+          Recoverable working capital across inventory &amp; spend
+        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {hasInv && results.inventory && (
-            <div className="bg-white/10 rounded-xl py-4 px-5 text-center">
+            <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Optimization</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-inventory">{fmt(results.inventory.totalInvReduction)}</p>
-              <p className="text-sm text-white/70 mt-0.5">Inventory Optimization</p>
             </div>
           )}
           {hasSpend && results.spend && (
-            <div className="bg-white/10 rounded-xl py-4 px-5 text-center">
+            <div className="bg-[#0075c9]/20 border border-[#0075c9]/50 rounded-xl py-4 px-5">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#6cb8ee] mb-1.5">Spend Reduction</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-spend">{fmt(results.spend.totalSpend)}</p>
-              <p className="text-sm text-white/70 mt-0.5">Spend Reduction</p>
             </div>
           )}
         </div>
 
-        {hasDowntime && results.downtime && (
-          <div className="mt-3 sm:mt-4 bg-[#ed9b29] rounded-xl py-3.5 px-5 flex items-center justify-center sm:justify-start gap-3 flex-wrap text-center sm:text-left" data-testid="row-downtime-bonus">
-            <span className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-downtime-bonus">{fmt(results.downtime.dtSavings)}</span>
-            <span className="text-sm sm:text-base text-white/90 font-medium">Additional downtime risk avoidance</span>
-          </div>
-        )}
-
-        <div className="text-center mt-5">
+        <div className="text-center mt-5 sm:mt-6">
           <button
             onClick={onAdjustInputs}
             className="text-sm text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded px-4 py-2 transition-all inline-flex items-center gap-2"
@@ -469,6 +468,26 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
           </button>
         </div>
       </div>
+
+      {hasDowntime && results.downtime && (
+        <div className="bg-[#fff8ef] border border-[#ed9b29]/40 rounded-2xl p-5 sm:p-7 mb-6 md:mb-8 text-center" data-testid="row-downtime-bonus">
+          <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c47e16]">
+              Additional Downtime Avoidance Potential
+            </p>
+            <span className="text-[10px] sm:text-[11px] font-semibold text-[#c47e16] bg-[#ed9b29]/15 rounded-full px-2.5 py-0.5">
+              not included above
+            </span>
+          </div>
+          <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#003252] tracking-tight" data-testid="text-downtime-bonus">
+            {fmt(results.downtime.dtSavings)}
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">Estimated annual downtime cost reduction</p>
+          <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1.5 max-w-md mx-auto">
+            <Info className="w-3.5 h-3.5 flex-shrink-0" /> Downtime savings are shown separately — they depend on operational factors beyond inventory alone.
+          </p>
+        </div>
+      )}
 
       {hasInv && results.inventory && (
         <ResultSection
