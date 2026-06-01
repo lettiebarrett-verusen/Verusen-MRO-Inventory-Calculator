@@ -256,7 +256,7 @@ function GatedResults({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {results.inventory && (
             <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5 text-center">
-              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Optimization</p>
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Right-Sizing</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white">{fmt(results.inventory.totalInvReduction)}</p>
             </div>
           )}
@@ -282,7 +282,7 @@ function GatedResults({
           {results.inventory && (
             <div className="mb-4">
               <div className="text-sm font-bold uppercase tracking-wider text-white bg-[#3ec26d] px-4 py-3 rounded-t-lg">
-                MRO Inventory Optimization
+                Inventory Right-Sizing
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
                 <div>
@@ -344,7 +344,7 @@ function GatedResults({
           {hasDowntime && results.downtime && (
             <div className="mb-4">
               <div className="text-sm font-bold uppercase tracking-wider text-white bg-[#ed9b29] px-4 py-3 rounded-t-lg">
-                Bonus — Downtime Avoidance
+                Additional Downtime Avoidance Opportunity
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0 rounded-b-lg">
                 <div>

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { type CalculationResult, type CalculatorInputs, type PainPoint } from "@/lib/calculator-logic";
 import { Button } from "@/components/ui/button";
-import { Download, Phone, RotateCcw, Brain, ArrowLeft, Info, ClipboardList } from "lucide-react";
+import { Download, Phone, RotateCcw, Brain, ArrowLeft, ArrowRight, Info, ClipboardList } from "lucide-react";
 import { JourneyChart } from "./JourneyChart";
 import { jsPDF } from "jspdf";
 import { VERUSEN_LOGO_BASE64 } from "@/lib/verusen-logo";
@@ -35,7 +35,7 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   const buckets = [
     hasInv && results.inventory ? { label: "Stockout Mitigation Increases", color: "#6b7280", value: results.inventory.activeIncrease } : null,
-    hasInv && results.inventory ? { label: "Inventory\nReduction", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
+    hasInv && results.inventory ? { label: "Inventory\nRight-Sizing", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
     hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
   ].filter(Boolean) as { label: string; color: string; value: number }[];
 
@@ -269,17 +269,17 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
     if (hasInv && results.inventory) {
       y = checkPage(60, y);
-      y = drawSectionHeader("MRO Inventory Optimization", "#3ec26d", y);
+      y = drawSectionHeader("Inventory Right-Sizing", "#3ec26d", y);
       y = await addChartImage(y);
       y = drawTotalRow("Total Inventory Value Reduction Opportunity", "One-time reduction in on-hand inventory value through right-sizing initiatives", results.inventory.totalInvReduction, "#3ec26d", y);
       y = drawRiskRow("Stockout Mitigation Increases", "Active material investment to cover critical stockout gaps", results.inventory.activeIncrease, y);
       y = drawBreakdownTable(
-        `Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`,
+        `Components of the ${fmt(results.inventory.totalInvReduction)} inventory right-sizing`,
         [
           { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
-          { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
           { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
           { name: "VMI Disposition", desc: "Vendor-managed inventory transfers stock ownership off your books", value: results.inventory.vmi },
+          { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
         ],
         results.inventory.totalInvReduction,
         "#3ec26d",
@@ -426,7 +426,7 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
-      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-6 md:mb-8 relative overflow-hidden">
+      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-3 md:mb-4 relative overflow-hidden">
         <div className="bg-white/[0.06] rounded-xl py-5 sm:py-7 px-4 text-center mb-3 sm:mb-4">
           <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white/50 mb-2" data-testid="text-results-label">
             Total MRO Optimization Opportunity
@@ -439,7 +439,7 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {hasInv && results.inventory && (
             <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5 text-center">
-              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Optimization</p>
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Right-Sizing</p>
               <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-inventory">{fmt(results.inventory.totalInvReduction)}</p>
             </div>
           )}
@@ -460,20 +460,24 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         )}
       </div>
 
+      <p className="text-[10px] sm:text-[11px] leading-snug text-muted-foreground text-center max-w-3xl mx-auto mb-6 md:mb-8 px-2" data-testid="text-hero-disclaimer">
+        These figures are estimates and savings projections calculated by comparing your summarized inventory and spend data against Verusen and broader industry benchmarks. Actual results may vary.
+      </p>
+
       {hasInv && results.inventory && (
         <ResultSection
-          title="MRO Inventory Optimization"
+          title="Inventory Right-Sizing"
           chart={<JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />}
           color="green"
-          totalLabel="Total inventory value reduction opportunity"
+          totalLabel="Total inventory right-sizing opportunity"
           totalValue={results.inventory.totalInvReduction}
-          breakdownLabel={`Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`}
+          breakdownLabel={`Components of the ${fmt(results.inventory.totalInvReduction)} inventory right-sizing`}
           rows={[
             { name: "Stockout Mitigation Increases", desc: "Active material investment to cover critical stockout gaps (added back to inventory)", value: -results.inventory.activeIncrease, muted: true },
             { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
-            { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
             { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
             { name: "VMI Disposition", desc: "Vendor-managed inventory transfers stock ownership off your books", value: results.inventory.vmi },
+            { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
           ]}
         />
       )}
@@ -506,49 +510,57 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
       )}
       {hasDowntime && results.downtime && (
         <div className="mb-8">
-          <div className="flex items-start gap-3 bg-[#ed9b29]/5 border border-[#ed9b29]/20 rounded-lg p-4 mb-4">
-            <div>
-              <p className="text-sm font-bold text-[#003252]">Additional Upside — Beyond the Core MRO Number</p>
-              <p className="text-xs text-muted-foreground">A bonus opportunity layered on top of your inventory and spend savings: avoiding stockout-driven production downtime.</p>
-            </div>
-          </div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 px-4 sm:px-6 py-4 rounded-t-lg bg-[#ed9b29]">
             <div>
-              <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">Bonus — Downtime Avoidance</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">Additional Downtime Avoidance Opportunity</h3>
               <p className="text-xs sm:text-sm text-white/80">Annual savings from reducing stockout-driven unplanned downtime</p>
             </div>
             <p className="text-2xl sm:text-3xl font-extrabold text-white whitespace-nowrap" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
           </div>
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
-            How this savings is calculated — current vs. optimized state
+            Current state vs. optimized state
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden min-w-[480px]">
               <thead>
                 <tr className="bg-white">
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Metric</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Current State</th>
-                  <th className="text-right text-xs font-medium text-[#ed9b29] uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Optimized State</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Current → Optimized</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-gray-100">
                   <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Org-Wide Unplanned Downtime Hours</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
+                  <td className="px-3 sm:px-4 py-2.5">
+                    <span className="flex items-center justify-end gap-2 whitespace-nowrap">
+                      <span className="font-mono text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#ed9b29] flex-shrink-0" />
+                      <span className="font-mono text-[#ed9b29] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</span>
+                    </span>
+                  </td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Total Unplanned Downtime Cost</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmt(results.downtime.unplannedCost)}</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
+                  <td className="px-3 sm:px-4 py-2.5">
+                    <span className="flex items-center justify-end gap-2 whitespace-nowrap">
+                      <span className="font-mono text-muted-foreground">{fmt(results.downtime.unplannedCost)}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#ed9b29] flex-shrink-0" />
+                      <span className="font-mono text-[#ed9b29] font-medium">{fmt(results.downtime.optimizedDtCost)}</span>
+                    </span>
+                  </td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Critical Spares Stockout Rate</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
+                  <td className="px-3 sm:px-4 py-2.5">
+                    <span className="flex items-center justify-end gap-2 whitespace-nowrap">
+                      <span className="font-mono text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#ed9b29] flex-shrink-0" />
+                      <span className="font-mono text-[#ed9b29] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</span>
+                    </span>
+                  </td>
                 </tr>
                 <tr className="bg-gray-50 font-semibold">
-                  <td className="px-3 sm:px-4 py-2.5 text-[#003252]" colSpan={2}>Avoidable Downtime Cost (stockout-attributed portion)</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-[#003252]">Avoidable Downtime Cost (stockout-attributed portion)</td>
                   <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29]">{fmt(results.downtime.dtSavings)}</td>
                 </tr>
               </tbody>
@@ -573,8 +585,8 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
           </button>
         </div>
 
-        <div className="p-4 sm:p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-5">
+        <div className="p-3 sm:p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
             <InputItem label="Industry" value={industry || "Not specified"} testid="input-summary-industry" />
             <InputItem label="Number of Sites" value={`${fmtInt(inputs.siteCount)} ${inputs.siteCount === 1 ? "site" : "sites"}`} testid="input-summary-sites" />
             <InputItem label="On-Hand Inventory Value" value={fmt(inputs.totalInventoryValue)} testid="input-summary-inventory" />
@@ -587,9 +599,9 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
             />
           </div>
 
-          <div className="mt-6 pt-5 border-t border-gray-200">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#003252]/40 mb-4">Modeling Assumptions Applied</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-5">
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#003252]/40 mb-3">Modeling Assumptions Applied</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3">
               <InputItem label="Active / Slow" value={`${inputs.activePercent}%`} testid="input-summary-active" small />
               <InputItem label="Non-Moving" value={`${inputs.obsoletePercent}%`} testid="input-summary-nonmoving" small />
               <InputItem label="Special Items" value={`${inputs.specialPercent}%`} testid="input-summary-special" small />
@@ -711,7 +723,7 @@ function ResultSection({
                 <td className={`px-3 sm:px-4 py-2.5 font-medium ${row.muted ? "text-[#6b7280]" : "text-[#003252]"}`}>{row.name}</td>
                 <td className="px-3 sm:px-4 py-2.5 text-muted-foreground hidden sm:table-cell">{row.desc}</td>
                 <td className={`px-3 sm:px-4 py-2.5 text-right font-mono font-medium ${row.muted ? "text-[#6b7280]" : colorClass}`}>
-                  {row.value < 0 ? `−${fmt(Math.abs(row.value))}` : fmt(row.value)}
+                  {row.value < 0 ? `(${fmt(Math.abs(row.value))})` : fmt(row.value)}
                 </td>
               </tr>
             ))}

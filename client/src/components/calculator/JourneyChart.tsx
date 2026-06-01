@@ -1,5 +1,6 @@
 import { type CalculationResult, type PainPoint } from "@/lib/calculator-logic";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { ArrowRight } from "lucide-react";
 
 interface JourneyChartProps {
   results: CalculationResult;
@@ -44,10 +45,10 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   steps.push({ label: "Now", delta: cur, color: "#003252", tip: `Starting On-Hand: ${fmt(cur)}`, isTotal: true });
 
   if (hasInv && inv) {
-    steps.push({ label: "Active+", delta: inv.activeIncrease, color: "#6b7280", tip: `Stockout Mitigation Increases: +${fmt(inv.activeIncrease)}` });
+    steps.push({ label: "Mitigation", delta: inv.activeIncrease, color: "#6b7280", tip: `Stockout Mitigation Increases: +${fmt(inv.activeIncrease)}` });
     cur += inv.activeIncrease;
 
-    steps.push({ label: "Active-", delta: -inv.activeDecrease, color: "#3ec26d", tip: `Active Material Decreases: -${fmt(inv.activeDecrease)}` });
+    steps.push({ label: "Reduction", delta: -inv.activeDecrease, color: "#3ec26d", tip: `Active Material Reduction: -${fmt(inv.activeDecrease)}` });
     cur -= inv.activeDecrease;
 
     steps.push({ label: "Pooling", delta: -inv.pooling, color: "#3ec26d", tip: `Parts Pooling: -${fmt(inv.pooling)}` });
@@ -113,20 +114,24 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   const CustomBar = (props: any) => {
     const { x, y, width, height, payload } = props;
     if (!payload) return null;
+    const labelVal = payload.isTotal ? payload.total : payload.change;
 
     return (
       <g>
         <rect x={x} y={y} width={width} height={Math.max(height, 1)} rx={3} ry={3} fill={payload.color} opacity={0.85} />
         {payload.isLast && (
-          <text x={x + width / 2} y={y - 6} textAnchor="middle" fontSize={14}>🎯</text>
+          <text x={x + width / 2} y={y - 22} textAnchor="middle" fontSize={14}>🎯</text>
         )}
+        <text x={x + width / 2} y={y - 7} textAnchor="middle" fontSize={11} fontWeight={700} fill="#003252">
+          {fmtCompact(labelVal)}
+        </text>
       </g>
     );
   };
 
   const legendItems = [
     ...(hasInv ? [{ label: "Stockout Mitigation Increases", color: "#6b7280" }] : []),
-    ...(hasInv ? [{ label: "Inventory Reduction", color: "#3ec26d" }] : []),
+    ...(hasInv ? [{ label: "Inventory Right-Sizing", color: "#3ec26d" }] : []),
   ];
 
   return (
@@ -135,7 +140,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-5">
           <div>
             <h3 className="text-lg font-bold text-[#003252]">MRO Roadmap</h3>
-            <p className="text-xs text-muted-foreground">Projected value trajectory achievable within 12 months and beyond</p>
+            <p className="text-xs text-muted-foreground">Working Capital Trajectory within 12-36 Months</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {legendItems.map((l) => (
@@ -172,6 +177,20 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {hasInv && (
+          <div className="mt-4 flex items-center justify-center gap-4 sm:gap-6 border-t border-gray-200 pt-4">
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">Starting Inventory</p>
+              <p className="text-base sm:text-lg font-bold text-[#003252]" data-testid="text-starting-inventory">{fmt(totalInventoryValue)}</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-[#10b981] flex-shrink-0" />
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">Target Inventory</p>
+              <p className="text-base sm:text-lg font-bold text-[#10b981]" data-testid="text-target-inventory">{fmt(improvedVal)}</p>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
