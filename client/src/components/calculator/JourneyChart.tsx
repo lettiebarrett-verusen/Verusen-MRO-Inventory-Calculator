@@ -44,7 +44,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   steps.push({ label: "Now", delta: cur, color: "#003252", tip: `Starting On-Hand: ${fmt(cur)}`, isTotal: true });
 
   if (hasInv && inv) {
-    steps.push({ label: "Active+", delta: inv.activeIncrease, color: "#6b7280", tip: `Active Material Increases: +${fmt(inv.activeIncrease)}` });
+    steps.push({ label: "Active+", delta: inv.activeIncrease, color: "#6b7280", tip: `Stockout Mitigation Increases: +${fmt(inv.activeIncrease)}` });
     cur += inv.activeIncrease;
 
     steps.push({ label: "Active-", delta: -inv.activeDecrease, color: "#3ec26d", tip: `Active Material Decreases: -${fmt(inv.activeDecrease)}` });
@@ -125,7 +125,7 @@ export function JourneyChart({ results, selectedPains, totalInventoryValue }: Jo
   };
 
   const legendItems = [
-    ...(hasInv ? [{ label: "Active Material Increases", color: "#6b7280" }] : []),
+    ...(hasInv ? [{ label: "Stockout Mitigation Increases", color: "#6b7280" }] : []),
     ...(hasInv ? [{ label: "Inventory Reduction", color: "#3ec26d" }] : []),
   ];
 

@@ -34,7 +34,7 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
   const coreTotal = (results.inventory?.totalInvReduction ?? 0) + (results.spend?.totalSpend ?? 0);
 
   const buckets = [
-    hasInv && results.inventory ? { label: "Active Material Increases", color: "#6b7280", value: results.inventory.activeIncrease } : null,
+    hasInv && results.inventory ? { label: "Stockout Mitigation Increases", color: "#6b7280", value: results.inventory.activeIncrease } : null,
     hasInv && results.inventory ? { label: "Inventory\nReduction", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
     hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
   ].filter(Boolean) as { label: string; color: string; value: number }[];
@@ -272,7 +272,7 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
       y = drawSectionHeader("MRO Inventory Optimization", "#3ec26d", y);
       y = await addChartImage(y);
       y = drawTotalRow("Total Inventory Value Reduction Opportunity", "One-time reduction in on-hand inventory value through right-sizing initiatives", results.inventory.totalInvReduction, "#3ec26d", y);
-      y = drawRiskRow("Active Materials Increase", "Active material investment to cover critical stockout gaps", results.inventory.activeIncrease, y);
+      y = drawRiskRow("Stockout Mitigation Increases", "Active material investment to cover critical stockout gaps", results.inventory.activeIncrease, y);
       y = drawBreakdownTable(
         `Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`,
         [
@@ -470,6 +470,105 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         </div>
       </div>
 
+      {hasInv && results.inventory && (
+        <ResultSection
+          title="MRO Inventory Optimization"
+          chart={<JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />}
+          color="green"
+          totalLabel="Total inventory value reduction opportunity"
+          totalValue={results.inventory.totalInvReduction}
+          riskLabel="Stockout Mitigation Increases"
+          riskSub="Active material investment to cover critical stockout gaps"
+          riskValue={results.inventory.activeIncrease}
+          breakdownLabel={`Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`}
+          rows={[
+            { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
+            { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
+            { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
+            { name: "VMI Disposition", desc: "Vendor-managed inventory transfers stock ownership off your books", value: results.inventory.vmi },
+          ]}
+        />
+      )}
+
+      {hasSpend && results.spend && hasInv && <div className="border-t-2 border-gray-200 my-10" />}
+      {hasSpend && results.spend && !hasInv && (
+        <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
+      )}
+      {hasSpend && results.spend && (
+        <ResultSection
+          title="Spend Reduction/Avoidance"
+          color="blue"
+          totalLabel="Total annual spend reduction & avoidance"
+          totalValue={results.spend.totalSpend}
+          breakdownLabel={`Components of the ${fmt(results.spend.totalSpend)} annual spend reduction`}
+          rows={[
+            { name: "Carrying / Holding Cost Savings", desc: "Annual cost of carrying inventory eliminated as on-hand value drops", value: results.spend.holdingSavings },
+            { name: "WACC Savings", desc: "Capital cost freed as inventory reduction releases working capital", value: results.spend.waccSavings },
+            { name: "PPV & Tailspend Savings", desc: "Price variance and tail spend consolidation through supplier rationalization", value: results.spend.ppvSavings },
+            { name: "Replenishment Suppression", desc: "Reduced reorder activity as optimized inventory eliminates unnecessary restocking", value: results.spend.replenishmentSuppression },
+            { name: "Additional Repairable Materials", desc: "Parts identified as repairable rather than replaced, reducing new spend", value: results.spend.repairableMaterials },
+            { name: "Expediting Cost Reduction", desc: "Emergency and rush order costs avoided through better stock positioning", value: results.spend.expediting },
+          ]}
+        />
+      )}
+
+      {hasDowntime && results.downtime && (hasInv || hasSpend) && <div className="border-t-2 border-gray-200 my-10" />}
+      {hasDowntime && results.downtime && !hasInv && !hasSpend && (
+        <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
+      )}
+      {hasDowntime && results.downtime && (
+        <div className="mb-8">
+          <div className="flex items-start gap-3 bg-[#ed9b29]/5 border border-[#ed9b29]/20 rounded-lg p-4 mb-4">
+            <div>
+              <p className="text-sm font-bold text-[#003252]">Additional Upside — Beyond the Core MRO Number</p>
+              <p className="text-xs text-muted-foreground">A bonus opportunity layered on top of your inventory and spend savings: avoiding stockout-driven production downtime.</p>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 px-4 sm:px-6 py-4 rounded-t-lg bg-[#ed9b29]">
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">Bonus — Downtime Avoidance</h3>
+              <p className="text-xs sm:text-sm text-white/80">Annual savings from reducing stockout-driven unplanned downtime</p>
+            </div>
+            <p className="text-2xl sm:text-3xl font-extrabold text-white whitespace-nowrap" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
+          </div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
+            How this savings is calculated — current vs. optimized state
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden min-w-[480px]">
+              <thead>
+                <tr className="bg-white">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Metric</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Current State</th>
+                  <th className="text-right text-xs font-medium text-[#ed9b29] uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Optimized State</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Org-Wide Unplanned Downtime Hours</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Total Unplanned Downtime Cost</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmt(results.downtime.unplannedCost)}</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Critical Spares Stockout Rate</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
+                </tr>
+                <tr className="bg-gray-50 font-semibold">
+                  <td className="px-3 sm:px-4 py-2.5 text-[#003252]" colSpan={2}>Avoidable Downtime Cost (stockout-attributed portion)</td>
+                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29]">{fmt(results.downtime.dtSavings)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div className="border border-gray-200 rounded-xl overflow-hidden mb-6 md:mb-8" data-testid="section-your-inputs">
         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-200">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#003252]/70 flex items-center gap-2">
@@ -521,115 +620,6 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
         </div>
       </div>
 
-      {hasInv && results.inventory && (
-        <ResultSection
-          title="MRO Inventory Optimization"
-          chart={<JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />}
-          icon="📦"
-          color="green"
-          totalLabel="Total Inventory Value Reduction Opportunity"
-          totalSub="One-time reduction in on-hand inventory value through right-sizing initiatives"
-          totalValue={results.inventory.totalInvReduction}
-          riskLabel="Active Materials Increase"
-          riskSub="Active material investment to cover critical stockout gaps"
-          riskValue={results.inventory.activeIncrease}
-          breakdownLabel={`Components of the ${fmt(results.inventory.totalInvReduction)} inventory reduction`}
-          rows={[
-            { name: "Active Material Reduction", desc: "Excess active & slow-moving stock removed from balance sheet", value: results.inventory.activeDecrease },
-            { name: "Deduplication", desc: "Cross-site SKU rationalization eliminates duplicate stock holdings", value: results.inventory.dedup },
-            { name: "Parts Pooling & Network Sharing", desc: "Consolidated cross-site inventory reduces per-site overstocking", value: results.inventory.pooling },
-            { name: "VMI Disposition", desc: "Vendor-managed inventory transfers stock ownership off your books", value: results.inventory.vmi },
-          ]}
-          totalRowValue={results.inventory.totalInvReduction}
-        />
-      )}
-
-      {hasSpend && results.spend && hasInv && <div className="border-t-2 border-gray-200 my-10" />}
-      {hasSpend && results.spend && !hasInv && (
-        <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
-      )}
-      {hasSpend && results.spend && (
-        <ResultSection
-          title="Spend Reduction/Avoidance"
-          icon="💸"
-          color="blue"
-          totalLabel="Total Annual Spend Reduction & Avoidance"
-          totalSub="Ongoing annual savings from eliminating leakage across your MRO spend categories"
-          totalValue={results.spend.totalSpend}
-          breakdownLabel={`Components of the ${fmt(results.spend.totalSpend)} annual spend reduction`}
-          rows={[
-            { name: "Carrying / Holding Cost Savings", desc: "Annual cost of carrying inventory eliminated as on-hand value drops", value: results.spend.holdingSavings },
-            { name: "WACC Savings", desc: "Capital cost freed as inventory reduction releases working capital", value: results.spend.waccSavings },
-            { name: "PPV & Tailspend Savings", desc: "Price variance and tail spend consolidation through supplier rationalization", value: results.spend.ppvSavings },
-            { name: "Replenishment Suppression", desc: "Reduced reorder activity as optimized inventory eliminates unnecessary restocking", value: results.spend.replenishmentSuppression },
-            { name: "Additional Repairable Materials", desc: "Parts identified as repairable rather than replaced, reducing new spend", value: results.spend.repairableMaterials },
-            { name: "Expediting Cost Reduction", desc: "Emergency and rush order costs avoided through better stock positioning", value: results.spend.expediting },
-          ]}
-          totalRowValue={results.spend.totalSpend}
-        />
-      )}
-
-      {hasDowntime && results.downtime && (hasInv || hasSpend) && <div className="border-t-2 border-gray-200 my-10" />}
-      {hasDowntime && results.downtime && !hasInv && !hasSpend && (
-        <JourneyChart results={results} selectedPains={selectedPains} totalInventoryValue={totalInventoryValue} />
-      )}
-      {hasDowntime && results.downtime && (
-        <div className="mb-8">
-          <div className="flex items-start gap-3 bg-[#ed9b29]/5 border border-[#ed9b29]/20 rounded-lg p-4 mb-4">
-            <span className="text-lg leading-none">✨</span>
-            <div>
-              <p className="text-sm font-bold text-[#003252]">Additional Upside — Beyond the Core MRO Number</p>
-              <p className="text-xs text-muted-foreground">A bonus opportunity layered on top of your inventory and spend savings: avoiding stockout-driven production downtime.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
-            <span>⚠️</span> Bonus — Downtime Avoidance
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-white border border-gray-200 border-t-0">
-            <div>
-              <p className="font-semibold text-[#003252] text-sm sm:text-base">Total Estimated Downtime Cost Avoidance</p>
-              <p className="text-xs text-muted-foreground">Annual savings from reducing stockout-driven unplanned downtime</p>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-[#ed9b29]" data-testid="text-dt-savings">{fmt(results.downtime.dtSavings)}</p>
-          </div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-gray-50 px-4 py-2 border border-gray-200 border-t-0">
-            How this savings is calculated — current vs. optimized state
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border border-gray-200 border-t-0 rounded-b-lg overflow-hidden min-w-[480px]">
-              <thead>
-                <tr className="bg-white">
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Metric</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Current State</th>
-                  <th className="text-right text-xs font-medium text-[#ed9b29] uppercase tracking-wider px-3 sm:px-4 py-2 border-b border-gray-200">Optimized State</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-gray-100">
-                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Org-Wide Unplanned Downtime Hours</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmtInt(results.downtime.orgDtHours)} hrs</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmtInt(results.downtime.optimizedDtHours)} hrs</td>
-                </tr>
-                <tr className="border-b border-gray-100">
-                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Total Unplanned Downtime Cost</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{fmt(results.downtime.unplannedCost)}</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{fmt(results.downtime.optimizedDtCost)}</td>
-                </tr>
-                <tr className="border-b border-gray-100">
-                  <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">Critical Spares Stockout Rate</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-muted-foreground">{(results.downtime.curStockoutRate * 100).toFixed(0)}%</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29] font-medium">{(results.downtime.tgtStockoutRate * 100).toFixed(0)}%</td>
-                </tr>
-                <tr className="bg-gray-50 font-semibold">
-                  <td className="px-3 sm:px-4 py-2.5 text-[#003252]" colSpan={2}>Avoidable Downtime Cost (stockout-attributed portion)</td>
-                  <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-[#ed9b29]">{fmt(results.downtime.dtSavings)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex gap-3 mb-8 text-sm text-muted-foreground">
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
@@ -679,40 +669,38 @@ function InputItem({ label, value, testid, small, accent }: { label: string; val
 
 function ResultSection({
   title,
-  icon,
   color,
   totalLabel,
-  totalSub,
   totalValue,
   riskLabel,
   riskSub,
   riskValue,
   breakdownLabel,
   rows,
-  totalRowValue,
   chart,
 }: {
   title: string;
-  icon: string;
   color: "green" | "blue";
   totalLabel: string;
-  totalSub: string;
   totalValue: number;
   riskLabel?: string;
   riskSub?: string;
   riskValue?: number;
   breakdownLabel: string;
   rows: { name: string; desc: string; value: number }[];
-  totalRowValue: number;
   chart?: React.ReactNode;
 }) {
   const colorClass = color === "green" ? "text-[#3ec26d]" : "text-[#0075c9]";
-  const headerBg = color === "green" ? "bg-[#3ec26d]/5 text-[#3ec26d] border-[#3ec26d]/20" : "bg-[#0075c9]/5 text-[#0075c9] border-[#0075c9]/20";
+  const headerBg = color === "green" ? "bg-[#3ec26d]" : "bg-[#0075c9]";
 
   return (
     <div className="mb-8">
-      <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-t-lg border border-b-0 ${headerBg}`}>
-        <span>{icon}</span> {title}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 px-4 sm:px-6 py-4 rounded-t-lg ${headerBg}`}>
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">{title}</h3>
+          <p className="text-xs sm:text-sm text-white/80">{totalLabel}</p>
+        </div>
+        <p className="text-2xl sm:text-3xl font-extrabold text-white whitespace-nowrap">{fmt(totalValue)}</p>
       </div>
 
       {chart && (
@@ -721,18 +709,10 @@ function ResultSection({
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-white border border-gray-200 border-t-0">
-        <div>
-          <p className="font-semibold text-[#003252] text-sm sm:text-base">{totalLabel}</p>
-          <p className="text-xs text-muted-foreground">{totalSub}</p>
-        </div>
-        <p className={`text-xl sm:text-2xl font-bold ${colorClass}`}>{fmt(totalValue)}</p>
-      </div>
-
       {riskLabel && riskValue !== undefined && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-[#6b7280]/5 border border-gray-200 border-t-0">
           <div>
-            <p className="font-semibold text-[#003252] text-sm sm:text-base">⚠ {riskLabel}</p>
+            <p className="font-semibold text-[#003252] text-sm sm:text-base">{riskLabel}</p>
             <p className="text-xs text-muted-foreground">{riskSub}</p>
           </div>
           <p className="text-xl sm:text-2xl font-bold text-[#6b7280]">{fmt(riskValue)}</p>
@@ -753,16 +733,12 @@ function ResultSection({
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className="border-b border-gray-100">
+              <tr key={i} className="border-b border-gray-100 last:border-b-0">
                 <td className="px-3 sm:px-4 py-2.5 font-medium text-[#003252]">{row.name}</td>
                 <td className="px-3 sm:px-4 py-2.5 text-muted-foreground hidden sm:table-cell">{row.desc}</td>
                 <td className={`px-3 sm:px-4 py-2.5 text-right font-mono font-medium ${colorClass}`}>{fmt(row.value)}</td>
               </tr>
             ))}
-            <tr className="bg-gray-50 font-semibold">
-              <td className="px-3 sm:px-4 py-2.5 text-[#003252]" colSpan={2}>Total</td>
-              <td className={`px-3 sm:px-4 py-2.5 text-right font-mono ${colorClass}`}>{fmt(totalRowValue)}</td>
-            </tr>
           </tbody>
         </table>
       </div>

@@ -281,8 +281,8 @@ function GatedResults({
         <div className="blur-[6px] pointer-events-none select-none" aria-hidden="true">
           {results.inventory && (
             <div className="mb-4">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#3ec26d] bg-[#3ec26d]/5 px-4 py-2.5 rounded-t-lg border border-[#3ec26d]/20 border-b-0">
-                <span>📦</span> MRO Inventory Optimization
+              <div className="text-sm font-bold uppercase tracking-wider text-white bg-[#3ec26d] px-4 py-3 rounded-t-lg">
+                MRO Inventory Optimization
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
                 <div>
@@ -314,8 +314,8 @@ function GatedResults({
 
           {results.spend && (
             <div className="mb-4">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0075c9] bg-[#0075c9]/5 px-4 py-2.5 rounded-t-lg border border-[#0075c9]/20 border-b-0">
-                <span>💸</span> Spend Reduction/Avoidance
+              <div className="text-sm font-bold uppercase tracking-wider text-white bg-[#0075c9] px-4 py-3 rounded-t-lg">
+                Spend Reduction/Avoidance
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0">
                 <div>
@@ -343,8 +343,8 @@ function GatedResults({
 
           {hasDowntime && results.downtime && (
             <div className="mb-4">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
-                <span>⚠️</span> Bonus — Downtime Avoidance
+              <div className="text-sm font-bold uppercase tracking-wider text-white bg-[#ed9b29] px-4 py-3 rounded-t-lg">
+                Bonus — Downtime Avoidance
               </div>
               <div className="flex items-center justify-between p-5 bg-white border border-gray-200 border-t-0 rounded-b-lg">
                 <div>

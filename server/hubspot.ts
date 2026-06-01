@@ -161,7 +161,7 @@ function buildCalculatorNote(lead: LeadData, data: FullCalculationData): string 
     lines.push(`- Parts Pooling & Network Sharing: ${fmtCurrency(data.inventory.pooling)}`);
     lines.push(`- VMI Disposition: ${fmtCurrency(data.inventory.vmi)}`);
     lines.push(`- Deduplication: ${fmtCurrency(data.inventory.dedup)}`);
-    lines.push(`- Active Materials Increase (investment): ${fmtCurrency(data.inventory.activeIncrease)}`);
+    lines.push(`- Stockout Mitigation Increases (investment): ${fmtCurrency(data.inventory.activeIncrease)}`);
     lines.push('');
   }
 
