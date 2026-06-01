@@ -191,6 +191,7 @@ export function Calculator() {
                   <ResultsView
                     results={results}
                     inputs={inputs}
+                    industry={industry}
                     selectedPains={selectedPains}
                     onReset={handleReset}
                     onAdjustInputs={() => goToStep(1)}

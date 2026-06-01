@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { type CalculationResult, type CalculatorInputs, type PainPoint } from "@/lib/calculator-logic";
 import { Button } from "@/components/ui/button";
-import { Download, Phone, RotateCcw, Brain, ArrowLeft, Info } from "lucide-react";
+import { Download, Phone, RotateCcw, Brain, ArrowLeft, Info, ClipboardList } from "lucide-react";
 import { JourneyChart } from "./JourneyChart";
 import { jsPDF } from "jspdf";
 import { VERUSEN_LOGO_BASE64 } from "@/lib/verusen-logo";
@@ -9,6 +9,7 @@ import { VERUSEN_LOGO_BASE64 } from "@/lib/verusen-logo";
 interface ResultsViewProps {
   results: CalculationResult;
   inputs: CalculatorInputs;
+  industry?: string;
   selectedPains: Set<PainPoint>;
   onReset: () => void;
   onAdjustInputs: () => void;
@@ -24,7 +25,7 @@ const fmt = (n: number) => {
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
 
-export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustInputs, totalInventoryValue, uploadToken, uploadCompany }: ResultsViewProps) {
+export function ResultsView({ results, inputs, industry, selectedPains, onReset, onAdjustInputs, totalInventoryValue, uploadToken, uploadCompany }: ResultsViewProps) {
   const hasInv = selectedPains.has("inventory");
   const hasSpend = selectedPains.has("spend");
   const hasDowntime = selectedPains.has("downtime");
@@ -461,6 +462,57 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
         </button>
       </div>
 
+      <div className="border border-gray-200 rounded-xl overflow-hidden mb-6 md:mb-8" data-testid="section-your-inputs">
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-200">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#003252]/70 flex items-center gap-2">
+            <ClipboardList className="w-4 h-4 text-[#003252]/50" /> Your Inputs — Used To Generate This Analysis
+          </p>
+          <button
+            onClick={onAdjustInputs}
+            className="shrink-0 text-xs sm:text-sm text-[#0075c9] hover:text-[#003252] border border-[#0075c9]/30 hover:border-[#0075c9] rounded-full px-3 py-1.5 transition-colors inline-flex items-center gap-1.5"
+            data-testid="button-edit-inputs"
+          >
+            <ArrowLeft className="w-3 h-3" /> Edit inputs
+          </button>
+        </div>
+
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-5">
+            <InputItem label="Industry" value={industry || "Not specified"} testid="input-summary-industry" />
+            <InputItem label="Number of Sites" value={`${fmtInt(inputs.siteCount)} ${inputs.siteCount === 1 ? "site" : "sites"}`} testid="input-summary-sites" />
+            <InputItem label="On-Hand Inventory Value" value={fmt(inputs.totalInventoryValue)} testid="input-summary-inventory" />
+            <InputItem label="Number of SKUs" value={`${fmtInt(inputs.skuCount)} SKUs`} testid="input-summary-skus" />
+            <InputItem label="Annual MRO Spend" value={fmt(inputs.annualSpend)} testid="input-summary-spend" />
+            <InputItem
+              label="Spend / Inventory Ratio"
+              value={inputs.totalInventoryValue > 0 ? `${Math.round((inputs.annualSpend / inputs.totalInventoryValue) * 100)}% of inventory value` : "—"}
+              testid="input-summary-ratio"
+            />
+          </div>
+
+          <div className="mt-6 pt-5 border-t border-gray-200">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#003252]/40 mb-4">Modeling Assumptions Applied</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-5">
+              <InputItem label="Active / Slow" value={`${inputs.activePercent}%`} testid="input-summary-active" small />
+              <InputItem label="Non-Moving" value={`${inputs.obsoletePercent}%`} testid="input-summary-nonmoving" small />
+              <InputItem label="Special Items" value={`${inputs.specialPercent}%`} testid="input-summary-special" small />
+              <InputItem label="Holding Cost Rate" value={`${inputs.holdingCostRate}%`} testid="input-summary-holding" small />
+              <InputItem label="WACC" value={`${inputs.waccRate}%`} testid="input-summary-wacc" small />
+            </div>
+          </div>
+
+          {hasDowntime && (
+            <div className="mt-5 rounded-lg bg-[#ed9b29]/10 border border-[#ed9b29]/25 p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-4">
+                <InputItem label="Downtime Hrs / Site / Yr" value={`${fmtInt(inputs.downtimeHoursPerSite)} hrs`} testid="input-summary-downtime-hrs" accent />
+                <InputItem label="Cost Per Hour / Site" value={`${fmt(inputs.downtimeCostPerHour)}/hr`} testid="input-summary-downtime-cost" accent />
+                <InputItem label="Service Level: Current → Target" value={`${inputs.currentServiceLevel}% → ${inputs.targetServiceLevel}%`} testid="input-summary-service" accent />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {hasInv && results.inventory && (
         <ResultSection
           title="MRO Inventory Optimization"
@@ -604,6 +656,15 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           <RotateCcw className="w-3.5 h-3.5" /> Start Over
         </button>
       </div>
+    </div>
+  );
+}
+
+function InputItem({ label, value, testid, small, accent }: { label: string; value: string; testid: string; small?: boolean; accent?: boolean }) {
+  return (
+    <div>
+      <p className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-1 ${accent ? "text-[#ed9b29]" : "text-[#003252]/40"}`}>{label}</p>
+      <p className={`font-semibold text-[#003252] ${small ? "text-sm" : "text-base sm:text-lg"}`} data-testid={testid}>{value}</p>
     </div>
   );
 }
