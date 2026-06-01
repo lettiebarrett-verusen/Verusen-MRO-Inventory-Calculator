@@ -30,11 +30,12 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
   const hasDowntime = selectedPains.has("downtime");
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const coreTotal = (results.inventory?.totalInvReduction ?? 0) + (results.spend?.totalSpend ?? 0);
+
   const buckets = [
     hasInv && results.inventory ? { label: "Active Material Increases", color: "#6b7280", value: results.inventory.activeIncrease } : null,
     hasInv && results.inventory ? { label: "Inventory\nReduction", color: "#3ec26d", value: results.inventory.totalInvReduction } : null,
     hasSpend && results.spend ? { label: "Spend Reduction/Avoidance", color: "#0075c9", value: results.spend.totalSpend } : null,
-    hasDowntime && results.downtime ? { label: "Downtime\nReduction", color: "#ed9b29", value: results.downtime.dtSavings } : null,
   ].filter(Boolean) as { label: string; color: string; value: number }[];
 
   const captureSvgAsImage = (container: HTMLElement | null): string | null => {
@@ -92,10 +93,14 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
     doc.text("TOTAL MRO OPTIMIZATION OPPORTUNITY", mx + 5, 24);
     doc.setFontSize(26);
     doc.setTextColor(255, 255, 255);
-    doc.text(fmt(results.grandTotal), mx + 5, 38);
+    doc.text(fmt(coreTotal), mx + 5, 38);
     doc.setFontSize(8);
     doc.setTextColor(160, 185, 210);
-    doc.text("Powered by your data, Verusen\u2019s advanced AI modeling, and industry benchmarks.", mx + 5, 48);
+    if (hasDowntime && results.downtime) {
+      doc.text(`Inventory + spend optimization  \u2022  + ${fmt(results.downtime.dtSavings)} bonus downtime avoidance`, mx + 5, 48);
+    } else {
+      doc.text("Powered by your data, Verusen\u2019s advanced AI modeling, and industry benchmarks.", mx + 5, 48);
+    }
 
     const bucketW = cw / buckets.length;
     const bucketY = 56;
@@ -425,11 +430,18 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
           Total MRO Optimization Opportunity
         </p>
         <p className="text-4xl md:text-5xl font-extrabold text-white mb-2 relative" data-testid="text-grand-total">
-          {fmt(results.grandTotal)}
+          {fmt(coreTotal)}
         </p>
         <p className="text-sm text-white/70 relative max-w-2xl mx-auto leading-relaxed">
-          Powered by your data, Verusen's advanced AI modeling, and industry benchmarks, this analysis reveals hidden stockout risks and untapped savings opportunities across your MRO inventory.
+          Inventory reduction plus annual spend optimization — powered by your data, Verusen's advanced AI modeling, and industry benchmarks.
         </p>
+
+        {hasDowntime && results.downtime && (
+          <div className="mt-4 inline-flex items-center gap-2 bg-[#ed9b29]/15 border border-[#ed9b29]/30 rounded-full px-4 py-1.5">
+            <span className="text-[#ed9b29] text-sm font-bold" style={{ filter: "brightness(1.3)" }} data-testid="text-downtime-bonus">+ {fmt(results.downtime.dtSavings)}</span>
+            <span className="text-white/70 text-xs">additional downtime risk avoidance (bonus)</span>
+          </div>
+        )}
 
         <div className={`mt-4 sm:mt-6 grid gap-px rounded-lg overflow-hidden border border-white/15 ${buckets.length <= 2 ? 'grid-cols-' + buckets.length : 'grid-cols-2 sm:grid-cols-' + buckets.length}`}>
           {buckets.map((b) => (
@@ -503,8 +515,15 @@ export function ResultsView({ results, inputs, selectedPains, onReset, onAdjustI
       )}
       {hasDowntime && results.downtime && (
         <div className="mb-8">
+          <div className="flex items-start gap-3 bg-[#ed9b29]/5 border border-[#ed9b29]/20 rounded-lg p-4 mb-4">
+            <span className="text-lg leading-none">✨</span>
+            <div>
+              <p className="text-sm font-bold text-[#003252]">Additional Upside — Beyond the Core MRO Number</p>
+              <p className="text-xs text-muted-foreground">A bonus opportunity layered on top of your inventory and spend savings: avoiding stockout-driven production downtime.</p>
+            </div>
+          </div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ed9b29] bg-[#ed9b29]/5 px-4 py-2.5 rounded-t-lg border border-[#ed9b29]/20 border-b-0">
-            <span>⚠️</span> Downtime Avoidance
+            <span>⚠️</span> Bonus — Downtime Avoidance
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-2 bg-white border border-gray-200 border-t-0">
             <div>
