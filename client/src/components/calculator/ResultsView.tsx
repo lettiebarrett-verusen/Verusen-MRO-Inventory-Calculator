@@ -408,35 +408,35 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
 
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
-      <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-3 md:mb-4 relative overflow-hidden">
-        <div className="bg-white/[0.06] rounded-xl py-3 sm:py-4 px-4 text-center mb-3 sm:mb-4">
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white/50 mb-1.5" data-testid="text-results-label">
+      <div className="bg-[#003252] rounded-2xl p-2.5 sm:p-3 md:p-4 mb-3 md:mb-4 relative overflow-hidden">
+        <div className="bg-white/[0.06] rounded-xl py-2.5 sm:py-3 px-4 text-center mb-2.5 sm:mb-3">
+          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white/50 mb-1" data-testid="text-results-label">
             Total MRO Optimization Opportunity
           </p>
-          <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
+          <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
             {fmt(coreTotal)}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
           {hasInv && results.inventory && (
-            <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-4 px-5 text-center">
-              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1.5">Inventory Right-Sizing</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-inventory">{fmt(results.inventory.totalInvReduction)}</p>
+            <div className="bg-[#3ec26d]/15 border border-[#3ec26d]/40 rounded-xl py-3 px-4 text-center">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#5fd991] mb-1">Inventory Right-Sizing</p>
+              <p className="text-xl sm:text-2xl font-extrabold text-white" data-testid="text-hero-inventory">{fmt(results.inventory.totalInvReduction)}</p>
             </div>
           )}
           {hasSpend && results.spend && (
-            <div className="bg-[#0075c9]/20 border border-[#0075c9]/50 rounded-xl py-4 px-5 text-center">
-              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#6cb8ee] mb-1.5">Spend Reduction</p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-hero-spend">{fmt(results.spend.totalSpend)}</p>
+            <div className="bg-[#0075c9]/20 border border-[#0075c9]/50 rounded-xl py-3 px-4 text-center">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#6cb8ee] mb-1">Spend Reduction</p>
+              <p className="text-xl sm:text-2xl font-extrabold text-white" data-testid="text-hero-spend">{fmt(results.spend.totalSpend)}</p>
             </div>
           )}
         </div>
 
         {hasDowntime && results.downtime && (
-          <div className="bg-black/25 rounded-xl py-4 px-5 text-center mt-3 sm:mt-4" data-testid="row-downtime-bonus">
+          <div className="bg-black/25 rounded-xl py-3 px-4 text-center mt-2.5 sm:mt-3" data-testid="row-downtime-bonus">
             <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ed9b29] mb-1">Additional Estimated Avoidable Downtime</p>
-            <p className="text-2xl sm:text-3xl font-extrabold text-white" data-testid="text-downtime-bonus">{fmt(results.downtime.dtSavings)}</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-white" data-testid="text-downtime-bonus">{fmt(results.downtime.dtSavings)}</p>
             <p className="text-xs italic text-white/50 mt-0.5">*Not included in optimization above</p>
           </div>
         )}

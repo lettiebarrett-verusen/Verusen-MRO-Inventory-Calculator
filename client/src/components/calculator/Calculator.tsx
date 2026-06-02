@@ -366,18 +366,18 @@ function GatedResults({
           </div>
         </div>
 
-        <div className="absolute inset-0 flex items-start justify-center pt-4 sm:pt-6" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,1) 70%)' }}>
+        <div className="absolute inset-0 flex items-start justify-center pt-2 sm:pt-3" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,1) 70%)' }}>
           <div className="w-full max-w-md mx-3 sm:mx-4 bg-white border border-gray-200 rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden">
-            <div className="bg-gradient-to-br from-[#003252] to-[#0075c9] px-5 sm:px-7 pt-6 pb-7 text-center relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#003252] to-[#0075c9] px-5 sm:px-7 pt-4 pb-5 text-center relative overflow-hidden">
               <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-white/5" aria-hidden="true" />
               <div className="absolute -bottom-10 -left-6 w-24 h-24 rounded-full bg-white/5" aria-hidden="true" />
               <div className="relative">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
-                  <LockOpen className="h-5 w-5 text-white" strokeWidth={2.25} />
+                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
+                  <LockOpen className="h-4 w-4 text-white" strokeWidth={2.25} />
                 </div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-white/60 font-semibold mb-1">One last step</p>
-                <h3 className="text-2xl font-extrabold text-white mb-2 leading-tight" data-testid="text-gate-title">Almost there!</h3>
-                <p className="text-sm text-white/75 leading-relaxed max-w-xs mx-auto">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/60 font-semibold mb-0.5">One last step</p>
+                <h3 className="text-xl font-extrabold text-white mb-1 leading-tight" data-testid="text-gate-title">Almost there!</h3>
+                <p className="text-sm text-white/75 leading-snug max-w-xs mx-auto">
                   Your full <span className="font-semibold text-white">{fmt(coreTotal)}</span> opportunity breakdown is ready to unlock.
                 </p>
               </div>
