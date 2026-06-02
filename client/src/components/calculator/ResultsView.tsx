@@ -409,11 +409,11 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
   return (
     <div className="max-w-4xl mx-auto" ref={resultsRef}>
       <div className="bg-[#003252] rounded-2xl p-3 sm:p-4 md:p-5 mb-3 md:mb-4 relative overflow-hidden">
-        <div className="bg-white/[0.06] rounded-xl py-5 sm:py-7 px-4 text-center mb-3 sm:mb-4">
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white/50 mb-2" data-testid="text-results-label">
+        <div className="bg-white/[0.06] rounded-xl py-3 sm:py-4 px-4 text-center mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white/50 mb-1.5" data-testid="text-results-label">
             Total MRO Optimization Opportunity
           </p>
-          <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
+          <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight" data-testid="text-grand-total">
             {fmt(coreTotal)}
           </p>
         </div>
