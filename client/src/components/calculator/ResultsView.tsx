@@ -593,11 +593,12 @@ export function ResultsView({ results, inputs, industry, selectedPains, onReset,
           </div>
 
           {hasDowntime && (
-            <div className="mt-5 rounded-lg bg-[#ed9b29]/10 border border-[#ed9b29]/25 p-4">
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#003252]/40 mb-3">Downtime Inputs</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-4">
-                <InputItem label="Downtime Hrs / Site / Yr" value={`${fmtInt(inputs.downtimeHoursPerSite)} hrs`} testid="input-summary-downtime-hrs" accent />
-                <InputItem label="Cost Per Hour / Site" value={`${fmt(inputs.downtimeCostPerHour)}/hr`} testid="input-summary-downtime-cost" accent />
-                <InputItem label="Service Level: Current → Target" value={`${inputs.currentServiceLevel}% → ${inputs.targetServiceLevel}%`} testid="input-summary-service" accent />
+                <InputItem label="Downtime Hrs / Site / Yr" value={`${fmtInt(inputs.downtimeHoursPerSite)} hrs`} testid="input-summary-downtime-hrs" small />
+                <InputItem label="Cost Per Hour / Site" value={`${fmt(inputs.downtimeCostPerHour)}/hr`} testid="input-summary-downtime-cost" small />
+                <InputItem label="Service Level: Current → Target" value={`${inputs.currentServiceLevel}% → ${inputs.targetServiceLevel}%`} testid="input-summary-service" small />
               </div>
             </div>
           )}
