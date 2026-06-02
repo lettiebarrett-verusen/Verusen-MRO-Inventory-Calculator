@@ -1,0 +1,1 @@
+- [HubSpot quirks](hubspot-quirks.md) — `function` contact prop is a strict enum; private-app token introspection 400 is normal; per-request console logs aren't in captured workflow logs (run `tsx` directly to debug).
